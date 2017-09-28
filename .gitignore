@@ -1,0 +1,5 @@
+config.dev.json
+config.production.json
+dist/bundle.js
+dist/uploads/
+node_modules/
