@@ -1,5 +1,5 @@
 import React from 'react';
-import PromotionList from '../PromitionList/Main'
+import PromotionList from '../PromotionList/Main';
 
 const RootArea = () => (
   <div>
