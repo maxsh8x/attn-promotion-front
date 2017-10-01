@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import ReactPropTypes from 'prop-types';
 import { PropTypes, inject, observer } from 'mobx-react';
 import { toJS } from 'mobx';
-import { Tabs, Table, DatePicker } from 'antd';
+import { Tabs, Table, DatePicker, Spin } from 'antd';
 import YandexMetrics from './YandexMetrics';
+import AddPage from './AddPage';
 import InputCost from './InputCost';
 import style from './Main.css';
 
@@ -16,9 +17,10 @@ class PromotionList extends Component {
     }).isRequired,
   }
 
-  // constructor(props) {
-  //   super(props);
-  // }
+  constructor(props) {
+    super(props);
+    this.updateDate = this.updateDate.bind(this);
+  }
 
   componentDidMount() {
     this.props.promotionStore.fetchPages();
@@ -30,6 +32,11 @@ class PromotionList extends Component {
       <YandexMetrics pageID={pageID} />
     </div>
   )
+
+  updateDate(date, dateString) {
+    this.props.promotionStore.updateInput('date', dateString);
+    this.props.promotionStore.fetchPages();
+  }
 
   renderPageURL = (pageURL) => {
     const urlParts = pageURL.split('/');
@@ -45,7 +52,6 @@ class PromotionList extends Component {
       {
         title: 'Цена за клик',
         children: [
-          // { dataIndex: 'url', title: 'Страница', render: this.renderPageURL, width: '25%' },
           { dataIndex: 'metrics.google', title: 'Google' },
           { dataIndex: 'metrics.facebook', title: 'Facebook' },
           { dataIndex: 'metrics.vk', title: 'Vk' },
@@ -56,24 +62,25 @@ class PromotionList extends Component {
       { title: 'Кликов' },
       { title: 'Всего потрачено' },
     ];
-    // dataSource={[].concat(...toJS(data).map(item =>
-    //   [{ ...item, _id: `_${item._id}` }, { ...item }],
-    // ))}
+
     return (
-      <div style={{ marginBottom: 16 }}>
-        <DatePicker />
+      <div>
+        <DatePicker onChange={this.updateDate} />
+        <AddPage />
         <Tabs defaultActiveKey="1">
           <TabPane tab="Активные" key="1">
-            <Table
-              bordered
-              rowKey="_id"
-              dataSource={toJS(data)}
-              columns={columns}
-              title={() => 'Список продвигаемых страниц'}
-              expandedRowRender={this.expandedRowRender}
-            />
+            <Spin spinning={this.props.promotionStore.states.fetchPages !== 'success'}>
+              <Table
+                bordered
+                rowKey="_id"
+                dataSource={toJS(data)}
+                columns={columns}
+                title={() => 'Список продвигаемых страниц'}
+                expandedRowRender={this.expandedRowRender}
+              />
+            </Spin>
           </TabPane>
-          <TabPane tab="Все" key="2" />
+          <TabPane tab="Неактивные" key="2" />
         </Tabs>
       </div>
     );

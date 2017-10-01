@@ -5,23 +5,38 @@ class PromotionStore {
   @observable state = 'pending'
   @observable data = []
   @observable yandexData = observable.shallowMap()
-  @observable totalClick = 0
-  @observable totalCost = 0
-  @observable date = '2017-09-11'
+  // @observable totalClick = 0
+  // @observable totalCost = 0
+  @observable inputData = {
+    url: '',
+    date: '',
+  }
+  @observable states = {
+    createPage: 'success',
+    fetchPages: 'pending',
+  }
 
   @action updateInput(name, value) {
-    this[name] = value;
+    this.inputData[name] = value;
   }
 
   @action fetchPages() {
+    this.states.fetchPages = 'pending';
     return axios().get('v1/page', {
-      params: { limit: 0, offset: 0 },
+      params: {
+        limit: 0,
+        offset: 0,
+        yDate: this.inputData.date,
+      },
     },
     ).then(
-      action('fetching metrics success', ({ data }) => {
+      action('fetching pages success', ({ data }) => {
         this.data.replace(data);
+        this.states.fetchPages = 'success';
       }),
-      action('fetching metrics failed', () => { }),
+      action('fetching pages failed', () => {
+        this.states.fetchPages = 'failed';
+      }),
     );
   }
 
@@ -30,7 +45,7 @@ class PromotionStore {
       'v1/metrics',
       {
         params: {
-          yDate: this.date,
+          yDate: this.inputData.date,
           pageID,
         },
       },
@@ -43,22 +58,24 @@ class PromotionStore {
   }
 
 
-  @action fetch(pageID) {
-    return axios().get(
-      'v1/metrics',
+  @action createPage() {
+    this.states.createPage = 'pending';
+    return axios().post(
+      'v1/page',
       {
-        params: {
-          yDate: this.date,
-          pageID,
-        },
+        url: this.inputData.url,
+        title: 'sample',
       },
     ).then(
-      action('fetching metrics success', ({ data }) => {
-        this.yandexData.set(pageID, data);
+      action('page successfully created', () => {
+        this.fetchPages();
+        this.states.createPage = 'success';
       }),
-      action('fetching metrics failed', () => { }),
+      action('page creation failed', () => {
+        this.states.createPage = 'failed';
+      }),
     );
-  }  
+  }
 }
 
 const promotionStore = new PromotionStore();

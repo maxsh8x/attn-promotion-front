@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactPropTypes from 'prop-types';
 import { PropTypes, inject, observer } from 'mobx-react';
-import { Table, Button } from 'antd';
+import { Table, Button, Spin } from 'antd';
 
 const metricName = {
   pageviews: 'Просмотры',
@@ -25,7 +25,8 @@ class YandexMetrics extends Component {
 
   render() {
     const { pageID } = this.props;
-    const data = this.props.promotionStore.yandexData.get(pageID) || [];
+    const data = this.props.promotionStore.yandexData.get(pageID);
+    const spinning = typeof data === 'undefined';
     const columns = [
       {
         title: 'Данные яндекс метрики',
@@ -46,14 +47,16 @@ class YandexMetrics extends Component {
       },
     ];
     return (
-      <Table
-        rowKey="_id"
-        columns={columns}
-        dataSource={data}
-        size="small"
-        pagination={false}
-        footer={() => `Стоимость за клик: ${this.props.promotionStore.yandexTotal}`}
-      />
+      <Spin spinning={spinning}>
+        <Table
+          rowKey="_id"
+          columns={columns}
+          dataSource={data || []}
+          size="small"
+          pagination={false}
+          footer={() => `Стоимость за клик: ${this.props.promotionStore.yandexTotal}`}
+        />
+      </Spin>
     );
   }
 }
