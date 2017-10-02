@@ -1,15 +1,9 @@
 import React, { Component } from 'react';
 import ReactPropTypes from 'prop-types';
+import { toJS } from 'mobx';
 import { PropTypes, inject, observer } from 'mobx-react';
-import { Table, Button } from 'antd';
+import { Table, Button, Spin } from 'antd';
 import EditableCell from './EditableCell';
-
-const metricName = {
-  pageviews: 'Просмотры',
-  pageDepth: 'Глубина просмотра',
-  avgVisitDurationSeconds: 'Среднее время на сайте (в секундах)',
-  bounceRate: 'Отказы %',
-};
 
 @inject('promotionStore') @observer
 class InputCost extends Component {
@@ -23,36 +17,21 @@ class InputCost extends Component {
     this.props.promotionStore.fetchMetrics(pageID);
   }
 
-
-  onCellChange = (key, dataIndex) => (value) => {
-    const dataSource = [...this.state.dataSource];
-    const target = dataSource.find(item => item.key === key);
-    if (target) {
-      target[dataIndex] = value;
-      this.setState({ dataSource });
-    }
-  };
-
-  editableCell = (text, record) => (
-    <EditableCell
-      value={text}
-      onChange={this.onCellChange(record.key, 'name')}
-    />
-  )
+  editableCell = (field, type, value) => {
+    return (
+      <EditableCell
+        field={field}
+        type={type}
+        value={value}
+        pageID={this.props.pageID}
+      />
+    );
+  }
 
   render() {
     const { pageID } = this.props;
-    // const data = this.props.promotionStore.yandexData.get(pageID) || [];
-    const data = [
-      {
-        google: { clicks: 0, cost: 0 },
-        facebook: { clicks: 0, cost: 0 },
-        vk: { clicks: 0, cost: 0 },
-        odnoklassniki: { clicks: 0, cost: 0 },
-        yandex: { clicks: 0, cost: 0 },
-      },
-    ];
-
+    const data = this.props.promotionStore.inputPageData.get(pageID);
+    const spinning = this.props.promotionStore.states.fetchMetrics !== 'success';
     const fields = ['google', 'facebook', 'vk', 'odnoklassniki', 'yandex'];
     const childItems = fields.map(field => (
       {
@@ -61,12 +40,12 @@ class InputCost extends Component {
           {
             title: 'Кликов',
             dataIndex: `${field}.clicks`,
-            render: this.editableCell,
+            render: value => (this.editableCell(field, 'clicks', value)),
           },
           {
             title: 'Потрачено',
             dataIndex: `${field}.cost`,
-            render: this.editableCell,
+            render: value => (this.editableCell(field, 'cost', value)),
           },
         ],
       }
@@ -78,13 +57,16 @@ class InputCost extends Component {
       },
     ];
     return (
-      <Table
-        rowKey="_id"
-        columns={columns}
-        dataSource={data}
-        size="small"
-        pagination={false}
-      />
+      <Spin spinning={spinning}>
+        <Table
+          rowKey="_id"
+          columns={columns}
+          dataSource={data ? [toJS(data)] : []}
+          size="small"
+          pagination={false}
+          footer={() => 'Стоимость за клик: 0'}
+        />
+      </Spin>
     );
   }
 }

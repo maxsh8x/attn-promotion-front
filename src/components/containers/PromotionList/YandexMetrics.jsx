@@ -26,7 +26,8 @@ class YandexMetrics extends Component {
   render() {
     const { pageID } = this.props;
     const data = this.props.promotionStore.yandexData.get(pageID);
-    const spinning = typeof data === 'undefined';
+    // const spinning = typeof data === 'undefined';
+    const spinning = this.props.promotionStore.states.fetchMetrics !== 'success';
     const columns = [
       {
         title: 'Данные яндекс метрики',
@@ -54,7 +55,7 @@ class YandexMetrics extends Component {
           dataSource={data || []}
           size="small"
           pagination={false}
-          footer={() => `Стоимость за клик: ${this.props.promotionStore.yandexTotal}`}
+          footer={() => 'Стоимость за клик: 0'}
         />
       </Spin>
     );
