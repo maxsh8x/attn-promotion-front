@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 import ReactPropTypes from 'prop-types';
 import { PropTypes, inject, observer } from 'mobx-react';
 import { toJS } from 'mobx';
-import { Tabs, Table, DatePicker, Spin } from 'antd';
+import { Tabs, Table, DatePicker, Spin, Switch } from 'antd';
 import YandexMetrics from './YandexMetrics';
 import AddPage from './AddPage';
 import InputCost from './InputCost';
-import style from './Main.css';
 
 const TabPane = Tabs.TabPane;
 
@@ -37,6 +37,10 @@ class PromotionList extends Component {
     this.props.promotionStore.fetchPages();
   }
 
+  updateStatus(pageID, active, rowIndex) {
+    this.props.promotionStore.updateStatus(pageID, active, rowIndex);
+  }
+
   expandedRowRender = ({ _id: pageID }, rowIndex) => {
     return (
       <div>
@@ -56,12 +60,17 @@ class PromotionList extends Component {
     return urlParts[urlParts.length - 2];
   }
 
+  renderStatus = (active, { _id: pageID }, rowIndex) => (
+    <Switch checked={active} onChange={checked => this.updateStatus(pageID, checked, rowIndex)} />
+  )
+
   render() {
-    const { data } = this.props.promotionStore;
+    const { data, inputData } = this.props.promotionStore;
 
     // TODO: generator
     const columns = [
-      { key: 'url', dataIndex: 'url', render: this.renderPageURL, className: style.test },
+      { key: 'status', dataIndex: 'active', render: this.renderStatus },
+      { key: 'url', dataIndex: 'url', render: this.renderPageURL },
       {
         title: 'Стоимость за клик',
         children: [
@@ -85,9 +94,9 @@ class PromotionList extends Component {
     // Table to external component
     return (
       <div>
-        <DatePicker onChange={this.updateDate} />
+        <DatePicker onChange={this.updateDate} defaultValue={moment(inputData.date, 'YYYY-MM-DD')} />
         <AddPage />
-        <Tabs defaultActiveKey="active" onChange={this.onTabChange}>
+        <Tabs defaultActiveKey="active" onChange={this.onTabChange} animated={false}>
           <TabPane tab="Активные" key="active">
             <Spin spinning={this.props.promotionStore.states.fetchPages !== 'success'}>
               <Table

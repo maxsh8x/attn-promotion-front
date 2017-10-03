@@ -73,6 +73,17 @@ class PromotionStore {
     );
   }
 
+  @action updateStatus = (pageID, active, rowIndex) => {
+    return axios().patch(`v1/page/${pageID}/status`, {
+      active,
+    }).then(
+      action('update status success', () => {
+        this.data[rowIndex].active = active;
+      }),
+      action('update status failed', () => { }),
+    );
+  }
+
   @action fetchPages(active = true) {
     this.states.fetchPages = 'pending';
     return axios().get('v1/page', {
@@ -111,6 +122,8 @@ class PromotionStore {
           const item = {
             _id: data.pages[i]._id,
             url: data.pages[i].url,
+            title: data.pages[i].title,
+            active: data.pages[i].active,
             networks: flatInput[data.pages[i]._id]
               ? { ...networksInitState, ...flatInput[data.pages[i]._id] }
               : networksInitState,
