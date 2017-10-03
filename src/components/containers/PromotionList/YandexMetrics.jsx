@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactPropTypes from 'prop-types';
 import { PropTypes, inject, observer } from 'mobx-react';
-import { Table, Button, Spin } from 'antd';
+import { Table, Spin } from 'antd';
 
 const metricName = {
   pageviews: 'Просмотры',

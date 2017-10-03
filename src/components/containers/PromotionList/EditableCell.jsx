@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import ReactPropTypes from 'prop-types';
 import { PropTypes, inject, observer } from 'mobx-react';
-import { InputNumber, Icon } from 'antd';
+import { InputNumber } from 'antd';
 
 @inject('promotionStore') @observer
-class EditableCell extends React.Component {
+class EditableCell extends Component {
   onBlur = (e) => {
     const { field: source, type, pageID, rowIndex } = this.props
     const value = parseInt(e.target.value, 10);

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactPropTypes from 'prop-types';
 import { toJS } from 'mobx';
 import { PropTypes, inject, observer } from 'mobx-react';
-import { Table, Button, Spin } from 'antd';
+import { Table } from 'antd';
 import EditableCell from './EditableCell';
 
 @inject('promotionStore') @observer

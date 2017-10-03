@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactPropTypes from 'prop-types';
 import { PropTypes, inject, observer } from 'mobx-react';
-import { Input, Form, Button } from 'antd';
+import { Input, Button } from 'antd';
 import style from './AddPage.css';
 
 

@@ -21,6 +21,7 @@ class PromotionList extends Component {
     super(props);
     this.updateDate = this.updateDate.bind(this);
     this.onTabChange = this.onTabChange.bind(this);
+    this.pagination = this.pagination.bind(this);
   }
 
   componentDidMount() {
@@ -28,8 +29,9 @@ class PromotionList extends Component {
   }
 
   onTabChange(tabKey) {
-    const isActive = tabKey === 'active';
-    this.props.promotionStore.fetchPages(isActive);
+    const isActiveTab = tabKey === 'active';
+    this.props.promotionStore.updateInput('isActiveTab', isActiveTab);
+    this.props.promotionStore.fetchPages();
   }
 
   updateDate(date, dateString) {
@@ -41,6 +43,13 @@ class PromotionList extends Component {
     this.props.promotionStore.updateStatus(pageID, active, rowIndex);
   }
 
+  pagination({ current, pageSize }) {
+    const offset = (current - 1) * pageSize;
+    this.props.promotionStore.updateInput('limit', pageSize);
+    this.props.promotionStore.updateInput('offset', offset);
+    this.props.promotionStore.fetchPages();
+  }
+
   expandedRowRender = ({ _id: pageID }, rowIndex) => {
     return (
       <div>
@@ -49,7 +58,6 @@ class PromotionList extends Component {
       </div>
     );
   }
-
 
   metricRender = value => ((value.cost && value.clicks)
     ? (value.cost / value.clicks).toFixed(2)
@@ -97,7 +105,7 @@ class PromotionList extends Component {
         <DatePicker onChange={this.updateDate} defaultValue={moment(inputData.date, 'YYYY-MM-DD')} />
         <AddPage />
         <Tabs defaultActiveKey="active" onChange={this.onTabChange} animated={false}>
-          <TabPane tab="Активные" key="active">
+          <TabPane tab={`Активные (${inputData.activePages})`} key="active">
             <Spin spinning={this.props.promotionStore.states.fetchPages !== 'success'}>
               <Table
                 bordered
@@ -106,10 +114,12 @@ class PromotionList extends Component {
                 columns={columns}
                 title={() => 'Список продвигаемых страниц'}
                 expandedRowRender={this.expandedRowRender}
+                onChange={this.pagination}
+                pagination={{ total: inputData.activePages }}
               />
             </Spin>
           </TabPane>
-          <TabPane tab="Неактивные" key="inactive">
+          <TabPane tab={`Неактивные (${inputData.inactivePages})`} key="inactive">
             <Spin spinning={this.props.promotionStore.states.fetchPages !== 'success'}>
               <Table
                 bordered
@@ -118,6 +128,7 @@ class PromotionList extends Component {
                 columns={columns}
                 title={() => 'Список продвигаемых страниц'}
                 expandedRowRender={this.expandedRowRender}
+                pagination={{ total: inputData.inactivePages }}
               />
             </Spin>
           </TabPane>

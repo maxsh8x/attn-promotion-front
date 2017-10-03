@@ -8,6 +8,11 @@ class PromotionStore {
   @observable data = []
   @observable yandexData = observable.shallowMap()
   @observable inputData = {
+    isActiveTab: true,
+    activePages: 0,
+    inactivePages: 0,
+    limit: 10,
+    offset: 0,
     url: '',
     date: '',
   }
@@ -84,19 +89,21 @@ class PromotionStore {
     );
   }
 
-  @action fetchPages(active = true) {
+  @action fetchPages() {
     this.states.fetchPages = 'pending';
     return axios().get('v1/page', {
       params: {
-        limit: 50,
-        offset: 0,
+        limit: this.inputData.limit,
+        offset: this.inputData.offset,
         yDate: this.inputData.date,
-        active,
+        active: this.inputData.isActiveTab,
       },
     },
     ).then(
       action('fetching pages success', ({ data }) => {
         this.metricNetworks.replace(data.metricNetworks);
+        this.inputData.inactivePages = data.inactivePages;
+        this.inputData.activePages = data.activePages;
         const newData = [];
         const networksInitState = {};
 
