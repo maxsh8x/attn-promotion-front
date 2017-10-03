@@ -77,7 +77,7 @@ class PromotionStore {
 
         const flatInput = {};
         for (let i = 0; i < data.input.length; i++) {
-          flatInput[data.input[i]._id.page] = metricsInitState;
+          flatInput[data.input[i]._id.page] = { ...metricsInitState };
           for (let x = 0; x < data.input[i].sources.length; x++) {
             flatInput[data.input[i]._id.page][data.input[i].sources[x]] = {
               cost: data.input[i].cost[x],
