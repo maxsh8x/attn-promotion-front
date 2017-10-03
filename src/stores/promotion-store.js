@@ -1,4 +1,4 @@
-import { action, observable, extendObservable } from 'mobx';
+import { action, observable } from 'mobx';
 import { message } from 'antd';
 import axios from '../utils/axios';
 
@@ -7,7 +7,9 @@ class PromotionStore {
   @observable state = 'pending'
   @observable data = []
   @observable yandexData = observable.shallowMap()
-  @observable inputPageData = observable.map()
+  @observable totalCost = observable.shallowMap()
+  // TODO: remove
+  // @observable inputPageData = observable.map()
   @observable inputData = {
     url: '',
     date: '',
@@ -26,6 +28,10 @@ class PromotionStore {
 
   @action updateInput(name, value) {
     this.inputData[name] = value;
+  }
+
+  @action setTotalCost(pageID, totalCost) {
+    this.totalCost.set(pageID, totalCost);
   }
 
   @action commitInputChanges(params) {
@@ -92,8 +98,7 @@ class PromotionStore {
             url: data.pages[i].url,
             metrics: flatInput[data.pages[i]._id]
               ? { ...metricsInitState, ...flatInput[data.pages[i]._id] }
-              : metricsInitState
-            ,
+              : metricsInitState,
           };
           newData.push(item);
         }
@@ -109,7 +114,6 @@ class PromotionStore {
 
   @action fetchMetrics(pageID) {
     this.states.fetchMetrics = 'pending';
-    this.inputPageData.delete(pageID);
     this.yandexData.delete(pageID);
     return axios().get(
       'v1/metrics',
@@ -121,8 +125,8 @@ class PromotionStore {
       },
     ).then(
       action('fetching metrics success', ({ data }) => {
-        this.inputPageData.set(pageID, data.input);
-        this.yandexData.set(pageID, data.yandex);
+        // this.inputPageData.set(pageID, data.input);
+        this.yandexData.set(pageID, data);
         this.states.fetchMetrics = 'success';
       }),
       action('fetching metrics failed', () => {

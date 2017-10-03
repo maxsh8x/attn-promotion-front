@@ -7,13 +7,18 @@ import style from './EditableCell.css';
 @inject('promotionStore') @observer
 class EditableCell extends React.Component {
   onBlur = (e) => {
+    const { field: source, type, pageID, rowIndex } = this.props
+    const value = parseInt(e.target.value, 10);
     this.props.promotionStore.commitInputChanges({
-      source: this.props.field,
-      type: this.props.type,
-      pageID: this.props.pageID,
-      value: parseInt(e.target.value, 10),
-      rowIndex: this.props.rowIndex,
+      value,
+      source,
+      type,
+      pageID,
+      rowIndex,
     });
+    if (type === 'cost') {
+      this.props.promotionStore.setTotalCost(pageID, value);
+    }
   }
 
   render() {

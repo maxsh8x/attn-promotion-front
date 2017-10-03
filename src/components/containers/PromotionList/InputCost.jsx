@@ -12,11 +12,6 @@ class InputCost extends Component {
     }).isRequired,
   }
 
-  componentDidMount() {
-    const { pageID } = this.props;
-    this.props.promotionStore.fetchMetrics(pageID);
-  }
-
   editableCell = (field, type, value) => {
     return (
       <EditableCell
@@ -30,8 +25,8 @@ class InputCost extends Component {
   }
 
   render() {
-    const { pageID } = this.props;
-    const data = this.props.promotionStore.inputPageData.get(pageID);
+    const { pageID, rowIndex } = this.props;
+    const data = this.props.promotionStore.data[rowIndex].metrics;
     const spinning = this.props.promotionStore.states.fetchMetrics !== 'success';
     const fields = ['google', 'facebook', 'vk', 'odnoklassniki', 'yandex'];
     const childItems = fields.map(field => (
@@ -57,15 +52,15 @@ class InputCost extends Component {
         children: childItems,
       },
     ];
+
     return (
       <Spin spinning={spinning}>
         <Table
           rowKey="_id"
           columns={columns}
-          dataSource={data ? [toJS(data)] : []}
+          dataSource={data ? [toJS({ ...data, _id: pageID })] : []}
           size="small"
           pagination={false}
-          footer={() => 'Стоимость за клик: 0'}
         />
       </Spin>
     );

@@ -22,12 +22,12 @@ class YandexMetrics extends Component {
     this.props.promotionStore.fetchMetrics(pageID);
   }
 
-
   render() {
     const { pageID } = this.props;
-    const data = this.props.promotionStore.yandexData.get(pageID);
-    // const spinning = typeof data === 'undefined';
+    const data = this.props.promotionStore.yandexData.get(pageID) || [];
+    const totalCost = this.props.promotionStore.totalCost.get(pageID);
     const spinning = this.props.promotionStore.states.fetchMetrics !== 'success';
+    // TODO: generator
     const columns = [
       {
         title: 'Данные яндекс метрики',
@@ -47,15 +47,28 @@ class YandexMetrics extends Component {
         ],
       },
     ];
+
+    // TODO: generator
+    // TODO: cache value
+    const targetFields = ['google', 'facebook', 'vk', 'odnoklassniki', 'yandex'];
+    let totalClickCost = 0;
+    if (data.length > 0) {
+      let totalViews = 0;
+      for (let i = 0; i < targetFields.length; i++) {
+        totalViews += data[0][targetFields[i]] || 0;
+      }
+      totalClickCost = (totalCost / totalViews).toFixed(2);
+    }
+
     return (
       <Spin spinning={spinning}>
         <Table
-          rowKey="_id"
+          rowKey="metric"
           columns={columns}
-          dataSource={data || []}
+          dataSource={data}
           size="small"
           pagination={false}
-          footer={() => 'Стоимость за клик: 0'}
+          footer={() => `Стоимость за клик: ${totalClickCost}`}
         />
       </Spin>
     );
