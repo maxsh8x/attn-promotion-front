@@ -24,6 +24,7 @@ class InputCost extends Component {
         type={type}
         value={value}
         pageID={this.props.pageID}
+        rowIndex={this.props.rowIndex}
       />
     );
   }

@@ -12,6 +12,7 @@ class EditableCell extends React.Component {
       type: this.props.type,
       pageID: this.props.pageID,
       value: parseInt(e.target.value, 10),
+      rowIndex: this.props.rowIndex,
     });
   }
 

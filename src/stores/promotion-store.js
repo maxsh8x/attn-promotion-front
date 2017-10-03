@@ -1,9 +1,7 @@
-import { action, observable, computed } from 'mobx';
+import { action, observable, extendObservable } from 'mobx';
 import { message } from 'antd';
 import axios from '../utils/axios';
 
-const yesterdayDate = new Date();
-yesterdayDate.setDate(yesterdayDate.getDate() - 1);
 
 class PromotionStore {
   @observable state = 'pending'
@@ -12,12 +10,18 @@ class PromotionStore {
   @observable inputPageData = observable.map()
   @observable inputData = {
     url: '',
-    date: yesterdayDate.toISOString().slice(0, 10),
+    date: '',
   }
   @observable states = {
     createPage: 'success',
     fetchPages: 'pending',
     fetchMetrics: 'pending',
+  }
+
+  constructor() {
+    const yesterdayDate = new Date();
+    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+    this.inputData.date = yesterdayDate.toISOString().slice(0, 10);
   }
 
   @action updateInput(name, value) {
@@ -30,13 +34,10 @@ class PromotionStore {
       type,
       pageID,
       value,
+      rowIndex,
     } = params;
 
-    // if (source in this.inputPageData.get(pageID)) {
-    //   this.inputPageData.get(pageID)[source][type] = value;
-    // } else {
-    //   this.inputPageData.get(pageID)[source] = { [type]: value };
-    // }
+    this.data[rowIndex].metrics[source][type] = value;
 
     return axios().post('v1/input', {
       yDate: this.inputData.date,
@@ -66,18 +67,34 @@ class PromotionStore {
       action('fetching pages success', ({ data }) => {
         const newData = [];
 
-        for (let i = 0; i < data.length; i++) {
-          const item = {
-            _id: data[i]._id,
-            url: data[i].url,
-            metrics: {},
+        const metricsInitState = {};
+        for (let i = 0; i < data.metricNetworks.length; i++) {
+          metricsInitState[data.metricNetworks[i]] = {
+            cost: 0,
+            clicks: 0,
           };
-          for (let x = 0; x < data[i].sources.length; x++) {
-            item.metrics[data[i].sources[x]] = {
-              cost: data[i].cost[x],
-              clicks: data[i].clicks[x],
+        }
+
+        const flatInput = {};
+        for (let i = 0; i < data.input.length; i++) {
+          flatInput[data.input[i]._id.page] = metricsInitState;
+          for (let x = 0; x < data.input[i].sources.length; x++) {
+            flatInput[data.input[i]._id.page][data.input[i].sources[x]] = {
+              cost: data.input[i].cost[x],
+              clicks: data.input[i].clicks[x],
             };
           }
+        }
+
+        for (let i = 0; i < data.pages.length; i++) {
+          const item = {
+            _id: data.pages[i]._id,
+            url: data.pages[i].url,
+            metrics: flatInput[data.pages[i]._id]
+              ? { ...metricsInitState, ...flatInput[data.pages[i]._id] }
+              : metricsInitState
+            ,
+          };
           newData.push(item);
         }
 

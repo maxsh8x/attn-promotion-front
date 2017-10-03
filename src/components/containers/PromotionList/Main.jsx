@@ -37,12 +37,15 @@ class PromotionList extends Component {
     this.props.promotionStore.fetchPages();
   }
 
-  expandedRowRender = ({ _id: pageID }) => (
-    <div>
-      <InputCost pageID={pageID} />
-      <YandexMetrics pageID={pageID} />
-    </div>
-  )
+  expandedRowRender = ({ _id: pageID }, rowIndex) => {
+    return (
+      <div>
+        <InputCost pageID={pageID} rowIndex={rowIndex} />
+        <YandexMetrics pageID={pageID} />
+      </div>
+    );
+  }
+
 
   metricRender = (value) => {
     if (value && (value.cost && value.clicks)) {
@@ -54,6 +57,16 @@ class PromotionList extends Component {
   renderPageURL = (pageURL) => {
     const urlParts = pageURL.split('/');
     return urlParts[urlParts.length - 2];
+  }
+
+  renderTotal = (type, metrics) => {
+    const keys = Object.keys(metrics);
+    let result = 0;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      result += metrics[key][type];
+    }
+    return result;
   }
 
   render() {
@@ -71,8 +84,8 @@ class PromotionList extends Component {
           { dataIndex: 'metrics.yandex', title: 'Yandex', render: this.metricRender },
         ],
       },
-      { dataIndex: 'totalClicks', title: 'Кликов' },
-      { dataIndex: 'totalCost', title: 'Всего потрачено' },
+      { title: 'Кликов', render: ({ metrics }) => this.renderTotal('clicks', metrics) },
+      { title: 'Всего потрачено', render: ({ metrics }) => this.renderTotal('cost', metrics) },
     ];
 
     // Table to external component
