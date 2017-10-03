@@ -23,9 +23,9 @@ class YandexMetrics extends Component {
   }
 
   render() {
-    const { pageID } = this.props;
+    const { pageID, rowIndex } = this.props;
     const data = this.props.promotionStore.yandexData.get(pageID) || [];
-    const totalCost = this.props.promotionStore.totalCost.get(pageID);
+    const totalCost = this.props.promotionStore.data[rowIndex].total.cost;
     const spinning = this.props.promotionStore.states.fetchMetrics !== 'success';
     // TODO: generator
     const columns = [
@@ -57,7 +57,9 @@ class YandexMetrics extends Component {
       for (let i = 0; i < targetFields.length; i++) {
         totalViews += data[0][targetFields[i]] || 0;
       }
-      totalClickCost = (totalCost / totalViews).toFixed(2);
+      if (totalCost && totalViews) {
+        totalClickCost = (totalCost / totalViews).toFixed(2);
+      }
     }
 
     return (

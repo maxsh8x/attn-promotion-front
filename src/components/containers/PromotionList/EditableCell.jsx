@@ -16,9 +16,6 @@ class EditableCell extends React.Component {
       pageID,
       rowIndex,
     });
-    if (type === 'cost') {
-      this.props.promotionStore.setTotalCost(pageID, value);
-    }
   }
 
   render() {

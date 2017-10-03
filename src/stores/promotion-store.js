@@ -7,9 +7,6 @@ class PromotionStore {
   @observable state = 'pending'
   @observable data = []
   @observable yandexData = observable.shallowMap()
-  @observable totalCost = observable.shallowMap()
-  // TODO: remove
-  // @observable inputPageData = observable.map()
   @observable inputData = {
     url: '',
     date: '',
@@ -19,6 +16,7 @@ class PromotionStore {
     fetchPages: 'pending',
     fetchMetrics: 'pending',
   }
+  @observable metricNetworks = []
 
   constructor() {
     const yesterdayDate = new Date();
@@ -43,7 +41,23 @@ class PromotionStore {
       rowIndex,
     } = params;
 
-    this.data[rowIndex].metrics[source][type] = value;
+    const networks = this.data[rowIndex].networks;
+    networks[source][type] = value;
+    const total = {
+      cost: 0,
+      clicks: 0,
+      costPerClick: 0,
+    };
+
+    const metricNetworks = this.metricNetworks.toJS();
+    for (let i = 0; i < metricNetworks.length; i++) {
+      total.cost += networks[metricNetworks[i]].cost;
+      total.clicks += networks[metricNetworks[i]].clicks;
+    }
+    if (total.cost && total.clicks) {
+      total.costPerClick = (total.cost / total.clicks).toFixed(2);
+    }
+    this.data[rowIndex].total = total;
 
     return axios().post('v1/input', {
       yDate: this.inputData.date,
@@ -71,11 +85,12 @@ class PromotionStore {
     },
     ).then(
       action('fetching pages success', ({ data }) => {
+        this.metricNetworks.replace(data.metricNetworks);
         const newData = [];
+        const networksInitState = {};
 
-        const metricsInitState = {};
         for (let i = 0; i < data.metricNetworks.length; i++) {
-          metricsInitState[data.metricNetworks[i]] = {
+          networksInitState[data.metricNetworks[i]] = {
             cost: 0,
             clicks: 0,
           };
@@ -83,7 +98,7 @@ class PromotionStore {
 
         const flatInput = {};
         for (let i = 0; i < data.input.length; i++) {
-          flatInput[data.input[i]._id.page] = { ...metricsInitState };
+          flatInput[data.input[i]._id.page] = { ...networksInitState };
           for (let x = 0; x < data.input[i].sources.length; x++) {
             flatInput[data.input[i]._id.page][data.input[i].sources[x]] = {
               cost: data.input[i].cost[x],
@@ -96,10 +111,23 @@ class PromotionStore {
           const item = {
             _id: data.pages[i]._id,
             url: data.pages[i].url,
-            metrics: flatInput[data.pages[i]._id]
-              ? { ...metricsInitState, ...flatInput[data.pages[i]._id] }
-              : metricsInitState,
+            networks: flatInput[data.pages[i]._id]
+              ? { ...networksInitState, ...flatInput[data.pages[i]._id] }
+              : networksInitState,
+            total: {
+              cost: 0,
+              clicks: 0,
+              costPerClick: 0,
+            },
           };
+
+          for (let x = 0; x < data.metricNetworks.length; x++) {
+            item.total.cost += item.networks[data.metricNetworks[x]].cost;
+            item.total.clicks += item.networks[data.metricNetworks[x]].clicks;
+          }
+          if (item.total.cost && item.total.clicks) {
+            item.total.costPerClick = (item.total.cost / item.total.clicks).toFixed(2);
+          }
           newData.push(item);
         }
 
@@ -125,7 +153,6 @@ class PromotionStore {
       },
     ).then(
       action('fetching metrics success', ({ data }) => {
-        // this.inputPageData.set(pageID, data.input);
         this.yandexData.set(pageID, data);
         this.states.fetchMetrics = 'success';
       }),

@@ -41,42 +41,19 @@ class PromotionList extends Component {
     return (
       <div>
         <InputCost pageID={pageID} rowIndex={rowIndex} />
-        <YandexMetrics pageID={pageID} />
+        <YandexMetrics pageID={pageID} rowIndex={rowIndex} />
       </div>
     );
   }
 
 
-  metricRender = (value) => {
-    if (value && (value.cost && value.clicks)) {
-      return (value.cost / value.clicks).toFixed(2);
-    }
-    return null;
-  }
+  metricRender = value => ((value.cost && value.clicks)
+    ? (value.cost / value.clicks).toFixed(2)
+    : 0)
 
   renderPageURL = (pageURL) => {
     const urlParts = pageURL.split('/');
     return urlParts[urlParts.length - 2];
-  }
-
-  renderCostClicks = (type, pageID, metrics) => {
-    const keys = Object.keys(metrics);
-    let result = 0;
-    for (let i = 0; i < keys.length; i++) {
-      result += metrics[keys[i]][type];
-    }
-    return result;
-  }
-
-  renderTotal = (pageID, metrics) => {
-    const keys = Object.keys(metrics);
-    let cost = 0;
-    let clicks = 0;
-    for (let i = 0; i < keys.length; i++) {
-      cost += metrics[keys[i]].cost;
-      clicks += metrics[keys[i]].clicks;
-    }
-    return (cost / clicks).toFixed(2);
   }
 
   render() {
@@ -88,19 +65,19 @@ class PromotionList extends Component {
       {
         title: 'Стоимость за клик',
         children: [
-          { key: 'google', dataIndex: 'metrics.google', title: 'Google', render: this.metricRender },
-          { key: 'facebook', dataIndex: 'metrics.facebook', title: 'Facebook', render: this.metricRender },
-          { key: 'vk', dataIndex: 'metrics.vk', title: 'Vk', render: this.metricRender },
-          { key: 'odnoklassniki', dataIndex: 'metrics.odnoklassniki', title: 'Odnoklassniki', render: this.metricRender },
-          { key: 'yandex', dataIndex: 'metrics.yandex', title: 'Yandex', render: this.metricRender },
+          { key: 'google', dataIndex: 'networks.google', title: 'Google', render: this.metricRender },
+          { key: 'facebook', dataIndex: 'networks.facebook', title: 'Facebook', render: this.metricRender },
+          { key: 'vk', dataIndex: 'networks.vk', title: 'Vk', render: this.metricRender },
+          { key: 'odnoklassniki', dataIndex: 'networks.odnoklassniki', title: 'Odnoklassniki', render: this.metricRender },
+          { key: 'yandex', dataIndex: 'networks.yandex', title: 'Yandex', render: this.metricRender },
         ],
       },
       {
         title: 'Итого',
         children: [
-          { key: 'totalClicks', title: 'Кликов', render: ({ _id, metrics }) => this.renderCostClicks('clicks', _id, metrics) },
-          { key: 'totalCost', title: 'Потрачено', render: ({ _id, metrics }) => this.renderCostClicks('cost', _id, metrics) },
-          { key: 'totalClickCost', title: 'Стоимость', render: ({ _id, metrics }) => this.renderTotal(_id, metrics) },
+          { key: 'totalClicks', dataIndex: 'total.clicks', title: 'Кликов' },
+          { key: 'totalCost', dataIndex: 'total.cost', title: 'Потрачено' },
+          { key: 'totalCostPerClick', dataIndex: 'total.costPerClick', title: 'Стоимость' },
         ],
       },
     ];

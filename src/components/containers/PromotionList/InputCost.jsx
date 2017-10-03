@@ -26,8 +26,7 @@ class InputCost extends Component {
 
   render() {
     const { pageID, rowIndex } = this.props;
-    const data = this.props.promotionStore.data[rowIndex].metrics;
-    const spinning = this.props.promotionStore.states.fetchMetrics !== 'success';
+    const data = this.props.promotionStore.data[rowIndex].networks;
     const fields = ['google', 'facebook', 'vk', 'odnoklassniki', 'yandex'];
     const childItems = fields.map(field => (
       {
@@ -54,15 +53,13 @@ class InputCost extends Component {
     ];
 
     return (
-      <Spin spinning={spinning}>
-        <Table
-          rowKey="_id"
-          columns={columns}
-          dataSource={data ? [toJS({ ...data, _id: pageID })] : []}
-          size="small"
-          pagination={false}
-        />
-      </Spin>
+      <Table
+        rowKey="_id"
+        columns={columns}
+        dataSource={data ? [toJS({ ...data, _id: pageID })] : []}
+        size="small"
+        pagination={false}
+      />
     );
   }
 }
