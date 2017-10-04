@@ -53,13 +53,15 @@ class InputCost extends Component {
     ];
 
     return (
-      <Table
-        rowKey="_id"
-        columns={columns}
-        dataSource={data ? [toJS({ ...data, _id: pageID })] : []}
-        size="small"
-        pagination={false}
-      />
+      <div style={{ marginBottom: 16 }}>
+        <Table
+          rowKey="_id"
+          columns={columns}
+          dataSource={data ? [toJS({ ...data, _id: pageID })] : []}
+          size="small"
+          pagination={false}
+        />
+      </div>
     );
   }
 }

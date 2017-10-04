@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactPropTypes from 'prop-types';
 import { PropTypes, inject, observer } from 'mobx-react';
-import { Table, Spin } from 'antd';
+import { Table, Spin, Button } from 'antd';
 
 const metricName = {
   pageviews: 'Просмотры',
@@ -17,9 +17,19 @@ class YandexMetrics extends Component {
     }).isRequired,
   }
 
+  constructor(props) {
+    super(props);
+    this.updateData = this.updateData.bind(this);
+  }
+
+
   componentDidMount() {
     const { pageID } = this.props;
     this.props.promotionStore.fetchMetrics(pageID);
+  }
+
+  updateData(pageID) {
+    this.props.promotionStore.updateData(pageID);
   }
 
   render() {
@@ -64,14 +74,17 @@ class YandexMetrics extends Component {
 
     return (
       <Spin spinning={spinning}>
-        <Table
-          rowKey="metric"
-          columns={columns}
-          dataSource={data}
-          size="small"
-          pagination={false}
-          footer={() => `Стоимость за клик: ${totalClickCost}`}
-        />
+        <div style={{ marginBottom: 16 }}>
+          <Table
+            rowKey="metric"
+            columns={columns}
+            dataSource={data}
+            size="small"
+            pagination={false}
+            footer={() => `Стоимость за клик: ${totalClickCost}`}
+          />
+        </div>
+        <Button onClick={() => this.updateData(pageID)}>Обновить за выбранную дату</Button>
       </Spin>
     );
   }

@@ -7,6 +7,7 @@ class PromotionStore {
   @observable state = 'pending'
   @observable data = []
   @observable yandexData = observable.shallowMap()
+  // @observable exp
   @observable inputData = {
     isActiveTab: true,
     activePages: 0,
@@ -101,6 +102,7 @@ class PromotionStore {
     },
     ).then(
       action('fetching pages success', ({ data }) => {
+        this.yandexData.clear();
         this.metricNetworks.replace(data.metricNetworks);
         this.inputData.inactivePages = data.inactivePages;
         this.inputData.activePages = data.activePages;
@@ -179,6 +181,18 @@ class PromotionStore {
       action('fetching metrics failed', () => {
         this.states.fetchMetrics = 'failed';
       }),
+    );
+  }
+
+  @action updateData(pageID) {
+    return axios().post('/v1/metrics', {
+      yDate: this.inputData.date,
+      pageID,
+    }).then(
+      action('metrics update success', () => {
+        this.fetchMetrics(pageID);
+      }),
+      action('metrics update failed', () => { }),
     );
   }
 

@@ -109,7 +109,7 @@ class PromotionList extends Component {
             <Spin spinning={this.props.promotionStore.states.fetchPages !== 'success'}>
               <Table
                 bordered
-                rowKey="_id"
+                rowKey={({ _id }) => `${_id}_${inputData.date}`}
                 dataSource={toJS(data)}
                 columns={columns}
                 title={() => 'Список продвигаемых страниц'}
@@ -123,7 +123,7 @@ class PromotionList extends Component {
             <Spin spinning={this.props.promotionStore.states.fetchPages !== 'success'}>
               <Table
                 bordered
-                rowKey="_id"
+                rowKey={({ _id }) => `${_id}_${inputData.date}`}
                 dataSource={toJS(data)}
                 columns={columns}
                 title={() => 'Список продвигаемых страниц'}
