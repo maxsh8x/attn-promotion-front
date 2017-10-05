@@ -15,12 +15,16 @@ const PrivateAreaLayout = props => (
         <Sider width={200} style={{ background: '#fff' }}>
           <Menu
             mode="inline"
-            defaultSelectedKeys={['1']}
-            defaultOpenKeys={['sub1']}
+            defaultSelectedKeys={['2']}
+            defaultOpenKeys={['sub1', 'sub2']}
             style={{ height: '100%', borderRight: 0 }}
           >
-            <SubMenu key="sub1" title={<span><Icon type="area-chart" />Метрики</span>}>
-              <Menu.Item key="1">Продвижение</Menu.Item>
+            <SubMenu key="sub1" title={<span><Icon type="api" />Управление</span>}>
+              <Menu.Item key="1"><Icon type="team" />Клиенты</Menu.Item>
+              <Menu.Item key="2"><Icon type="bank" />Источники рекламы</Menu.Item>
+            </SubMenu>
+            <SubMenu key="sub2" title={<span><Icon type="area-chart" />Метрики</span>}>
+              <Menu.Item key="3">Продвижение страниц</Menu.Item>
             </SubMenu>
           </Menu>
         </Sider>

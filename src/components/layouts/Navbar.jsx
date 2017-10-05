@@ -1,6 +1,6 @@
 import React from 'react';
 import jwtDecode from 'jwt-decode';
-import { Avatar, Button, Layout, Menu } from 'antd';
+import { Avatar, Button, Layout, BackTop } from 'antd';
 import style from './Navbar.css';
 
 const { Header } = Layout;
@@ -20,6 +20,7 @@ const Navbar = () => {
         {/* <span>{username}</span> */}
         {/* <Avatar src="/img/placeholder-avatar.png" /> */}
         <Button onClick={logout}>Выход</Button>
+        <BackTop />
       </div>
     </Header>
   );

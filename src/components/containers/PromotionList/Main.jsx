@@ -3,7 +3,7 @@ import moment from 'moment';
 import ReactPropTypes from 'prop-types';
 import { PropTypes, inject, observer } from 'mobx-react';
 import { toJS } from 'mobx';
-import { Tabs, Table, DatePicker, Spin, Switch } from 'antd';
+import { Tabs, Table, DatePicker, Spin, Switch, Popover } from 'antd';
 import YandexMetrics from './YandexMetrics';
 import AddPage from './AddPage';
 import InputCost from './InputCost';
@@ -63,9 +63,19 @@ class PromotionList extends Component {
     ? (value.cost / value.clicks).toFixed(2)
     : 0)
 
-  renderPageURL = (pageURL) => {
+  renderPageURL = (pageURL, { title, createdAt }) => {
+    const content = (
+      <div>
+        <p>Создана: {moment(createdAt).format('YYYY-MM-DD')}</p>
+      </div>
+    );
+
     const urlParts = pageURL.split('/');
-    return urlParts[urlParts.length - 2];
+    return (
+      <Popover content={content} title={title}>
+        <a href={pageURL}>{urlParts[urlParts.length - 2]}</a>
+      </Popover>
+    );
   }
 
   renderStatus = (active, { _id: pageID }, rowIndex) => (
@@ -99,20 +109,27 @@ class PromotionList extends Component {
       },
     ];
 
-    // Table to external component
+    const spinning = this.props.promotionStore.states.fetchPages !== 'success';
+    const rowKey = ({ _id }) => `${_id}_${inputData.date}`;
+    const title = () => 'Список продвигаемых страниц';
+
     return (
       <div>
-        <DatePicker onChange={this.updateDate} defaultValue={moment(inputData.date, 'YYYY-MM-DD')} />
+        <DatePicker
+          onChange={this.updateDate}
+          defaultValue={moment(inputData.date, 'YYYY-MM-DD')}
+          allowClear={false}
+        />
         <AddPage />
         <Tabs defaultActiveKey="active" onChange={this.onTabChange} animated={false}>
           <TabPane tab={`Активные (${inputData.activePages})`} key="active">
-            <Spin spinning={this.props.promotionStore.states.fetchPages !== 'success'}>
+            <Spin spinning={spinning} >
               <Table
                 bordered
                 rowKey={({ _id }) => `${_id}_${inputData.date}`}
                 dataSource={toJS(data)}
                 columns={columns}
-                title={() => 'Список продвигаемых страниц'}
+                title={title}
                 expandedRowRender={this.expandedRowRender}
                 onChange={this.pagination}
                 pagination={{ total: inputData.activePages }}
@@ -120,13 +137,13 @@ class PromotionList extends Component {
             </Spin>
           </TabPane>
           <TabPane tab={`Неактивные (${inputData.inactivePages})`} key="inactive">
-            <Spin spinning={this.props.promotionStore.states.fetchPages !== 'success'}>
+            <Spin spinning={spinning}>
               <Table
                 bordered
-                rowKey={({ _id }) => `${_id}_${inputData.date}`}
+                rowKey={rowKey}
                 dataSource={toJS(data)}
                 columns={columns}
-                title={() => 'Список продвигаемых страниц'}
+                title={title}
                 expandedRowRender={this.expandedRowRender}
                 pagination={{ total: inputData.inactivePages }}
               />
