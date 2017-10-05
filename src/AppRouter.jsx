@@ -13,8 +13,8 @@ const WrappedLoginLayout = () => (
   </LoginLayout>
 );
 
-const WrappedPrivateAreaLayout = () => (
-  <PrivateAreaLayout>
+const WrappedPrivateAreaLayout = ({ history }) => (
+  <PrivateAreaLayout history={history}>
     <PrivateArea />
   </PrivateAreaLayout>
 );
@@ -23,7 +23,7 @@ const AppRouter = () => (
   <HashRouter>
     <Switch>
       <Route path="/login" component={WrappedLoginLayout} />
-      <PrivateRoute path="/" component={WrappedPrivateAreaLayout} />
+      <PrivateRoute component={WrappedPrivateAreaLayout} />
     </Switch>
   </HashRouter>
 );

@@ -4,7 +4,6 @@ import axios from '../utils/axios';
 
 
 class PromotionStore {
-  @observable state = 'pending'
   @observable data = []
   @observable yandexData = observable.shallowMap()
   @observable inputData = {
