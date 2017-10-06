@@ -34,7 +34,7 @@ class AddPage extends Component {
       <span>
         <Input
           placeholder="Адрес страницы"
-          className={style.test}
+          className={style.inputField}
           onChange={this.updateURL}
           disabled={this.props.promotionStore.states.createPage !== 'success'}
         />

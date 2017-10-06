@@ -7,6 +7,7 @@ class PromotionStore {
   @observable data = []
   @observable yandexData = observable.shallowMap()
   @observable inputData = {
+    filter: '',
     isActiveTab: true,
     activePages: 0,
     inactivePages: 0,
@@ -100,6 +101,7 @@ class PromotionStore {
         offset: this.inputData.offset,
         yDate: this.inputData.date,
         active: this.inputData.isActiveTab,
+        filter: this.inputData.filter,
       },
     },
     ).then(

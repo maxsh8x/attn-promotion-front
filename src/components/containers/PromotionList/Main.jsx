@@ -4,9 +4,11 @@ import ReactPropTypes from 'prop-types';
 import { PropTypes, inject, observer } from 'mobx-react';
 import { toJS } from 'mobx';
 import { Tabs, Table, DatePicker, Spin, Switch, Popover } from 'antd';
+import style from './Main.css';
 import YandexMetrics from './YandexMetrics';
-import AddPage from './AddPage';
+import ClientSelector from './ClientSelector';
 import InputCost from './InputCost';
+import PageFilter from './PageFilter';
 
 const TabPane = Tabs.TabPane;
 
@@ -115,41 +117,44 @@ class PromotionList extends Component {
 
     return (
       <div>
-        <DatePicker
-          onChange={this.updateDate}
-          defaultValue={moment(inputData.date, 'YYYY-MM-DD')}
-          allowClear={false}
-        />
-        <AddPage />
-        <Tabs defaultActiveKey="active" onChange={this.onTabChange} animated={false}>
-          <TabPane tab={`Активные (${inputData.activePages})`} key="active">
-            <Spin spinning={spinning} >
-              <Table
-                bordered
-                rowKey={({ _id }) => `${_id}_${inputData.date}`}
-                dataSource={toJS(data)}
-                columns={columns}
-                title={title}
-                expandedRowRender={this.expandedRowRender}
-                onChange={this.pagination}
-                pagination={{ total: inputData.activePages }}
-              />
-            </Spin>
-          </TabPane>
-          <TabPane tab={`Неактивные (${inputData.inactivePages})`} key="inactive">
-            <Spin spinning={spinning}>
-              <Table
-                bordered
-                rowKey={rowKey}
-                dataSource={toJS(data)}
-                columns={columns}
-                title={title}
-                expandedRowRender={this.expandedRowRender}
-                pagination={{ total: inputData.inactivePages }}
-              />
-            </Spin>
-          </TabPane>
-        </Tabs>
+        <div className={style.tableOperations}>
+          <DatePicker
+            onChange={this.updateDate}
+            defaultValue={moment(inputData.date, 'YYYY-MM-DD')}
+            allowClear={false}
+          />
+          <ClientSelector />
+          <PageFilter />
+          <Tabs defaultActiveKey="active" onChange={this.onTabChange} animated={false}>
+            <TabPane tab={`Активные (${inputData.activePages})`} key="active">
+              <Spin spinning={spinning} >
+                <Table
+                  bordered
+                  rowKey={({ _id }) => `${_id}_${inputData.date}`}
+                  dataSource={toJS(data)}
+                  columns={columns}
+                  title={title}
+                  expandedRowRender={this.expandedRowRender}
+                  onChange={this.pagination}
+                  pagination={{ total: inputData.activePages }}
+                />
+              </Spin>
+            </TabPane>
+            <TabPane tab={`Неактивные (${inputData.inactivePages})`} key="inactive">
+              <Spin spinning={spinning}>
+                <Table
+                  bordered
+                  rowKey={rowKey}
+                  dataSource={toJS(data)}
+                  columns={columns}
+                  title={title}
+                  expandedRowRender={this.expandedRowRender}
+                  pagination={{ total: inputData.inactivePages }}
+                />
+              </Spin>
+            </TabPane>
+          </Tabs>
+        </div>
       </div>
     );
   }
