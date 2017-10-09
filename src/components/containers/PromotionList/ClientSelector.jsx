@@ -22,12 +22,12 @@ class ClientSelector extends Component {
   }
 
   render() {
-    const { state, data, value } = this.props.clientSelectorStore;
+    const { state, data, clients } = this.props.clientSelectorStore;
     return (
       <Select
         mode="multiple"
         labelInValue
-        value={value.toJS()}
+        value={clients.toJS()}
         placeholder="Введите имя клиента"
         notFoundContent={state !== 'success' ? <Spin size="small" /> : null}
         filterOption={false}

@@ -1,4 +1,8 @@
-.inputField {
+.tableOperations > input {
   width: 40%;
+}
+
+.tableOperations > * {
   margin-right: 8px;
+  margin-bottom: 16px;
 }

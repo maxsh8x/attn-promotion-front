@@ -3,9 +3,14 @@ import axios from '../utils/axios';
 
 class ClientsStore {
   @observable modalShown = false
+  @observable pagesData = observable.shallowMap()
   @observable data = []
   @observable inputData = {
     name: '',
+  }
+  @observable states = {
+    fetchPages: 'pending',
+    createPage: 'success',
   }
 
   @action toggleModal() {
@@ -28,7 +33,7 @@ class ClientsStore {
     );
   }
 
-  @action fetchClients = () => {
+  @action fetchClients() {
     return axios().get('v1/client', {
       params: {
         offset: 0,
@@ -40,6 +45,45 @@ class ClientsStore {
         this.data.replace(data);
       }),
       action('fetch clients failed', () => { }),
+    );
+  }
+
+  @action fetchPages(clientID) {
+    this.states.fetchPages = 'pending';
+    return axios().get('v1/page/client', {
+      params: {
+        limit: 100,
+        offset: 0,
+        clientID,
+      },
+    }).then(
+      action('fetch pages success', ({ data }) => {
+        this.pagesData.set(clientID, data);
+        this.states.fetchPages = 'success';
+      }),
+      action('fetch pages failed', () => {
+        this.states.fetchPages = 'failed';
+      }),
+    );
+  }
+
+  @action createPage(clientID) {
+    this.states.createPage = 'pending';
+    return axios().post(
+      'v1/page',
+      {
+        url: this.inputData.url,
+        title: '',
+        clientID,
+      },
+    ).then(
+      action('page successfully created', () => {
+        this.fetchPages(clientID);
+        this.states.createPage = 'success';
+      }),
+      action('page creation failed', () => {
+        this.states.createPage = 'failed';
+      }),
     );
   }
 }

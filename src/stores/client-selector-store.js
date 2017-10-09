@@ -1,9 +1,10 @@
 import { action, observable } from 'mobx';
 import axios from '../utils/axios';
+import promotionStore from './promotion-store';
 
 class ClientSelectorStore {
   @observable state = 'success'
-  @observable value = []
+  @observable clients = []
   @observable data = []
   lastFetchID = 0
 
@@ -34,10 +35,11 @@ class ClientSelectorStore {
     );
   }
 
-  @action changeSelect(value) {
-    this.value.replace(value);
+  @action changeSelect(clients) {
+    this.clients.replace(clients);
     this.data.clear();
     this.state = 'success';
+    promotionStore.fetchPages(clients.map(x => x.key));
   }
 }
 

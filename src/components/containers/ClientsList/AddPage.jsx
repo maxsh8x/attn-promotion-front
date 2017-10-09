@@ -5,10 +5,10 @@ import { Input, Button } from 'antd';
 import style from './AddPage.css';
 
 
-@inject('promotionStore') @observer
+@inject('clientsStore') @observer
 class AddPage extends Component {
   static propTypes = {
-    promotionStore: ReactPropTypes.shape({
+    clientsStore: ReactPropTypes.shape({
     }).isRequired,
   }
 
@@ -19,32 +19,34 @@ class AddPage extends Component {
   }
 
   updateURL(e) {
-    this.props.promotionStore.updateInput(
+    this.props.clientsStore.updateInput(
       'url',
       e.target.value,
     );
   }
 
   createPage() {
-    this.props.promotionStore.createPage();
+    const { clientID } = this.props;
+    this.props.clientsStore.createPage(clientID);
   }
 
   render() {
+    const disabled = this.props.clientsStore.states.createPage !== 'success';
+
     return (
-      <span>
+      <div className={style.tableOperations}>
         <Input
           placeholder="Адрес страницы"
-          className={style.inputField}
           onChange={this.updateURL}
-          disabled={this.props.promotionStore.states.createPage !== 'success'}
+          disabled={disabled}
         />
         <Button
           type="primary"
           icon="plus"
           onClick={this.createPage}
-          loading={this.props.promotionStore.states.createPage !== 'success'}
+          loading={disabled}
         />
-      </span>
+      </div>
     );
   }
 }

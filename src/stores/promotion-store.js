@@ -17,7 +17,6 @@ class PromotionStore {
     date: '',
   }
   @observable states = {
-    createPage: 'success',
     fetchPages: 'pending',
     fetchMetrics: 'pending',
   }
@@ -93,7 +92,7 @@ class PromotionStore {
     );
   }
 
-  @action fetchPages() {
+  @action fetchPages(clients = []) {
     this.states.fetchPages = 'pending';
     return axios().get('v1/page', {
       params: {
@@ -102,6 +101,7 @@ class PromotionStore {
         yDate: this.inputData.date,
         active: this.inputData.isActiveTab,
         filter: this.inputData.filter,
+        clients: clients.join(','),
       },
     },
     ).then(
@@ -197,25 +197,6 @@ class PromotionStore {
         this.fetchMetrics(pageID);
       }),
       action('metrics update failed', () => { }),
-    );
-  }
-
-  @action createPage() {
-    this.states.createPage = 'pending';
-    return axios().post(
-      'v1/page',
-      {
-        url: this.inputData.url,
-        title: '',
-      },
-    ).then(
-      action('page successfully created', () => {
-        this.fetchPages();
-        this.states.createPage = 'success';
-      }),
-      action('page creation failed', () => {
-        this.states.createPage = 'failed';
-      }),
     );
   }
 }

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { PropTypes, inject, observer } from 'mobx-react';
 import { Table, Button, Modal, Form, Input, Dropdown } from 'antd';
+// import AddPage from './AddPage';
+import PageList from './PageList';
 import style from './Main.css';
 
 @inject('clientsStore') @observer
@@ -34,7 +36,7 @@ class ClientsList extends Component {
   expandedRowRender = ({ _id: clientID }) => {
     return (
       <div>
-        {clientID}
+        <PageList clientID={clientID} />
       </div>
     );
   }
