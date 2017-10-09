@@ -4,8 +4,6 @@ import debounce from 'lodash.debounce';
 import { PropTypes, inject, observer } from 'mobx-react';
 import style from './ClientSelector.css';
 
-const Option = Select.Option;
-
 @inject('clientSelectorStore') @observer
 class ClientSelector extends Component {
   constructor(props) {
@@ -35,7 +33,7 @@ class ClientSelector extends Component {
         onChange={this.changeSelect}
         className={style.inputField}
       >
-        {data.toJS().map(d => <Option key={d.value}>{d.text}</Option>)}
+        {data.toJS().map(d => <Select.Option key={d.value}>{d.text}</Select.Option>)}
       </Select>
     );
   }

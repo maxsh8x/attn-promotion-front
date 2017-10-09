@@ -52,8 +52,6 @@ class ClientsStore {
     this.states.fetchPages = 'pending';
     return axios().get('v1/page/client', {
       params: {
-        limit: 100,
-        offset: 0,
         clientID,
       },
     }).then(

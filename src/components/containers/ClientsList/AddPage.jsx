@@ -45,7 +45,9 @@ class AddPage extends Component {
           icon="plus"
           onClick={this.createPage}
           loading={disabled}
-        />
+        >
+          Добавить
+        </Button>
       </div>
     );
   }

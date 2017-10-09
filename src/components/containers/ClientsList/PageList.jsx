@@ -5,6 +5,11 @@ import { PropTypes, inject, observer } from 'mobx-react';
 import { Table, Spin, Badge } from 'antd';
 import AddPage from './AddPage';
 
+const StatusBadge = ({ active }) => {
+  const status = active ? 'success' : 'error';
+  const text = active ? 'Активна' : 'Неактивна';
+  return <Badge status={status} text={text} />;
+};
 
 @inject('clientsStore') @observer
 class PageList extends Component {
@@ -34,9 +39,13 @@ class PageList extends Component {
         render: this.renderPageURL,
       },
       {
+        dataIndex: 'title',
+        title: 'Название',
+      },
+      {
         dataIndex: 'active',
         title: 'Статус',
-        render: active => <Badge status={active ? 'success' : 'error'} />,
+        render: active => <StatusBadge active={active} />,
       },
       {
         dataIndex: 'createdAt',
@@ -56,6 +65,7 @@ class PageList extends Component {
             columns={columns}
             dataSource={data}
             size="small"
+            pagination={false}
           />
         </Spin>
       </div>
