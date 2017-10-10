@@ -4,6 +4,7 @@ import ReactPropTypes from 'prop-types';
 import { PropTypes, inject, observer } from 'mobx-react';
 import { Table, Spin, Badge } from 'antd';
 import AddPage from './AddPage';
+import RelatedList from './RelatedList';
 
 const StatusBadge = ({ active }) => {
   const status = active ? 'success' : 'error';
@@ -21,6 +22,10 @@ class PageList extends Component {
   componentDidMount() {
     const { clientID } = this.props;
     this.props.clientsStore.fetchPages(clientID);
+  }
+
+  expandedRowRender = () => {
+    return <RelatedList />;
   }
 
   renderPageURL = (pageURL) => {
@@ -41,6 +46,10 @@ class PageList extends Component {
       {
         dataIndex: 'title',
         title: 'Название',
+      },
+      {
+        dataIndex: 'type',
+        title: 'Тип',
       },
       {
         dataIndex: 'active',
@@ -66,6 +75,8 @@ class PageList extends Component {
             dataSource={data}
             size="small"
             pagination={false}
+            title={() => 'Список страниц клиента'}
+            expandedRowRender={this.expandedRowRender}
           />
         </Spin>
       </div>

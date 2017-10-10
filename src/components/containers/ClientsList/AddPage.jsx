@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ReactPropTypes from 'prop-types';
 import { PropTypes, inject, observer } from 'mobx-react';
 import { Input, Button } from 'antd';
+import QuestionTypeSelector from './QuestionTypeSelector';
 import style from './AddPage.css';
 
 
@@ -40,6 +41,7 @@ class AddPage extends Component {
           onChange={this.updateURL}
           disabled={disabled}
         />
+        <QuestionTypeSelector />
         <Button
           type="primary"
           icon="plus"

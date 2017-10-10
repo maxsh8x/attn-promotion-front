@@ -45,6 +45,8 @@ class ClientsList extends Component {
     const { data, modalShown, inputData } = this.props.clientsStore;
     const columns = [
       { dataIndex: 'name', title: 'Имя клиента' },
+      { title: 'Активных' },
+      { title: 'Неактивных' },
     ];
 
     return (
