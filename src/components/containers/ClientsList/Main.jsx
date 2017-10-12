@@ -15,7 +15,7 @@ class ClientsList extends Component {
   }
 
   componentDidMount() {
-    // this.props.clientsStore.fetchClients();
+    this.props.clientsStore.fetchClients();
   }
 
   toggleModal() {
@@ -58,9 +58,10 @@ class ClientsList extends Component {
                 placeholder="Название"
                 name="name"
                 value={clientCreator.name}
+                onChange={e => clientCreator.setName(e.target.value)}
               />
             </Form.Item>
-            <Button >Создать</Button>
+            <Button onClick={clientCreator.createClient}>Создать</Button>
           </Form>
         </Modal>
         <div className={style.tableOperations}>

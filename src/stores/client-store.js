@@ -12,11 +12,14 @@ const Page = types.model({
 });
 
 const PageCreator = types
-  .model({
+  .model('PageCreator', {
     state: 'done',
-    id: types.optional(types.identifier(), randomUuid()),
+    id: types.identifier(),
     url: types.string,
-    type: types.string,
+    type: types.optional(
+      types.enumeration(['group', 'individual']),
+      'individual',
+    ),
   })
   .views(self => ({
     get client() {
@@ -40,41 +43,54 @@ const PageCreator = types
     return { create };
   });
 
-const Client = types.model({
+const Client = types.model('Client', {
   id: types.identifier(types.number),
   name: types.string,
-  pageCreator: types.reference(PageCreator),
+  pageCreator: types.maybe(types.reference(PageCreator)),
 });
 
 const ClientCreator = types
-  .model({
-    id: types.identifier(),
+  .model('ClientCreator', {
+    id: types.optional(
+      types.identifier(),
+      randomUuid(),
+    ),
     name: '',
     modalShown: false,
+    state: types.enumeration(['pending', 'done', 'error']),
   })
   .views(self => ({
     get clientStore() {
       return getParent(self);
     },
   }))
-  .actions((self) => {
-    function setName(value) {
+  .actions(self => ({
+    setName(value) {
       self.name = value;
-    }
-
-    function create(value) {
+    },
+    createClient() {
+      self.state = 'pending';
+      axios().post('v1/client', {
+        name: self.name,
+      }).then(
+        self.createClientSuccess,
+        self.createClientError,
+      );
+    },
+    createClientSuccess() {
+      self.state = 'done';
+    },
+    createClientError() {
+      self.state = 'error';
       self.name = value;
-    }
-
-    function toggleModal() {
+    },
+    toggleModal() {
       self.modalShown = !self.modalShown;
-    }
-
-    return { setName, create, toggleModal };
-  });
+    },
+  }));
 
 const ClientStore = types
-  .model({
+  .model('ClientStore', {
     clients: types.map(Client),
     clientCreator: types.reference(ClientCreator),
     state: types.enumeration(['pending', 'done', 'error']),
@@ -101,6 +117,7 @@ const ClientStore = types
     },
     fetchClientsSuccess({ data }) {
       for (let i = 0; i < data.length; i += 1) {
+        data[i].id = data[i]._id;
         self.clients.put(data[i]);
       }
       self.state = 'done';
@@ -111,11 +128,10 @@ const ClientStore = types
   }));
 
 const clientStore = ClientStore.create({
-  clients: {
-    state: 'pending',
-  },
+  state: 'pending',
+  clients: {},
   clientCreator: ClientCreator.create({
-    id: randomUuid(),
+    state: 'done',
   }),
 });
 export default clientStore;
