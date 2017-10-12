@@ -4,6 +4,7 @@ import axios from '../utils/axios';
 class ClientsStore {
   @observable modalShown = false
   @observable pagesData = observable.shallowMap()
+  @observable createPageData = observable.shallowMap()
   @observable data = []
   @observable inputData = {
     name: '',

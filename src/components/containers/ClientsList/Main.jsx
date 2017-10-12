@@ -15,7 +15,7 @@ class ClientsList extends Component {
   }
 
   componentDidMount() {
-    this.props.clientsStore.fetchClients();
+    // this.props.clientsStore.fetchClients();
   }
 
   toggleModal() {
@@ -42,7 +42,7 @@ class ClientsList extends Component {
   }
 
   render() {
-    const { data, modalShown, inputData } = this.props.clientsStore;
+    const { data, clientCreator } = this.props.clientsStore;
     const columns = [
       { dataIndex: 'name', title: 'Имя клиента' },
       { title: 'Активных' },
@@ -51,26 +51,25 @@ class ClientsList extends Component {
 
     return (
       <div>
-        <Modal visible={modalShown} title="Информация о клиенте" footer={null} onCancel={this.toggleModal}>
+        <Modal visible={clientCreator.modalShown} title="Информация о клиенте" footer={null} onCancel={clientCreator.toggleModal}>
           <Form>
             <Form.Item>
               <Input
                 placeholder="Название"
                 name="name"
-                onChange={this.updateInput}
-                value={inputData.name}
+                value={clientCreator.name}
               />
             </Form.Item>
-            <Button onClick={this.submit}>Создать</Button>
+            <Button >Создать</Button>
           </Form>
         </Modal>
         <div className={style.tableOperations}>
-          <Button onClick={this.toggleModal}>Создать клиента</Button>
+          <Button onClick={clientCreator.toggleModal}>Создать клиента</Button>
           <Table
             bordered
             rowKey="_id"
             columns={columns}
-            dataSource={data.toJS()}
+            dataSource={data}
             title={() => 'Список клиентов'}
             expandedRowRender={this.expandedRowRender}
           />

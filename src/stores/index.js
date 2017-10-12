@@ -1,5 +1,5 @@
 import authStore from './auth-store';
-import clientsStore from './clients-store';
+import clientsStore from './client-store';
 import clientSelectorStore from './client-selector-store';
 import promotionStore from './promotion-store';
 

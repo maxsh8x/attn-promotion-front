@@ -3,12 +3,13 @@ import moment from 'moment';
 import ReactPropTypes from 'prop-types';
 import { PropTypes, inject, observer } from 'mobx-react';
 import { toJS } from 'mobx';
-import { Tabs, Table, DatePicker, Spin, Switch, Popover } from 'antd';
+import { Tabs, Table, DatePicker, Spin, Switch, Popover, Card } from 'antd';
 import style from './Main.css';
 import YandexMetrics from './YandexMetrics';
 import ClientSelector from './ClientSelector';
 import InputCost from './InputCost';
 import PageFilter from './PageFilter';
+import PromotionChart from './PromotionChart';
 
 const TabPane = Tabs.TabPane;
 
@@ -55,8 +56,15 @@ class PromotionList extends Component {
   expandedRowRender = ({ _id: pageID }, rowIndex) => {
     return (
       <div>
-        <InputCost pageID={pageID} rowIndex={rowIndex} />
-        <YandexMetrics pageID={pageID} rowIndex={rowIndex} />
+        <Card noHovering>
+          <InputCost pageID={pageID} rowIndex={rowIndex} />
+        </Card>
+        <Card noHovering>
+          <YandexMetrics pageID={pageID} rowIndex={rowIndex} />
+        </Card>
+        <Card noHovering>
+          <PromotionChart />
+        </Card>
       </div>
     );
   }
