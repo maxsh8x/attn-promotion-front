@@ -8,7 +8,7 @@ const Page = types.model({
   title: types.string,
   type: types.string,
   active: types.boolean,
-  date: types.Date,
+  // date: types.Date,
 });
 
 const PageCreator = types
@@ -43,11 +43,59 @@ const PageCreator = types
     return { create };
   });
 
-const Client = types.model('Client', {
-  id: types.identifier(types.number),
-  name: types.string,
-  pageCreator: types.maybe(types.reference(PageCreator)),
-});
+const Pages = types
+  .model('Pages', {
+    id: types.identifier(types.number),
+    pages: types.optional(types.map(Page), {}),
+    state: types.enumeration(['pending', 'done', 'error']),
+  })
+  .views(self => ({
+    get pagesData() {
+      return self.pages.values();
+    },
+  }))
+  .actions(self => ({
+
+    fetchPages() {
+      self.state = 'pending';
+      axios().get('v1/page/client', {
+        params: {
+          clientID: self.id,
+        },
+      }).then(
+        self.fetchPagesSuccess,
+        self.fetchPagesError,
+      );
+    },
+    fetchPagesSuccess({ data }) {
+      for (let i = 0; i < data.length; i += 1) {
+        data[i].id = data[i]._id;
+        self.pages.put(data[i]);
+      }
+      self.state = 'done';
+    },
+    fetchPagesError() {
+      self.state = 'error';
+    },
+  }));
+
+const Client = types
+  .model('Client', {
+    id: types.identifier(types.number),
+    name: types.string,
+    pageCreator: types.maybe(types.reference(PageCreator)),
+    pages: types.maybe(types.reference(Pages)),
+  })
+  .actions(self => ({
+    loadPages() {
+      // lazy loading
+      self.pages = Pages.create({
+        id: self.id,
+        state: 'pending',
+      });
+      self.pages.fetchPages();
+    },
+  }));
 
 const ClientCreator = types
   .model('ClientCreator', {
@@ -82,7 +130,6 @@ const ClientCreator = types
     },
     createClientError() {
       self.state = 'error';
-      self.name = value;
     },
     toggleModal() {
       self.modalShown = !self.modalShown;
@@ -91,12 +138,12 @@ const ClientCreator = types
 
 const ClientStore = types
   .model('ClientStore', {
-    clients: types.map(Client),
+    clients: types.optional(types.map(Client), {}),
     clientCreator: types.reference(ClientCreator),
     state: types.enumeration(['pending', 'done', 'error']),
   })
   .views(self => ({
-    get data() {
+    get clientsData() {
       return self.clients.values();
     },
   }))
@@ -129,7 +176,6 @@ const ClientStore = types
 
 const clientStore = ClientStore.create({
   state: 'pending',
-  clients: {},
   clientCreator: ClientCreator.create({
     state: 'done',
   }),

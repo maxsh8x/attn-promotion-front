@@ -14,18 +14,8 @@ const StatusBadge = ({ active }) => {
 
 @inject('clientsStore') @observer
 class PageList extends Component {
-  static propTypes = {
-    clientsStore: ReactPropTypes.shape({
-    }).isRequired,
-  }
-
   componentDidMount() {
-    const { clientID } = this.props;
-    this.props.clientsStore.fetchPages(clientID);
-  }
-
-  expandedRowRender = () => {
-    return <RelatedList />;
+    this.props.client.loadPages();
   }
 
   renderPageURL = (pageURL) => {
@@ -34,8 +24,9 @@ class PageList extends Component {
   }
 
   render() {
-    const { clientID } = this.props;
-    const data = this.props.clientsStore.pagesData.get(clientID) || [];
+    const { client } = this.props;
+    const data = client.pages ? client.pages.pagesData : [];
+    const spinning = Boolean(client.pages && client.pages.state === 'done');
 
     const columns = [
       {
@@ -63,22 +54,17 @@ class PageList extends Component {
       },
     ];
 
-    const spinning = this.props.clientsStore.states.fetchPages !== 'success';
-
     return (
       <div>
-        <AddPage clientID={clientID} />
-        <Spin spinning={spinning}>
-          <Table
-            rowKey="_id"
-            columns={columns}
-            dataSource={data}
-            size="small"
-            pagination={false}
-            title={() => 'Список страниц клиента'}
-            expandedRowRender={this.expandedRowRender}
-          />
-        </Spin>
+        {/* <AddPage clientID={clientID} /> */}
+        <Table
+          rowKey="_id"
+          columns={columns}
+          dataSource={data}
+          size="small"
+          pagination={false}
+          title={() => 'Список страниц клиента'}
+        />
       </div>
     );
   }

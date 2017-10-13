@@ -1,57 +1,37 @@
 import React, { Component } from 'react';
 import { PropTypes, inject, observer } from 'mobx-react';
-import { Table, Button, Modal, Form, Input, Dropdown } from 'antd';
-// import AddPage from './AddPage';
+import { Table, Button, Modal, Form, Input } from 'antd';
 import PageList from './PageList';
 import style from './Main.css';
 
 @inject('clientsStore') @observer
 class ClientsList extends Component {
-  constructor(props) {
-    super(props);
-    this.toggleModal = this.toggleModal.bind(this);
-    this.updateInput = this.updateInput.bind(this);
-    this.submit = this.submit.bind(this);
-  }
-
   componentDidMount() {
     this.props.clientsStore.fetchClients();
   }
 
-  toggleModal() {
-    this.props.clientsStore.toggleModal();
-  }
-
-  updateInput(e, field) {
-    this.props.clientsStore.updateInput(
-      field || e.target.name,
-      e.target.value,
-    );
-  }
-
-  submit() {
-    this.props.clientsStore.createClient();
-  }
-
-  expandedRowRender = ({ _id: clientID }) => {
-    return (
-      <div>
-        <PageList clientID={clientID} />
-      </div>
-    );
+  expandedRowRender = ({ id }) => {
+    const client = this.props.clientsStore.clients.get(id);
+    return <PageList client={client} />;
   }
 
   render() {
-    const { data, clientCreator } = this.props.clientsStore;
+    const { clients, clientsData, clientCreator } = this.props.clientsStore;
     const columns = [
       { dataIndex: 'name', title: 'Имя клиента' },
       { title: 'Активных' },
       { title: 'Неактивных' },
     ];
 
+
     return (
       <div>
-        <Modal visible={clientCreator.modalShown} title="Информация о клиенте" footer={null} onCancel={clientCreator.toggleModal}>
+        <Modal
+          visible={clientCreator.modalShown}
+          title="Информация о клиенте"
+          footer={null}
+          onCancel={clientCreator.toggleModal}
+        >
           <Form>
             <Form.Item>
               <Input
@@ -68,9 +48,9 @@ class ClientsList extends Component {
           <Button onClick={clientCreator.toggleModal}>Создать клиента</Button>
           <Table
             bordered
-            rowKey="_id"
+            rowKey="id"
             columns={columns}
-            dataSource={data}
+            dataSource={clientsData}
             title={() => 'Список клиентов'}
             expandedRowRender={this.expandedRowRender}
           />
