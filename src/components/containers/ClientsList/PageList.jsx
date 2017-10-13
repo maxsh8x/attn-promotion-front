@@ -14,8 +14,8 @@ const StatusBadge = ({ active }) => {
 
 @inject('clientsStore') @observer
 class PageList extends Component {
-  componentDidMount() {
-    this.props.client.loadPages();
+  componentWillMount() {
+    this.props.client.fetchPages();
   }
 
   renderPageURL = (pageURL) => {
@@ -25,8 +25,7 @@ class PageList extends Component {
 
   render() {
     const { client } = this.props;
-    const data = client.pages ? client.pages.pagesData : [];
-    const spinning = Boolean(client.pages && client.pages.state === 'done');
+    const spinning = !(client.fetchPagesState === 'done');
 
     const columns = [
       {
@@ -53,18 +52,19 @@ class PageList extends Component {
         render: createdAt => moment(createdAt).format('YYYY-MM-DD'),
       },
     ];
-
     return (
       <div>
-        {/* <AddPage clientID={clientID} /> */}
-        <Table
-          rowKey="_id"
-          columns={columns}
-          dataSource={data}
-          size="small"
-          pagination={false}
-          title={() => 'Список страниц клиента'}
-        />
+        <AddPage pageCreator={client.pageCreator} />
+        <Spin spinning={spinning}>
+          <Table
+            rowKey="id"
+            columns={columns}
+            dataSource={client.pagesData}
+            size="small"
+            pagination={false}
+            title={() => 'Список страниц клиента'}
+          />
+        </Spin>
       </div>
     );
   }

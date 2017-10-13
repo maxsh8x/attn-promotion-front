@@ -1,8 +1,10 @@
-import { types, getParent, process } from 'mobx-state-tree';
+import { types, getRoot } from 'mobx-state-tree';
 import axios from '../utils/axios';
 import { randomUuid } from '../utils/random';
 
-const Page = types.model({
+const fetchStates = ['pending', 'done', 'error'];
+
+const Page = types.model('Page', {
   id: types.identifier(types.number),
   url: types.string,
   title: types.string,
@@ -13,51 +15,67 @@ const Page = types.model({
 
 const PageCreator = types
   .model('PageCreator', {
-    state: 'done',
-    id: types.identifier(),
-    url: types.string,
+    id: types.identifier(types.number),
+    state: types.enumeration(fetchStates),
+    url: '',
+    title: '',
     type: types.optional(
-      types.enumeration(['group', 'individual']),
+      types.enumeration(['group', 'individual', 'related']),
       'individual',
     ),
+    parentPageID: types.undefined,
   })
-  .views(self => ({
-    get client() {
-      return getParent(self);
+  .actions(self => ({
+    setURL(value) {
+      self.url = value;
     },
-  }))
-  .actions((self) => {
-    const create = process(function* createPage() {
-      try {
-        yield axios().post({
-          url: self.url,
-          clientID: self.client.id,
-          type: self.type,
-          title: '',
-        });
-        self.state = 'done';
-      } catch (e) {
-        self.state = 'error';
-      }
-    });
-    return { create };
-  });
+    afterCreate() {
+      // console.log(self, 'wtf')
+    },
+    createPage() {
+      self.state = 'pending';
+      axios().post('v1/page', {
+        url: self.url,
+        title: self.title,
+        clientID: self.id,
+        type: self.type,
+        parent: self.parentPageID,
+      }).then(
+        self.createPageSuccess,
+        self.createPageError,
+      );
+    },
+    createPageSuccess() {
+      self.state = 'done';
+    },
+    createPageError() {
+      self.state = 'error';
+    },
+  }));
 
-const Pages = types
-  .model('Pages', {
+const Client = types
+  .model('Client', {
     id: types.identifier(types.number),
+    name: types.string,
     pages: types.optional(types.map(Page), {}),
-    state: types.enumeration(['pending', 'done', 'error']),
+    fetchPagesState: types.optional(types.enumeration(fetchStates), 'pending'),
   })
   .views(self => ({
     get pagesData() {
       return self.pages.values();
     },
+    get pageCreator() {
+      return getRoot(self).pageCreators.get(self.id);
+    },
   }))
   .actions(self => ({
-
+    afterCreate() {
+      console.log(getRoot(self), 'wtf');
+      // getRoot(self).addPageCreator(self.id);
+    },
     fetchPages() {
-      self.state = 'pending';
+      self.fetchPagesState = 'pending';
+      self.pages.clear();
       axios().get('v1/page/client', {
         params: {
           clientID: self.id,
@@ -72,28 +90,10 @@ const Pages = types
         data[i].id = data[i]._id;
         self.pages.put(data[i]);
       }
-      self.state = 'done';
+      self.fetchPagesState = 'done';
     },
     fetchPagesError() {
-      self.state = 'error';
-    },
-  }));
-
-const Client = types
-  .model('Client', {
-    id: types.identifier(types.number),
-    name: types.string,
-    pageCreator: types.maybe(types.reference(PageCreator)),
-    pages: types.maybe(types.reference(Pages)),
-  })
-  .actions(self => ({
-    loadPages() {
-      // lazy loading
-      self.pages = Pages.create({
-        id: self.id,
-        state: 'pending',
-      });
-      self.pages.fetchPages();
+      self.fetchPagesState = 'error';
     },
   }));
 
@@ -105,7 +105,7 @@ const ClientCreator = types
     ),
     name: '',
     modalShown: false,
-    state: types.enumeration(['pending', 'done', 'error']),
+    state: types.enumeration(fetchStates),
   })
   .views(self => ({
     get clientStore() {
@@ -139,8 +139,9 @@ const ClientCreator = types
 const ClientStore = types
   .model('ClientStore', {
     clients: types.optional(types.map(Client), {}),
+    pageCreators: types.optional(types.map(PageCreator), {}),
     clientCreator: types.reference(ClientCreator),
-    state: types.enumeration(['pending', 'done', 'error']),
+    state: types.enumeration(fetchStates),
   })
   .views(self => ({
     get clientsData() {
@@ -148,6 +149,13 @@ const ClientStore = types
     },
   }))
   .actions(self => ({
+    addPageCreator(clientID) {
+      const pageCreator = PageCreator.create({
+        id: clientID,
+        state: 'done',
+      });
+      self.pageCreators.put(pageCreator);
+    },
     fetchClients() {
       self.state = 'pending';
       // TODO: clear
@@ -180,4 +188,5 @@ const clientStore = ClientStore.create({
     state: 'done',
   }),
 });
+
 export default clientStore;

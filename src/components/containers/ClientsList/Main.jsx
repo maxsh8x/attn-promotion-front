@@ -19,10 +19,7 @@ class ClientsList extends Component {
     const { clients, clientsData, clientCreator } = this.props.clientsStore;
     const columns = [
       { dataIndex: 'name', title: 'Имя клиента' },
-      { title: 'Активных' },
-      { title: 'Неактивных' },
     ];
-
 
     return (
       <div>
