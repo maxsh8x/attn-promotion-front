@@ -27,7 +27,7 @@ class InputCost extends Component {
   render() {
     const { pageID, rowIndex } = this.props;
     const data = this.props.promotionStore.data[rowIndex].networks;
-    const fields = ['google', 'facebook', 'vk', 'odnoklassniki', 'yandex'];
+    const fields = ['google', 'fb', 'yandex', 'vk', 'ok'];
     const childItems = fields.map(field => (
       {
         title: field[0].toUpperCase() + field.substr(1),

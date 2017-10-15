@@ -22,7 +22,6 @@ class YandexMetrics extends Component {
     this.updateData = this.updateData.bind(this);
   }
 
-
   componentDidMount() {
     const { pageID } = this.props;
     this.props.promotionStore.fetchMetrics(pageID);
@@ -43,16 +42,26 @@ class YandexMetrics extends Component {
         title: 'Данные яндекс метрики',
         children: [
           { dataIndex: 'metric', title: 'Метрика', render: metric => metricName[metric] },
-          { dataIndex: 'google', title: 'Google' },
-          { dataIndex: 'facebook', title: 'Facebook' },
-          { dataIndex: 'vk', title: 'Vk' },
-          { dataIndex: 'odnoklassniki', title: 'Odnoklassniki' },
-          { dataIndex: 'yandex', title: 'Yandex' },
-          { dataIndex: 'ad', title: 'Реклама всего' },
-          { dataIndex: 'social', title: 'Социальные сети' },
-          { dataIndex: 'referral', title: 'Ссылки на сайт' },
-          { dataIndex: 'internal', title: 'Внутренние переходы' },
-          { dataIndex: 'direct', title: 'Прямые заходы' },
+          {
+            title: 'Источники рекламы',
+            children: [
+              { dataIndex: 'google', title: 'Google' },
+              { dataIndex: 'fb', title: 'Fb' },
+              { dataIndex: 'yandex', title: 'Yandex' },
+              { dataIndex: 'vk', title: 'Vk' },
+              { dataIndex: 'ok', title: 'Ok' },
+            ],
+          },
+          {
+            title: 'Метагруппы',
+            children: [
+              { dataIndex: 'ad', title: 'Реклама всего' },
+              { dataIndex: 'social', title: 'Социальные сети' },
+              { dataIndex: 'referral', title: 'Ссылки на сайт' },
+              { dataIndex: 'internal', title: 'Внутренние переходы' },
+              { dataIndex: 'direct', title: 'Прямые заходы' },
+            ],
+          },
           { dataIndex: 'total', title: 'Итого' },
         ],
       },
@@ -60,7 +69,7 @@ class YandexMetrics extends Component {
 
     // TODO: generator
     // TODO: cache value
-    const targetFields = ['google', 'facebook', 'vk', 'odnoklassniki', 'yandex'];
+    const targetFields = ['google', 'fb', 'yandex', 'vk', 'ok'];
     let totalClickCost = 0;
     if (data.length > 0) {
       let totalViews = 0;

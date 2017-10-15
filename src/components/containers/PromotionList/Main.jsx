@@ -103,10 +103,10 @@ class PromotionList extends Component {
         title: 'Стоимость за клик',
         children: [
           { key: 'google', dataIndex: 'networks.google', title: 'Google', render: this.metricRender },
-          { key: 'facebook', dataIndex: 'networks.facebook', title: 'Facebook', render: this.metricRender },
-          { key: 'vk', dataIndex: 'networks.vk', title: 'Vk', render: this.metricRender },
-          { key: 'odnoklassniki', dataIndex: 'networks.odnoklassniki', title: 'Odnoklassniki', render: this.metricRender },
+          { key: 'fb', dataIndex: 'networks.fb', title: 'Fb', render: this.metricRender },
           { key: 'yandex', dataIndex: 'networks.yandex', title: 'Yandex', render: this.metricRender },
+          { key: 'vk', dataIndex: 'networks.vk', title: 'Vk', render: this.metricRender },
+          { key: 'ok', dataIndex: 'networks.ok', title: 'Ok', render: this.metricRender },
         ],
       },
       {

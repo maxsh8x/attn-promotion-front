@@ -42,7 +42,6 @@
     "mobx-react-devtools": "^4.2.15",
     "mobx-state-tree": "^1.0.1",
     "moment": "^2.18.1",
-    "node-uuid": "^1.4.8",
     "prop-types": "^15.6.0",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",

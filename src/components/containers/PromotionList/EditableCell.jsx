@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactPropTypes from 'prop-types';
 import { PropTypes, inject, observer } from 'mobx-react';
-import { InputNumber } from 'antd';
+import { InputNumber, Form } from 'antd';
 
 @inject('promotionStore') @observer
 class EditableCell extends Component {
@@ -22,7 +22,7 @@ class EditableCell extends Component {
       <div>
         <InputNumber
           min={0}
-          defaultValue={this.props.value || 0}
+          defaultValue={this.props.value}
           onBlur={this.onBlur}
         />
       </div>

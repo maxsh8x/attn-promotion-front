@@ -1,5 +1,6 @@
 import { action, observable } from 'mobx';
 import { message } from 'antd';
+import moment from 'moment';
 import axios from '../utils/axios';
 
 
@@ -23,9 +24,7 @@ class PromotionStore {
   @observable metricNetworks = []
 
   constructor() {
-    const yesterdayDate = new Date();
-    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-    this.inputData.date = yesterdayDate.toISOString().slice(0, 10);
+    this.inputData.date = moment().add(-1, 'days').format('YYYY-MM-DD')
   }
 
   getYData(pageID) {

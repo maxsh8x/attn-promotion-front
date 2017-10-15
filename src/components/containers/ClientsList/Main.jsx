@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import { PropTypes, inject, observer } from 'mobx-react';
-import { Table, Button, Modal, Form, Input } from 'antd';
+import { Table, Button, Modal, Form, Input, DatePicker } from 'antd';
+import moment from 'moment';
 import PageList from './PageList';
 import style from './Main.css';
+
+const { RangePicker } = DatePicker;
 
 @inject('clientsStore') @observer
 class ClientsList extends Component {
@@ -10,13 +13,23 @@ class ClientsList extends Component {
     this.props.clientsStore.fetchClients();
   }
 
-  expandedRowRender = ({ id }) => {
+  expandedRowRender = ({ id, type }) => {
     const client = this.props.clientsStore.clients.get(id);
-    return <PageList client={client} />;
+    return <PageList client={client} type={type} />;
+  }
+
+  updateDate = (dates, [startDate, endDate]) => {
+    this.props.clientsStore.setDate(startDate, endDate);
   }
 
   render() {
-    const { clients, clientsData, clientCreator } = this.props.clientsStore;
+    const {
+      clients,
+      clientsData,
+      clientCreator,
+      startDate,
+      endDate
+    } = this.props.clientsStore;
     const columns = [
       { dataIndex: 'name', title: 'Имя клиента' },
     ];
@@ -49,6 +62,13 @@ class ClientsList extends Component {
             columns={columns}
             dataSource={clientsData}
             title={() => 'Список клиентов'}
+            footer={() => (
+              <div>
+                Подсчет просмотров за период: <RangePicker
+                  defaultValue={[moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')]}
+                  onChange={this.updateDate}
+                />
+              </div>)}
             expandedRowRender={this.expandedRowRender}
           />
         </div>
