@@ -56,6 +56,7 @@ class ClientsList extends Component {
             <Form.Item>
               <InputNumber
                 placeholder="ID счетчика"
+                min={1}
                 name="counterID"
                 value={clientCreator.counterID}
                 onChange={clientCreator.setCounterID}

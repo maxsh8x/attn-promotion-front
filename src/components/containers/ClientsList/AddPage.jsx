@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
 import ReactPropTypes from 'prop-types';
-import { PropTypes, inject, observer } from 'mobx-react';
+import { PropTypes, observer } from 'mobx-react';
 import { Input, Button } from 'antd';
-import QuestionTypeSelector from './QuestionTypeSelector';
 import style from './AddPage.css';
 
 @observer
 class AddPage extends Component {
-
   render() {
     const { pageCreator, parent, related } = this.props;
     const inProgress = pageCreator.state === 'pending';
@@ -19,7 +17,7 @@ class AddPage extends Component {
           value={pageCreator.url}
           disabled={inProgress}
         />
-        {!related && <QuestionTypeSelector onChange={pageCreator.setType} />}
+        {/* {!related && <QuestionTypeSelector onChange={pageCreator.setType} />} */}
         <Button
           type="primary"
           icon="plus"
