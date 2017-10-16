@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { PropTypes, inject, observer } from 'mobx-react';
-import { Table, Button, Modal, Form, Input, DatePicker, InputNumber } from 'antd';
+import { Table, Button, Modal, Form, Input, DatePicker, InputNumber, Icon } from 'antd';
 import moment from 'moment';
 import PageList from './PageList';
 import style from './Main.css';
@@ -43,22 +43,32 @@ class ClientsList extends Component {
           footer={null}
           onCancel={clientCreator.toggleModal}
         >
-          <Form>
-            <Form.Item label="Название: ">
+          <Form layout="inline">
+            <Form.Item>
               <Input
+                prefix={<Icon type="user" style={{ fontSize: 13 }} />}
+                placeholder="Имя клиента"
                 name="name"
                 value={clientCreator.name}
                 onChange={e => clientCreator.setName(e.target.value)}
               />
             </Form.Item>
-            <Form.Item label="ID счетчика: ">
+            <Form.Item>
               <InputNumber
+                placeholder="ID счетчика"
                 name="counterID"
                 value={clientCreator.counterID}
                 onChange={clientCreator.setCounterID}
               />
             </Form.Item>
-            <Button onClick={clientCreator.createClient}>Создать</Button>
+            <Form.Item>
+              <Button
+                onClick={clientCreator.createClient}
+                type="primary"
+              >
+                Создать
+              </Button>
+            </Form.Item>
           </Form>
         </Modal>
         <div className={style.tableOperations}>
