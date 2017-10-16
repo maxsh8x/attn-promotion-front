@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { PropTypes, inject, observer } from 'mobx-react';
-import { Table, Button, Modal, Form, Input, DatePicker } from 'antd';
+import { Table, Button, Modal, Form, Input, DatePicker, InputNumber } from 'antd';
 import moment from 'moment';
 import PageList from './PageList';
 import style from './Main.css';
@@ -31,6 +31,7 @@ class ClientsList extends Component {
       endDate
     } = this.props.clientsStore;
     const columns = [
+      { dataIndex: 'counterID', title: 'ID счетчика', width: 100 },
       { dataIndex: 'name', title: 'Имя клиента' },
     ];
 
@@ -43,12 +44,18 @@ class ClientsList extends Component {
           onCancel={clientCreator.toggleModal}
         >
           <Form>
-            <Form.Item>
+            <Form.Item label="Название: ">
               <Input
-                placeholder="Название"
                 name="name"
                 value={clientCreator.name}
                 onChange={e => clientCreator.setName(e.target.value)}
+              />
+            </Form.Item>
+            <Form.Item label="ID счетчика: ">
+              <InputNumber
+                name="counterID"
+                value={clientCreator.counterID}
+                onChange={clientCreator.setCounterID}
               />
             </Form.Item>
             <Button onClick={clientCreator.createClient}>Создать</Button>

@@ -88,6 +88,7 @@ const PageCreator = types
 const Client = types
   .model('Client', {
     id: types.identifier(types.number),
+    counterID: types.number,
     name: types.string,
     pages: types.optional(types.map(Page), {}),
     fetchPagesState: types.optional(types.enumeration(fetchStates), 'pending'),
@@ -159,16 +160,21 @@ const ClientCreator = types
     id: types.identifier(),
     name: '',
     modalShown: false,
+    counterID: types.maybe(types.number),
     state: types.enumeration(fetchStates),
   })
   .actions(self => ({
     setName(value) {
       self.name = value;
     },
+    setCounterID(value) {
+      self.counterID = value;
+    },
     createClient() {
       self.state = 'pending';
       axios().post('v1/client', {
         name: self.name,
+        counterID: self.counterID,
       }).then(
         self.createClientSuccess,
         self.createClientError,
