@@ -5,41 +5,12 @@ import axios from '../utils/axios';
 
 const fetchStates = ['pending', 'done', 'error'];
 
-const Page = types
-  .model('Page', {
-    id: types.identifier(types.number),
-    url: types.string,
-    title: types.string,
-    type: types.string,
-    parent: types.maybe(types.number),
-    active: types.boolean,
-    views: 0,
-  })
-  .views(self => ({
-    get pages() {
-      return getParent(self);
-    },
-    get client() {
-      return getParent(self, 2);
-    },
-    get pagesData() {
-      return self.pages.values().filter(page => page.parent === self.id);
-    },
-    get totalViews() {
-      return self.pagesData.length > 0
-        ? self.pagesData.reduce((a, b) => a + b.views, 0)
-        : 0;
-    },
-    get pageCreator() {
-      return getParent(self, 2).pageCreators.get(self.id);
-    },
-  }));
-
 const PageCreator = types
   .model('PageCreator', {
-    id: types.identifier(types.number),
-    clientID: types.number,
-    state: types.enumeration(fetchStates),
+    state: types.optional(
+      types.enumeration(fetchStates),
+      'done',
+    ),
     url: '',
     title: '',
     type: types.optional(
@@ -49,7 +20,9 @@ const PageCreator = types
   })
   .views(self => ({
     get client() {
-      return getRoot(self).clients.get(self.clientID);
+      return (self.type === 'related')
+        ? getParent(self, 3)
+        : getParent(self);
     },
   }))
   .actions(self => ({
@@ -64,7 +37,7 @@ const PageCreator = types
       const query = {
         url: self.url,
         title: self.title,
-        clientID: self.clientID,
+        clientID: self.client.id,
         type: self.type,
       };
       if (related) {
@@ -85,6 +58,34 @@ const PageCreator = types
     },
   }));
 
+const Page = types
+  .model('Page', {
+    id: types.identifier(types.number),
+    url: types.string,
+    title: types.string,
+    type: types.string,
+    parent: types.maybe(types.number),
+    active: types.boolean,
+    views: 0,
+    pageCreator: types.optional(PageCreator, {}),
+  })
+  .views(self => ({
+    get pages() {
+      return getParent(self);
+    },
+    get client() {
+      return getParent(self, 2);
+    },
+    get pagesData() {
+      return self.pages.values().filter(page => page.parent === self.id);
+    },
+    get totalViews() {
+      return self.pagesData.length > 0
+        ? self.pagesData.reduce((a, b) => a + b.views, 0)
+        : 0;
+    },
+  }));
+
 const Client = types
   .model('Client', {
     id: types.identifier(types.number),
@@ -92,7 +93,7 @@ const Client = types
     name: types.string,
     pages: types.optional(types.map(Page), {}),
     fetchPagesState: types.optional(types.enumeration(fetchStates), 'pending'),
-    pageCreators: types.optional(types.map(PageCreator), {}),
+    pageCreator: types.optional(PageCreator, {}),
   })
   .views(self => ({
     get pagesData() {
@@ -102,9 +103,6 @@ const Client = types
       return self.pagesData.length > 0
         ? self.pagesData.reduce((a, b) => a + b.views, 0)
         : 0;
-    },
-    get pageCreator() {
-      return getRoot(self).pageCreators.get(self.id);
     },
     get clientStore() {
       return getRoot(self);
@@ -121,14 +119,6 @@ const Client = types
         () => self.fetchPages(),
       );
     },
-    addPageCreator(pageID) {
-      const pageCreator = PageCreator.create({
-        id: pageID,
-        state: 'done',
-        clientID: self.id,
-      });
-      self.pageCreators.put(pageCreator);
-    },
     fetchPages() {
       self.fetchPagesState = 'pending';
       axios().get('v1/page/client', {
@@ -144,7 +134,6 @@ const Client = types
     },
     fetchPagesSuccess({ data }) {
       for (let i = 0; i < data.length; i += 1) {
-        self.addPageCreator(data[i]._id);
         data[i].id = data[i]._id;
         self.pages.put(data[i]);
       }
@@ -157,15 +146,25 @@ const Client = types
 
 const ClientCreator = types
   .model('ClientCreator', {
-    id: types.identifier(),
     name: '',
+    brand: '',
+    vatin: '',
     modalShown: false,
     counterID: types.maybe(types.number),
-    state: types.enumeration(fetchStates),
+    state: types.optional(
+      types.enumeration(fetchStates),
+      'done',
+    ),
   })
   .actions(self => ({
     setName(value) {
       self.name = value;
+    },
+    setBrand(value) {
+      self.brand = value;
+    },
+    setVATIN(value) {
+      self.vatin = value;
     },
     setCounterID(value) {
       self.counterID = value;
@@ -193,12 +192,37 @@ const ClientCreator = types
     },
   }));
 
+const GroupQuestionCreator = types
+  .model('GroupQuestionCreator', {
+    url: '',
+    modalShown: false,
+    counterID: types.maybe(types.number),
+    state: types.optional(
+      types.enumeration(fetchStates),
+      'done',
+    ),
+  })
+  .actions(self => ({
+    setCounterID(value) {
+      self.counterID = value;
+    },
+    setURL(value) {
+      self.url = value;
+    },
+    toggleModal() {
+      self.modalShown = !self.modalShown;
+    },
+  }));
+
 const ClientStore = types
   .model('ClientStore', {
     clients: types.optional(types.map(Client), {}),
-    pageCreators: types.optional(types.map(PageCreator), {}),
-    clientCreator: types.reference(ClientCreator),
-    state: types.enumeration(fetchStates),
+    clientCreator: types.optional(ClientCreator, {}),
+    groupQuestionCreator: types.optional(GroupQuestionCreator, {}),
+    state: types.optional(
+      types.enumeration(fetchStates),
+      'pending',
+    ),
     startDate: types.optional(
       types.string,
       moment().subtract(1, 'months').format('YYYY-MM-DD'),
@@ -214,17 +238,12 @@ const ClientStore = types
     },
   }))
   .actions(self => ({
+    afterCreate() {
+      self.fetchClients();
+    },
     setDate(startDate, endDate) {
       self.startDate = startDate;
       self.endDate = endDate;
-    },
-    addPageCreator(clientID) {
-      const pageCreator = PageCreator.create({
-        id: clientID,
-        state: 'done',
-        clientID,
-      });
-      self.pageCreators.put(pageCreator);
     },
     fetchClients() {
       self.state = 'pending';
@@ -239,7 +258,6 @@ const ClientStore = types
     },
     fetchClientsSuccess({ data }) {
       for (let i = 0; i < data.length; i += 1) {
-        self.addPageCreator(data[i]._id);
         data[i].id = data[i]._id;
         self.clients.put(data[i]);
       }
@@ -250,13 +268,6 @@ const ClientStore = types
     },
   }));
 
-const clientStore = ClientStore.create({
-  id: '1',
-  state: 'pending',
-  clientCreator: ClientCreator.create({
-    id: '1',
-    state: 'done',
-  }),
-});
+const clientStore = ClientStore.create({});
 
 export default clientStore;

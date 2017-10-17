@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import ReactPropTypes from 'prop-types';
-import { PropTypes, observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { Input, Button } from 'antd';
 import style from './AddPage.css';
 
@@ -17,7 +16,6 @@ class AddPage extends Component {
           value={pageCreator.url}
           disabled={inProgress}
         />
-        {/* {!related && <QuestionTypeSelector onChange={pageCreator.setType} />} */}
         <Button
           type="primary"
           icon="plus"

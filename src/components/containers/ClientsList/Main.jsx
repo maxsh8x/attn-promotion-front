@@ -1,18 +1,16 @@
 import React, { Component } from 'react';
-import { PropTypes, inject, observer } from 'mobx-react';
-import { Table, Button, Modal, Form, Input, DatePicker, InputNumber, Icon } from 'antd';
+import { inject, observer } from 'mobx-react';
+import { Table, Button, Modal, DatePicker } from 'antd';
 import moment from 'moment';
 import PageList from './PageList';
+import ClientCreator from './ClientCreator';
+import GroupQuestionCreator from './GroupQuestionCreator';
 import style from './Main.css';
 
 const { RangePicker } = DatePicker;
 
 @inject('clientsStore') @observer
 class ClientsList extends Component {
-  componentDidMount() {
-    this.props.clientsStore.fetchClients();
-  }
-
   expandedRowRender = ({ id, type }) => {
     const client = this.props.clientsStore.clients.get(id);
     return <PageList client={client} type={type} />;
@@ -24,11 +22,11 @@ class ClientsList extends Component {
 
   render() {
     const {
-      clients,
       clientsData,
       clientCreator,
+      groupQuestionCreator,
       startDate,
-      endDate
+      endDate,
     } = this.props.clientsStore;
     const columns = [
       { dataIndex: 'counterID', title: 'ID счетчика', width: 100 },
@@ -43,37 +41,19 @@ class ClientsList extends Component {
           footer={null}
           onCancel={clientCreator.toggleModal}
         >
-          <Form layout="inline">
-            <Form.Item>
-              <Input
-                prefix={<Icon type="user" style={{ fontSize: 13 }} />}
-                placeholder="Имя клиента"
-                name="name"
-                value={clientCreator.name}
-                onChange={e => clientCreator.setName(e.target.value)}
-              />
-            </Form.Item>
-            <Form.Item>
-              <InputNumber
-                placeholder="ID счетчика"
-                min={1}
-                name="counterID"
-                value={clientCreator.counterID}
-                onChange={clientCreator.setCounterID}
-              />
-            </Form.Item>
-            <Form.Item>
-              <Button
-                onClick={clientCreator.createClient}
-                type="primary"
-              >
-                Создать
-              </Button>
-            </Form.Item>
-          </Form>
+          <ClientCreator clientCreator={clientCreator} />
+        </Modal>
+        <Modal
+          visible={groupQuestionCreator.modalShown}
+          title="Информация о клиенте"
+          footer={null}
+          onCancel={groupQuestionCreator.toggleModal}
+        >
+          <GroupQuestionCreator groupQuestionCreator={groupQuestionCreator} />
         </Modal>
         <div className={style.tableOperations}>
           <Button onClick={clientCreator.toggleModal}>Создать клиента</Button>
+          <Button onClick={groupQuestionCreator.toggleModal}>Создать групповой вопрос</Button>
           <Table
             bordered
             rowKey="id"
