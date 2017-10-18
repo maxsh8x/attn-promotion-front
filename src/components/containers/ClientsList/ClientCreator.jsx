@@ -11,69 +11,68 @@ const buttonItemLayout = {
   wrapperCol: { span: 14, offset: 6 },
 };
 
-const ClientCreator = ({ clientCreator }) => (
-  <div>
-    <Form layout="horizontal">
-      <Form.Item
-        label="Имя клиента"
-        {...formItemLayout}
+const ClientCreator = ({ clientCreator, form }) => (
+  <Form layout="horizontal">
+    <Form.Item
+      label="Имя клиента"
+      {...formItemLayout}
+    >
+      {form.getFieldDecorator('name', {
+        rules: [{ required: true, message: 'Введите имя клиента', whitespace: true }],
+        getValueFromEvent: () => clientCreator.name,
+        onChange: e => clientCreator.setName(e.target.value),
+      })(<Input placeholder="ООО Ромашка" />)}
+    </Form.Item>
+    <Form.Item
+      label="Название бренда"
+      {...formItemLayout}
+    >
+      {form.getFieldDecorator('brand', {
+        rules: [{ required: true, message: 'Введите название бренда', whitespace: true }],
+        getValueFromEvent: () => clientCreator.brand,
+        onChange: e => clientCreator.setBrand(e.target.value),
+      })(<Input placeholder="Детский центр" />)}
+    </Form.Item>
+    <Form.Item
+      label="ИНН"
+      {...formItemLayout}
+    >
+      {form.getFieldDecorator('vatin', {
+        rules: [{ required: true, message: 'Введите ИНН', whitespace: true }],
+        getValueFromEvent: () => clientCreator.vatin,
+        onChange: e => clientCreator.setVATIN(e.target.value),
+      })(<Input placeholder="430601071197" />)}
+    </Form.Item>
+    <Form.Item
+      label="ID счетчика"
+      {...formItemLayout}
+    >
+      <InputNumber
+        placeholder="41234234"
+        min={10000000}
+        max={99999999}
+        name="counterID"
+        value={clientCreator.counterID}
+        onChange={clientCreator.setCounterID}
+      />
+    </Form.Item>
+    <Form.Item
+      {...buttonItemLayout}
+    >
+      <Button
+        onClick={() => form.validateFieldsAndScroll(
+          (err) => {
+            if (!err) { clientCreator.createClient(); }
+          })}
+        type="primary"
       >
-        <Input
-          placeholder="ООО Ромашка"
-          name="name"
-          value={clientCreator.name}
-          onChange={e => clientCreator.setName(e.target.value)}
-        />
-      </Form.Item>
-      <Form.Item
-        label="Название бренда"
-        {...formItemLayout}
-      >
-        <Input
-          placeholder="Детский центр"
-          name="brand"
-          value={clientCreator.brand}
-          onChange={e => clientCreator.setBrand(e.target.value)}
-        />
-      </Form.Item>
-      <Form.Item
-        label="ИНН"
-        {...formItemLayout}
-      >
-        <Input
-          placeholder="430601071197"
-          name="vatin"
-          value={clientCreator.vatin}
-          onChange={e => clientCreator.setVATIN(e.target.value)}
-        />
-      </Form.Item>
-      <Form.Item
-        label="ID счетчика"
-        {...formItemLayout}
-      >
-        <InputNumber
-          placeholder="41234234"
-          min={1}
-          name="counterID"
-          value={clientCreator.counterID}
-          onChange={clientCreator.setCounterID}
-        />
-      </Form.Item>
-      <Form.Item
-        {...buttonItemLayout}
-      >
-        <Button
-          onClick={clientCreator.createClient}
-          type="primary"
-        >
-          Создать
-        </Button>
-      </Form.Item>
-    </Form>
-  </div>
+        Создать
+      </Button>
+    </Form.Item>
+  </Form>
 );
 
 ClientCreator.propTypes = {
 };
 
-export default observer(ClientCreator);
+export default Form.create()(observer(ClientCreator));

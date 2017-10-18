@@ -13,10 +13,7 @@ const PageCreator = types
     ),
     url: '',
     title: '',
-    type: types.optional(
-      types.enumeration(['group', 'individual', 'related']),
-      'related',
-    ),
+    type: types.enumeration(['group', 'individual', 'related']),
   })
   .views(self => ({
     get client() {
@@ -41,7 +38,7 @@ const PageCreator = types
         type: self.type,
       };
       if (related) {
-        query.parent = parent;
+        query.parent = getParent(self).id;
       }
       axios().post('v1/page', query).then(
         () => self.createPageSuccess(related, parent),
@@ -67,7 +64,7 @@ const Page = types
     parent: types.maybe(types.number),
     active: types.boolean,
     views: 0,
-    pageCreator: types.optional(PageCreator, {}),
+    pageCreator: types.optional(PageCreator, { type: 'related' }),
   })
   .views(self => ({
     get pages() {
@@ -93,7 +90,7 @@ const Client = types
     name: types.string,
     pages: types.optional(types.map(Page), {}),
     fetchPagesState: types.optional(types.enumeration(fetchStates), 'pending'),
-    pageCreator: types.optional(PageCreator, {}),
+    pageCreator: types.optional(PageCreator, { type: 'group' }),
   })
   .views(self => ({
     get pagesData() {
@@ -164,7 +161,13 @@ const ClientCreator = types
       self.brand = value;
     },
     setVATIN(value) {
-      self.vatin = value;
+      const reg = /^\d+$/;
+      if (
+        (!isNaN(value) && reg.test(value) && value.length <= 12)
+        || value === ''
+      ) {
+        self.vatin = value;
+      }
     },
     setCounterID(value) {
       self.counterID = value;
@@ -173,6 +176,8 @@ const ClientCreator = types
       self.state = 'pending';
       axios().post('v1/client', {
         name: self.name,
+        brand: self.brand,
+        vatin: self.vatin,
         counterID: self.counterID,
       }).then(
         self.createClientSuccess,

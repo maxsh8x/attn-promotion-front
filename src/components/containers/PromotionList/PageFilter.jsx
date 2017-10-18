@@ -27,7 +27,7 @@ class PageFilter extends Component {
     const { filter } = this.props.promotionStore.inputData;
     return (
       <Input
-        placeholder="Введите название страницы"
+        placeholder="Фильтр по названию страницы"
         className={style.inputField}
         value={filter}
         onChange={this.updateFilter}

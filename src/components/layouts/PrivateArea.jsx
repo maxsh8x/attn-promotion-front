@@ -28,6 +28,7 @@ const PrivateAreaLayout = ({ children, history }) => (
                 <NavLink to="/clients"><Icon type="team" />Клиенты</NavLink>
               </Menu.Item>
               <Menu.Item key="2" disabled><Icon type="bank" />Источники рекламы</Menu.Item>
+              <Menu.Item key="3" disabled><Icon type="question-circle-o" />Групповые вопросы</Menu.Item>
             </SubMenu>
             <SubMenu key="metrics" title={<span><Icon type="area-chart" />Метрики</span>}>
               <Menu.Item key="promotion">

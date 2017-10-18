@@ -3,8 +3,7 @@ import moment from 'moment';
 import ReactPropTypes from 'prop-types';
 import { PropTypes, inject, observer } from 'mobx-react';
 import { Table, Spin, Badge, Switch } from 'antd';
-import AddPage from './AddPage';
-import RelatedList from './RelatedList';
+import AddPage from './AddPage/Main';
 
 // const StatusBadge = ({ active }) => {
 //   const status = active ? 'success' : 'error';
@@ -55,7 +54,7 @@ class PageList extends Component {
       const page = client.pages.get(id);
       return (
         <div>
-          <AddPage pageCreator={page.pageCreator} parent={id} related />
+          <AddPage pageCreator={page.pageCreator} related />
           <Table
             rowKey="id"
             columns={basicColumns}

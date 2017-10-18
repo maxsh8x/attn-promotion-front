@@ -16,7 +16,8 @@ const GroupQuestionCreator = ({ groupQuestionCreator }) => (
       <Form.Item>
         <InputNumber
           placeholder="ID счетчика"
-          min={1}
+          min={10000000}
+          max={99999999}
           name="counterID"
           value={groupQuestionCreator.counterID}
           onChange={groupQuestionCreator.setCounterID}

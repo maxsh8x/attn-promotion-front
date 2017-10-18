@@ -26,7 +26,7 @@ class ClientSelector extends Component {
         mode="multiple"
         labelInValue
         value={clients.toJS()}
-        placeholder="Введите имя клиента"
+        placeholder="Фильтр по имени клиента"
         notFoundContent={state !== 'success' ? <Spin size="small" /> : null}
         filterOption={false}
         onSearch={this.fetchClients}

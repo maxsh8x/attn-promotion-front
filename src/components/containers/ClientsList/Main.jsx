@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Table, Button, Modal, DatePicker } from 'antd';
+import { Table, Button, Modal, DatePicker, Input } from 'antd';
 import moment from 'moment';
 import PageList from './PageList';
 import ClientCreator from './ClientCreator';
-import GroupQuestionCreator from './GroupQuestionCreator';
 import style from './Main.css';
 
 const { RangePicker } = DatePicker;
@@ -43,17 +42,9 @@ class ClientsList extends Component {
         >
           <ClientCreator clientCreator={clientCreator} />
         </Modal>
-        <Modal
-          visible={groupQuestionCreator.modalShown}
-          title="Информация о клиенте"
-          footer={null}
-          onCancel={groupQuestionCreator.toggleModal}
-        >
-          <GroupQuestionCreator groupQuestionCreator={groupQuestionCreator} />
-        </Modal>
         <div className={style.tableOperations}>
           <Button onClick={clientCreator.toggleModal}>Создать клиента</Button>
-          <Button onClick={groupQuestionCreator.toggleModal}>Создать групповой вопрос</Button>
+          <Input placeholder="Фильтр по адресу страницы" name="url" style={{ width: 400 }} />
           <Table
             bordered
             rowKey="id"
