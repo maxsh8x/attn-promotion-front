@@ -30,6 +30,8 @@ class ClientsList extends Component {
     const columns = [
       { dataIndex: 'counterID', title: 'ID счетчика', width: 100 },
       { dataIndex: 'name', title: 'Имя клиента' },
+      { dataIndex: 'brand', title: 'Бренд' },
+      { dataIndex: 'vatin', title: 'ИНН' },
     ];
 
     return (
@@ -56,6 +58,7 @@ class ClientsList extends Component {
                 Подсчет просмотров за период: <RangePicker
                   defaultValue={[moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')]}
                   onChange={this.updateDate}
+                  allowClear={false}
                 />
               </div>)}
             expandedRowRender={this.expandedRowRender}

@@ -2,29 +2,35 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { Button, Form, Input, InputNumber } from 'antd';
 
-const GroupQuestionCreator = ({ groupQuestionCreator }) => (
+const GroupQuestionCreator = ({ groupQuestionCreator, form }) => (
   <div>
     <Form layout="inline">
       <Form.Item>
-        <Input
-          placeholder="Адрес страницы"
-          name="url"
-          value={groupQuestionCreator.url}
-          onChange={e => groupQuestionCreator.setURL(e.target.value)}
-        />
+        {form.getFieldDecorator('url', {
+          rules: [
+            { required: true, message: 'Введите адрес страницы' },
+            { message: 'Неверный формат ссылки', type: 'url' },
+          ],
+          getValueFromEvent: () => groupQuestionCreator.url,
+          onChange: e => groupQuestionCreator.setURL(e.target.value),
+        })(<Input placeholder="Адрес страницы" />)}
       </Form.Item>
       <Form.Item>
-        <InputNumber
-          placeholder="ID счетчика"
-          min={10000000}
-          max={99999999}
-          name="counterID"
-          value={groupQuestionCreator.counterID}
-          onChange={groupQuestionCreator.setCounterID}
-        />
+        {form.getFieldDecorator('counterID', {
+          rules: [
+            { message: 'Введите ID счетчика', required: true },
+            { message: 'Неверный ID счетчика', type: 'number', min: 10000000, max: 99999999 },
+          ],
+          getValueFromEvent: () => groupQuestionCreator.counterID,
+          onChange: value => groupQuestionCreator.setCounterID(value),
+        })(<InputNumber placeholder="41234234" />)}
       </Form.Item>
       <Form.Item>
         <Button
+          onClick={() => form.validateFieldsAndScroll(
+            (err) => {
+              if (!err) { groupQuestionCreator.createGroupQuestion(); }
+            })}
           type="primary"
         >
           Создать
@@ -38,4 +44,4 @@ GroupQuestionCreator.propTypes = {
 
 };
 
-export default observer(GroupQuestionCreator);
+export default Form.create()(observer(GroupQuestionCreator));

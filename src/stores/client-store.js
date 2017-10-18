@@ -63,7 +63,7 @@ const Page = types
     type: types.string,
     parent: types.maybe(types.number),
     active: types.boolean,
-    views: 0,
+    views: 0, // null
     pageCreator: types.optional(PageCreator, { type: 'related' }),
   })
   .views(self => ({
@@ -88,6 +88,8 @@ const Client = types
     id: types.identifier(types.number),
     counterID: types.number,
     name: types.string,
+    brand: types.string,
+    vatin: types.string,
     pages: types.optional(types.map(Page), {}),
     fetchPagesState: types.optional(types.enumeration(fetchStates), 'pending'),
     pageCreator: types.optional(PageCreator, { type: 'group' }),
@@ -170,7 +172,12 @@ const ClientCreator = types
       }
     },
     setCounterID(value) {
-      self.counterID = value;
+      const counterID = parseInt(value, 10);
+      if (counterID) {
+        self.counterID = counterID;
+      } else if (value === '') {
+        self.counterID = null;
+      }
     },
     createClient() {
       self.state = 'pending';
@@ -197,33 +204,10 @@ const ClientCreator = types
     },
   }));
 
-const GroupQuestionCreator = types
-  .model('GroupQuestionCreator', {
-    url: '',
-    modalShown: false,
-    counterID: types.maybe(types.number),
-    state: types.optional(
-      types.enumeration(fetchStates),
-      'done',
-    ),
-  })
-  .actions(self => ({
-    setCounterID(value) {
-      self.counterID = value;
-    },
-    setURL(value) {
-      self.url = value;
-    },
-    toggleModal() {
-      self.modalShown = !self.modalShown;
-    },
-  }));
-
 const ClientStore = types
   .model('ClientStore', {
     clients: types.optional(types.map(Client), {}),
     clientCreator: types.optional(ClientCreator, {}),
-    groupQuestionCreator: types.optional(GroupQuestionCreator, {}),
     state: types.optional(
       types.enumeration(fetchStates),
       'pending',

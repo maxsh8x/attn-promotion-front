@@ -47,14 +47,14 @@ const ClientCreator = ({ clientCreator, form }) => (
       label="ID счетчика"
       {...formItemLayout}
     >
-      <InputNumber
-        placeholder="41234234"
-        min={10000000}
-        max={99999999}
-        name="counterID"
-        value={clientCreator.counterID}
-        onChange={clientCreator.setCounterID}
-      />
+      {form.getFieldDecorator('counterID', {
+        rules: [
+          { message: 'Введите ID счетчика', required: true },
+          { message: 'Неверный ID счетчика', type: 'number', min: 10000000, max: 99999999 },
+        ],
+        getValueFromEvent: () => clientCreator.counterID,
+        onChange: value => clientCreator.setCounterID(value),
+      })(<InputNumber placeholder="41234234" />)}
     </Form.Item>
     <Form.Item
       {...buttonItemLayout}
