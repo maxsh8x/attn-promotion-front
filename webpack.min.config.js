@@ -7,9 +7,6 @@ module.exports = {
   },
   context: resolve(__dirname, 'src'),
   entry: [
-    'react-hot-loader/patch',
-    'webpack-dev-server/client?http://localhost:8080',
-    'webpack/hot/only-dev-server',
     './App.jsx',
   ],
   output: {
@@ -18,13 +15,6 @@ module.exports = {
     publicPath: '/',
   },
   devtool: 'inline-source-map',
-  devServer: {
-    hot: true,
-    contentBase: resolve(__dirname, 'dist'),
-    publicPath: '/',
-    historyApiFallback: true,
-    disableHostCheck: true,
-  },
   module: {
     rules: [
       {
@@ -37,7 +27,22 @@ module.exports = {
       { test: /\.json$/, loader: 'json-loader' },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
+        oneOf: [
+          {
+            exclude: /antd/,
+            use: [
+              'style-loader',
+              'css-loader?modules',
+            ],
+          },
+          {
+            include: /antd/,
+            use: [
+              'style-loader',
+              'css-loader',
+            ],
+          },
+        ],
       },
     ],
   },
