@@ -5,6 +5,7 @@
   "repository": "git@gitlab.com:thesalt/answer-promotion-front.git",
   "author": "",
   "scripts": {
+    "postinstall": "npm run build",
     "build": "webpack --config=webpack.min.config.js",
     "dev": "webpack-dev-server"
   },
