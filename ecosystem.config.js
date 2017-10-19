@@ -11,7 +11,7 @@ module.exports = {
       script: 'serve',
       env: {
         COMMON_VARIABLE: 'true',
-        PM2_SERVE_PATH: './build',
+        PM2_SERVE_PATH: './dist',
         PM2_SERVE_PORT: 8080,
       },
       env_production: {
