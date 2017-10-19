@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { PropTypes, inject, observer } from 'mobx-react';
-import debounce from 'lodash.debounce';
 
 import { Input } from 'antd';
 import style from './ClientSelector.css';
