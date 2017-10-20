@@ -2,34 +2,36 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Select, Form, Spin } from 'antd';
 // TODO: Provider
-import { PageFilter } from '../../../../stores/filter-store';
+import Filter from '../../../../stores/filter-store';
 
 @observer
 class Group extends Component {
   constructor(props) {
     super(props);
-    this.pageFilter = PageFilter.create({});
+    const x = data => console.log(data, 'raised');
+    this.pageFilter = Filter.create({}, {
+      url: '/v1/page/search',
+      fetch: x,
+    });
   }
 
   render() {
     return (
-      <Form>
-        <Select
-          mode="multiple"
-          labelInValue
-          value={this.pageFilter.filter.toJS()}
-          placeholder="Select users"
-          notFoundContent={this.pageFilter.state === 'done' ? <Spin size="small" /> : null}
-          filterOption={false}
-          onSearch={this.pageFilter.fetchPages}
-          onChange={this.pageFilter.setFilter}
-          style={{ width: '100%' }}
-        >
-          {this.pageFilter.pages.map(page =>
-            <Select.Option key={page.id}>{page.url}</Select.Option>,
-          )}
-        </Select>
-      </Form>
+      <Select
+        mode="multiple"
+        labelInValue
+        value={this.pageFilter.itemsData}
+        placeholder="Введите страницу для поиска"
+        notFoundContent={this.pageFilter.state === 'done' ? <Spin size="small" /> : null}
+        filterOption={false}
+        onSearch={this.pageFilter.fetchData}
+        onChange={this.pageFilter.setFilter}
+        style={{ width: 400 }}
+      >
+        {this.pageFilter.data.map(page =>
+          <Select.Option key={page.value}>{page.text}</Select.Option>,
+        )}
+      </Select>
     );
   }
 }

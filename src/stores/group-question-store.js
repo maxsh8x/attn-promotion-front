@@ -71,9 +71,6 @@ const GroupQuestionStore = types
     },
   }))
   .actions(self => ({
-    afterCreate() {
-      self.fetchGroupQuestions();
-    },
     setDate(startDate, endDate) {
       self.startDate = startDate;
       self.endDate = endDate;

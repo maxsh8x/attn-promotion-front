@@ -227,9 +227,6 @@ const ClientStore = types
     },
   }))
   .actions(self => ({
-    afterCreate() {
-      self.fetchClients();
-    },
     setDate(startDate, endDate) {
       self.startDate = startDate;
       self.endDate = endDate;

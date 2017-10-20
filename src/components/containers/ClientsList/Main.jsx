@@ -10,6 +10,10 @@ const { RangePicker } = DatePicker;
 
 @inject('clientsStore') @observer
 class ClientsList extends Component {
+  componentWillMount() {
+    this.props.clientsStore.fetchClients();
+  }
+
   expandedRowRender = ({ id, type }) => {
     const client = this.props.clientsStore.clients.get(id);
     return <PageList client={client} type={type} />;

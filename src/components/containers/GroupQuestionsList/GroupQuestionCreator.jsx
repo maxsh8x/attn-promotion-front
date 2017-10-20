@@ -13,7 +13,7 @@ const GroupQuestionCreator = ({ groupQuestionCreator, form }) => (
           ],
           getValueFromEvent: () => groupQuestionCreator.url,
           onChange: e => groupQuestionCreator.setURL(e.target.value),
-        })(<Input placeholder="Адрес страницы" />)}
+        })(<Input placeholder="Адрес страницы" style={{ width: 250 }} />)}
       </Form.Item>
       <Form.Item>
         {form.getFieldDecorator('counterID', {

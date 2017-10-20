@@ -1,5 +1,5 @@
-// import { reaction } from 'mobx';
-import { types, unprotect } from 'mobx-state-tree';
+import { toJS } from 'mobx';
+import { types, getEnv } from 'mobx-state-tree';
 // import debounce from 'lodash.debounce';
 import axios from '../utils/axios';
 
@@ -7,74 +7,66 @@ const fetchStates = ['pending', 'done', 'error'];
 
 const Page = types
   .model({
-    id: types.identifier(types.number),
-    url: types.string,
+    text: types.string,
+    value: types.string,
   });
 
-const PageFilterValue = types
+const FilterValue = types
   .model({
-    key: '',
-    label: '',
+    key: types.string,
+    label: types.string,
   });
 
-const PageFilter = types
-  .model({
+const Filter = types
+  .model('Filter', {
     lastFetchID: 0,
-    filter: types.optional(types.array(PageFilterValue), []),
-    pages: types.optional(types.array(Page), []),
+    items: types.optional(types.array(FilterValue), []),
+    data: types.optional(types.array(Page), []),
     state: types.optional(
       types.enumeration(fetchStates),
       'done',
     ),
   })
+  .views(self => ({
+    get itemsData() {
+      return toJS(self.items);
+    },
+  }))
   .actions(self => ({
-    setFilter(value) {
-      self.filter.replace(value);
-      self.pages.clear();
-      self.state = 'pending';
-    },
-    fetchPages() {
-      self.state = 'pending';
-      axios().get('v1/page/search', {
-        params: {
-          filter: self.filter,
-        },
-      }).then(
-        self.fetchPagesSuccess,
-        self.fetchPagesError,
-      );
-    },
-    fetchPagesSuccess({ data }) {
-      self.pages.replace(data);
+    setFilter(items) {
+      self.items.replace(items);
+      self.data.clear();
       self.state = 'done';
     },
-    fetchPagesError() {
+    fetchData(filter) {
+      self.state = 'pending';
+      self.lastFetchID += 1;
+      const fetchID = self.lastFetchID;
+      const url = getEnv(self).url;
+      axios().get(url, {
+        params: {
+          filter,
+          limit: 5,
+        },
+      }).then(
+        ({ data }) => self.fetchDataSuccess({ data, fetchID }),
+        self.fetchDataError,
+      );
+    },
+    fetchDataSuccess({ data, fetchID }) {
+      if (fetchID !== self.lastFetchID) {
+        return;
+      }
+      const newData = data.map(item => ({
+        text: item.text,
+        value: `${item.value}`,
+      }));
+      self.data.replace(newData);
+      self.state = 'done';
+    },
+    fetchDataError() {
       self.state = 'error';
     },
   }));
 
-// const Client = types
-//   .model({
-//     id: types.identifier(types.number),
-//     name: types.string,
-//   });
-
-// const ClientFilter = types
-//   .model({
-//     filter: '',
-//     clients: types.array(Client),
-//     state: types.optional(
-//       types.enumeration(fetchStates),
-//       'done',
-//     ),
-//   })
-//   .actions(self => ({
-//   }));
-
-// const FiltersStore = types
-//   .model({
-//     page: types.optional(PageFilter, {}),
-//     client: types.optional(ClientFilter, {}),
-//   });
-
-export { PageFilter };
+export default Filter;

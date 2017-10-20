@@ -1,9 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
+import { Button, Input } from 'antd';
 import style from './Main.css';
 import TypeSelector from './TypeSelector';
-import Individual from './Individual';
 import Group from './Group';
 
 const AddPage = ({ pageCreator }) => (
@@ -12,8 +11,15 @@ const AddPage = ({ pageCreator }) => (
     {
       pageCreator.type === 'group'
         ? <Group />
-        : <Individual />
+        : <Input
+          placeholder="Введите адрес страницы"
+          onChange={e => pageCreator.setURL(e.target.value)}
+          value={pageCreator.url}
+          disabled={pageCreator.state === 'pending'}
+          style={{ width: 250 }}
+        />
     }
+    <Button onClick={pageCreator.createPage}>Привязать</Button>
   </div>
 );
 
