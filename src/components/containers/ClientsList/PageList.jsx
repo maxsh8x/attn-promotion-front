@@ -1,15 +1,7 @@
 import React, { Component } from 'react';
-import moment from 'moment';
-import ReactPropTypes from 'prop-types';
-import { PropTypes, inject, observer } from 'mobx-react';
-import { Table, Spin, Badge, Switch } from 'antd';
+import { observer } from 'mobx-react';
+import { Table, Spin, Switch } from 'antd';
 import AddPage from './AddPage/Main';
-
-// const StatusBadge = ({ active }) => {
-//   const status = active ? 'success' : 'error';
-//   const text = active ? 'Активна' : 'Неактивна';
-//   return <Badge status={status} text={text} />;
-// };
 
 const renderPageURL = (pageURL) => {
   const urlParts = pageURL.split('/');

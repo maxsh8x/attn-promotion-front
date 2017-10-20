@@ -1,57 +1,80 @@
-import { reaction } from 'mobx';
-import { types, getEnv } from 'mobx-state-tree';
-import debounce from 'lodash.debounce';
+// import { reaction } from 'mobx';
+import { types, unprotect } from 'mobx-state-tree';
+// import debounce from 'lodash.debounce';
+import axios from '../utils/axios';
+
+const fetchStates = ['pending', 'done', 'error'];
 
 const Page = types
   .model({
-    filter: types.string,
+    id: types.identifier(types.number),
+    url: types.string,
+  });
+
+const PageFilterValue = types
+  .model({
+    key: '',
+    label: '',
+  });
+
+const PageFilter = types
+  .model({
+    lastFetchID: 0,
+    filter: types.optional(types.array(PageFilterValue), []),
+    pages: types.optional(types.array(Page), []),
+    state: types.optional(
+      types.enumeration(fetchStates),
+      'done',
+    ),
   })
-  .views(self => ({
-    get fetchPages() {
-      return getEnv(self).fetchPages;
-    },
-  }))
   .actions(self => ({
-    afterCreate() {
-      reaction(
-        () => self.filter,
-        () => debounce(self.fetchPages(), 800),
+    setFilter(value) {
+      self.filter.replace(value);
+      self.pages.clear();
+      self.state = 'pending';
+    },
+    fetchPages() {
+      self.state = 'pending';
+      axios().get('v1/page/search', {
+        params: {
+          filter: self.filter,
+        },
+      }).then(
+        self.fetchPagesSuccess,
+        self.fetchPagesError,
       );
     },
-    setFilter(value) {
-      self.filter = value;
+    fetchPagesSuccess({ data }) {
+      self.pages.replace(data);
+      self.state = 'done';
+    },
+    fetchPagesError() {
+      self.state = 'error';
     },
   }));
 
-const Client = types
-  .model({
-    id: types.identifier(types.number),
-    name: types.string,
-  });
+// const Client = types
+//   .model({
+//     id: types.identifier(types.number),
+//     name: types.string,
+//   });
 
-const ClientFilter = types
-  .model({
-    value: types.string,
-    data: types.optional(types.map(Client), {}),
-  })
-  .views(self => ({
-    get fetchClients() {
-      return getEnv(self).fetchClients;
-    },
-  }))
-  .actions(self => ({
-    afterCreate() {
+// const ClientFilter = types
+//   .model({
+//     filter: '',
+//     clients: types.array(Client),
+//     state: types.optional(
+//       types.enumeration(fetchStates),
+//       'done',
+//     ),
+//   })
+//   .actions(self => ({
+//   }));
 
-    },
-    onChange() {
-      
-    },
-  }));
+// const FiltersStore = types
+//   .model({
+//     page: types.optional(PageFilter, {}),
+//     client: types.optional(ClientFilter, {}),
+//   });
 
-const FilterStore = types
-  .model({
-    page: types.optional(Page, {}),
-    client: types.optional(ClientFilter, {}),
-  });
-
-export default FilterStore;
+export { PageFilter };
