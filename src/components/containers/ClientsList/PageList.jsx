@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Table, Spin, Switch } from 'antd';
+import { Table, Spin, Switch, Modal, Button } from 'antd';
 import AddPage from './AddPage/Main';
+import style from './PageList.css';
 
 const renderPageURL = (pageURL) => {
   const urlParts = pageURL.split('/');
@@ -43,7 +44,7 @@ class PageList extends Component {
   expandedRowRender = ({ id, type }) => {
     if (type === 'group') {
       const { client } = this.props;
-      const page = client.pages.get(id);
+      const page = client.findPageById(id);
       return (
         <div>
           <AddPage pageCreator={page.pageCreator} related />
@@ -74,19 +75,29 @@ class PageList extends Component {
     ]);
     return (
       <div>
-        <AddPage pageCreator={client.pageCreator} related={false} />
-        <Spin spinning={spinning}>
-          <Table
-            rowKey="id"
-            columns={columns}
-            dataSource={client.pagesData}
-            size="small"
-            pagination={false}
-            title={() => 'Список страниц клиента'}
-            footer={() => `Всего просмотров: ${client.totalViews}`}
-            expandedRowRender={this.expandedRowRender}
-          />
-        </Spin>
+        <Modal
+          visible={client.pageCreator.modalShown}
+          title="Информация о странице"
+          footer={null}
+          onCancel={client.pageCreator.toggleModal}
+        >
+          <AddPage pageCreator={client.pageCreator} related={false} />
+        </Modal>
+        <div className={style.tableOperations}>
+          <Button onClick={client.pageCreator.toggleModal}>Создать клиента</Button>
+          <Spin spinning={spinning}>
+            <Table
+              rowKey="id"
+              columns={columns}
+              dataSource={client.pagesData}
+              size="small"
+              pagination={false}
+              title={() => 'Список страниц клиента'}
+              footer={() => `Всего просмотров: ${client.totalViews}`}
+              expandedRowRender={this.expandedRowRender}
+            />
+          </Spin>
+        </div>
       </div>
     );
   }

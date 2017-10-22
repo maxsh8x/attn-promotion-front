@@ -53,15 +53,15 @@ class GroupQuestionsList extends Component {
           >
             Создать групповой вопрос
           </Button>
-          <Table
-            bordered
-            rowKey="id"
-            columns={columns}
-            dataSource={groupQuestionsData}
-            title={() => 'Список групповых вопросов'}
-            expandedRowRender={this.expandedRowRender}
-          />
         </div>
+        <Table
+          bordered
+          rowKey="id"
+          columns={columns}
+          dataSource={groupQuestionsData}
+          title={() => 'Список групповых вопросов'}
+          expandedRowRender={this.expandedRowRender}
+        />
       </div>
     );
   }

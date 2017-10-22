@@ -1,207 +1,124 @@
-import { action, observable } from 'mobx';
-import { message } from 'antd';
+import { toJS } from 'mobx';
+import { types } from 'mobx-state-tree';
 import moment from 'moment';
 import axios from '../utils/axios';
 
+const fetchStates = ['pending', 'done', 'error'];
 
-class PromotionStore {
-  @observable data = []
-  @observable yandexData = observable.shallowMap()
-  @observable inputData = {
-    filter: '',
-    isActiveTab: true,
+const Input = types
+  .model('Input', {
+    cost: 0,
+    clicks: 0,
+  });
+
+const Page = types
+  .model('Page', {
+    id: types.identifier(types.number),
+    createdAt: types.string,
+    url: types.string,
+    type: types.string,
+    active: types.boolean,
+    inputs: types.optional(
+      types.map(Input),
+      {},
+    ),
+  })
+  .views(self => ({
+    get total() {
+      const result = {
+        cost: 0,
+        clicks: 0,
+        costPerClick: 0,
+      };
+      self.inputs.forEach((input) => {
+        result.cost = input.cost;
+        result.clicks = input.clicks;
+      });
+      if (result.cost && result.clicks) {
+        result.costPerClick = (result.cost / result.clicks).toFixed(2);
+      }
+      return result;
+    },
+  }));
+
+const PromotionStore = types
+  .model('PromotionStore', {
+    date: types.optional(
+      types.string,
+      moment().subtract(1, 'days').format('YYYY-MM-DD'),
+    ),
     activePages: 0,
     inactivePages: 0,
-    limit: 10,
+    metricNetworks: types.optional(
+      types.array(types.string),
+      [],
+    ),
+    pages: types.optional(
+      types.array(Page),
+      [],
+    ),
+    state: types.optional(
+      types.enumeration(fetchStates),
+      'done',
+    ),
+    isActiveTab: true,
     offset: 0,
-    url: '',
-    date: '',
-  }
-  @observable states = {
-    fetchPages: 'pending',
-    fetchMetrics: 'pending',
-  }
-  @observable metricNetworks = []
-
-  constructor() {
-    this.inputData.date = moment().add(-1, 'days').format('YYYY-MM-DD')
-  }
-
-  getYData(pageID) {
-    return this.yandexData.get(`${pageID}_${this.inputData.date}`);
-  }
-
-  @action updateInput(name, value) {
-    this.inputData[name] = value;
-  }
-
-  @action setTotalCost(pageID, totalCost) {
-    this.totalCost.set(pageID, totalCost);
-  }
-
-  @action commitInputChanges(params) {
-    const {
-      source,
-      type,
-      pageID,
-      value,
-      rowIndex,
-    } = params;
-
-    const networks = this.data[rowIndex].networks;
-    networks[source][type] = value;
-    const total = {
-      cost: 0,
-      clicks: 0,
-      costPerClick: 0,
-    };
-
-    const metricNetworks = this.metricNetworks.toJS();
-    for (let i = 0; i < metricNetworks.length; i += 1) {
-      total.cost += networks[metricNetworks[i]].cost;
-      total.clicks += networks[metricNetworks[i]].clicks;
-    }
-    if (total.cost && total.clicks) {
-      total.costPerClick = (total.cost / total.clicks).toFixed(2);
-    }
-    this.data[rowIndex].total = total;
-
-    return axios().post('v1/input', {
-      yDate: this.inputData.date,
-      source,
-      type,
-      pageID,
-      value,
-    }).then(
-      action('input commit success', () => {
-        message.info('Изменения сохранены');
-      }),
-      action('input commit failed', () => { }),
-    );
-  }
-
-  @action updateStatus = (pageID, active, rowIndex) => {
-    return axios().patch(`v1/page/${pageID}/status`, {
-      active,
-    }).then(
-      action('update status success', () => {
-        this.data[rowIndex].active = active;
-      }),
-      action('update status failed', () => { }),
-    );
-  }
-
-  @action fetchPages(clients = []) {
-    this.states.fetchPages = 'pending';
-    return axios().get('v1/page', {
-      params: {
-        limit: this.inputData.limit,
-        offset: this.inputData.offset,
-        yDate: this.inputData.date,
-        active: this.inputData.isActiveTab,
-        filter: this.inputData.filter,
-        clients: clients.join(','),
-      },
+    limit: 50,
+  })
+  .views(self => ({
+    get pagesData() {
+      return toJS(self.pages);
     },
-    ).then(
-      action('fetching pages success', ({ data }) => {
-        this.metricNetworks.replace(data.metricNetworks);
-        this.inputData.inactivePages = data.inactivePages;
-        this.inputData.activePages = data.activePages;
-        const newData = [];
-        const networksInitState = {};
-
-        for (let i = 0; i < data.metricNetworks.length; i += 1) {
-          networksInitState[data.metricNetworks[i]] = {
-            cost: 0,
-            clicks: 0,
-          };
-        }
-
-        const flatInput = {};
-        for (let i = 0; i < data.input.length; i += 1) {
-          flatInput[data.input[i]._id.page] = { ...networksInitState };
-          for (let x = 0; x < data.input[i].sources.length; x += 1) {
-            flatInput[data.input[i]._id.page][data.input[i].sources[x]] = {
-              cost: data.input[i].cost[x],
-              clicks: data.input[i].clicks[x],
-            };
-          }
-        }
-
-        for (let i = 0; i < data.pages.length; i += 1) {
-          const item = {
-            _id: data.pages[i]._id,
-            url: data.pages[i].url,
-            title: data.pages[i].title,
-            active: data.pages[i].active,
-            createdAt: data.pages[i].createdAt,
-            networks: flatInput[data.pages[i]._id]
-              ? { ...networksInitState, ...flatInput[data.pages[i]._id] }
-              : networksInitState,
-            total: {
-              cost: 0,
-              clicks: 0,
-              costPerClick: 0,
-            },
-          };
-
-          for (let x = 0; x < data.metricNetworks.length; x += 1) {
-            item.total.cost += item.networks[data.metricNetworks[x]].cost;
-            item.total.clicks += item.networks[data.metricNetworks[x]].clicks;
-          }
-          if (item.total.cost && item.total.clicks) {
-            item.total.costPerClick = (item.total.cost / item.total.clicks).toFixed(2);
-          }
-          newData.push(item);
-        }
-
-        this.data.replace(newData);
-        this.states.fetchPages = 'success';
-      }),
-      action('fetching pages failed', () => {
-        this.states.fetchPages = 'failed';
-      }),
-    );
-  }
-
-  @action fetchMetrics(pageID) {
-    this.states.fetchMetrics = 'pending';
-    this.yandexData.delete(pageID);
-    return axios().get(
-      'v1/metrics',
-      {
+  }))
+  .actions(self => ({
+    switchTab(tabKey) {
+      self.isActiveTab = tabKey === 'active';
+      self.fetchPages();
+    },
+    fetchPages() {
+      self.fetchPagesState = 'pending';
+      axios().get('v1/page', {
         params: {
-          yDate: this.inputData.date,
-          pageID,
+          yDate: self.date,
+          active: self.isActiveTab,
+          offset: self.offset,
+          limit: self.limit,
+          clients: '',
+          filter: '',
         },
-      },
-    ).then(
-      action('fetching metrics success', ({ data }) => {
-        this.yandexData.set(`${pageID}_${this.inputData.date}`, data);
-        this.states.fetchMetrics = 'success';
-      }),
-      action('fetching metrics failed', () => {
-        this.states.fetchMetrics = 'failed';
-      }),
-    );
-  }
+      }).then(
+        self.fetchPagesSuccess,
+        self.fetchPagesError,
+      );
+    },
+    fetchPagesSuccess({ data }) {
+      const flatInput = {};
 
-  @action updateData(pageID) {
-    return axios().post('/v1/metrics', {
-      yDate: this.inputData.date,
-      pageID,
-    }).then(
-      action('metrics update success', () => {
-        this.fetchMetrics(pageID);
-      }),
-      action('metrics update failed', () => { }),
-    );
-  }
-}
+      for (let i = 0; i < data.input.length; i += 1) {
+        flatInput[data.input[i]._id.page] = {};
+        for (let x = 0; x < data.input[i].sources.length; x += 1) {
+          flatInput[data.input[i]._id.page][data.input[i].sources[x]] = {
+            cost: data.input[i].cost[x],
+            clicks: data.input[i].clicks[x],
+          };
+        }
+      }
 
-const promotionStore = new PromotionStore();
+      self.pages.replace(data.pages.map(item => ({
+        ...item,
+        id: item._id,
+        inputs: flatInput[item._id],
+      })));
+      self.metricNetworks.replace(data.metricNetworks);
+      self.activePages = data.activePages;
+      self.inactivePages = data.inactivePages;
+      self.fetchPagesState = 'done';
+    },
+    fetchPagesError() {
+      self.fetchPagesState = 'error';
+    },
+  }));
+
+const promotionStore = PromotionStore.create({});
 
 export default promotionStore;
-
-export { PromotionStore };

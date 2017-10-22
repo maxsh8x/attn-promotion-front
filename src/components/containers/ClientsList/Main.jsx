@@ -15,7 +15,7 @@ class ClientsList extends Component {
   }
 
   expandedRowRender = ({ id, type }) => {
-    const client = this.props.clientsStore.clients.get(id);
+    const client = this.props.clientsStore.findClientById(id);
     return <PageList client={client} type={type} />;
   }
 
@@ -51,23 +51,23 @@ class ClientsList extends Component {
         <div className={style.tableOperations}>
           <Button onClick={clientCreator.toggleModal}>Создать клиента</Button>
           <Input placeholder="Фильтр по адресу страницы" name="url" style={{ width: 400 }} />
-          <Table
-            bordered
-            rowKey="id"
-            columns={columns}
-            dataSource={clientsData}
-            title={() => 'Список клиентов'}
-            footer={() => (
-              <div>
-                Подсчет просмотров за период: <RangePicker
-                  defaultValue={[moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')]}
-                  onChange={this.updateDate}
-                  allowClear={false}
-                />
-              </div>)}
-            expandedRowRender={this.expandedRowRender}
-          />
         </div>
+        <Table
+          bordered
+          rowKey="id"
+          columns={columns}
+          dataSource={clientsData}
+          title={() => 'Список клиентов'}
+          footer={() => (
+            <div>
+              Подсчет просмотров за период: <RangePicker
+                defaultValue={[moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')]}
+                onChange={this.updateDate}
+                allowClear={false}
+              />
+            </div>)}
+          expandedRowRender={this.expandedRowRender}
+        />
       </div>
     );
   }

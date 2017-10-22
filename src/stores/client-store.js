@@ -1,18 +1,29 @@
-import { reaction } from 'mobx';
+import { reaction, toJS } from 'mobx';
 import { types, getRoot, getParent } from 'mobx-state-tree';
 import moment from 'moment';
 import axios from '../utils/axios';
 
 const fetchStates = ['pending', 'done', 'error'];
 
-const PageCreator = types
-  .model('PageCreator', {
+const PageMetaCreator = types
+  .model('PageMetaCreator', {
+    modalShown: false,
     state: types.optional(
       types.enumeration(fetchStates),
       'done',
     ),
     url: '',
     title: '',
+    minViews: 0,
+    maxViews: 0,
+    startDate: types.optional(
+      types.string,
+      moment().format('YYYY-MM-DD'),
+    ),
+    endDate: types.optional(
+      types.string,
+      moment().add(1, 'months').format('YYYY-MM-DD'),
+    ),
     type: types.enumeration(['group', 'individual', 'related']),
   })
   .views(self => ({
@@ -23,6 +34,10 @@ const PageCreator = types
     },
   }))
   .actions(self => ({
+    setDate(startDate, endDate) {
+      self.startDate = startDate;
+      self.endDate = endDate;
+    },
     setURL(value) {
       self.url = value;
     },
@@ -53,6 +68,9 @@ const PageCreator = types
     createPageError() {
       self.state = 'error';
     },
+    toggleModal() {
+      self.modalShown = !self.modalShown;
+    },
   }));
 
 const Page = types
@@ -64,7 +82,7 @@ const Page = types
     parent: types.maybe(types.number),
     active: types.boolean,
     views: 0, // null
-    pageCreator: types.optional(PageCreator, { type: 'related' }),
+    pageCreator: types.optional(PageMetaCreator, { type: 'related' }),
   })
   .views(self => ({
     get pages() {
@@ -90,13 +108,13 @@ const Client = types
     name: types.string,
     brand: types.string,
     vatin: types.string,
-    pages: types.optional(types.map(Page), {}),
+    pages: types.optional(types.array(Page), []),
     fetchPagesState: types.optional(types.enumeration(fetchStates), 'pending'),
-    pageCreator: types.optional(PageCreator, { type: 'group' }),
+    pageCreator: types.optional(PageMetaCreator, { type: 'group' }),
   })
   .views(self => ({
     get pagesData() {
-      return self.pages.values().filter(page => page.type !== 'related');
+      return toJS(self.pages).filter(page => page.type !== 'related');
     },
     get totalViews() {
       return self.pagesData.length > 0
@@ -105,6 +123,9 @@ const Client = types
     },
     get clientStore() {
       return getRoot(self);
+    },
+    findPageById(id) {
+      return self.pages.find(page => page.id === id);
     },
   }))
   .actions(self => ({
@@ -206,7 +227,7 @@ const ClientCreator = types
 
 const ClientStore = types
   .model('ClientStore', {
-    clients: types.optional(types.map(Client), {}),
+    clients: types.optional(types.array(Client), []),
     clientCreator: types.optional(ClientCreator, {}),
     state: types.optional(
       types.enumeration(fetchStates),
@@ -223,7 +244,10 @@ const ClientStore = types
   })
   .views(self => ({
     get clientsData() {
-      return self.clients.values();
+      return toJS(self.clients);
+    },
+    findClientById(id) {
+      return self.clients.find(client => client.id === id);
     },
   }))
   .actions(self => ({
@@ -243,10 +267,7 @@ const ClientStore = types
       );
     },
     fetchClientsSuccess({ data }) {
-      for (let i = 0; i < data.length; i += 1) {
-        data[i].id = data[i]._id;
-        self.clients.put(data[i]);
-      }
+      self.clients.replace(data.map(item => ({ ...item, id: item._id })));
       self.state = 'done';
     },
     fetchClientsError(error) {
