@@ -12,6 +12,13 @@ const Input = types
     clicks: 0,
   });
 
+const Metric = types
+  .model('Metrics', {
+    metric: types.string,
+    sources: types.map(types.number),
+    metagroups: types.map(types.number),
+  });
+
 const Page = types
   .model('Page', {
     id: types.identifier(types.number),
@@ -26,6 +33,10 @@ const Page = types
     commitInputState: types.optional(
       types.enumeration(fetchStates),
       'done',
+    ),
+    metrics: types.optional(
+      types.array(Metric),
+      [],
     ),
   })
   .views(self => ({
@@ -52,6 +63,9 @@ const Page = types
         ...self.inputs.toJSON(),
         id: self.id,
       }];
+    },
+    get metricsData() {
+      return toJS(self.metrics);
     },
   }))
   .actions(self => ({
@@ -88,6 +102,24 @@ const Page = types
       self.active = checked;
     },
     updateStatusFailed() { },
+    fetchMetrics() {
+      return axios().get(
+        'v1/metrics',
+        {
+          params: {
+            yDate: self.store.date,
+            pageID: self.id,
+          },
+        },
+      ).then(
+        self.fetchMetricsSuccess,
+        self.fetchMetricsError,
+      );
+    },
+    fetchMetricsSuccess({ data }) {
+      self.metrics.replace(data);
+    },
+    fetchMetricsError() { },
   }));
 
 const PromotionStore = types
@@ -98,7 +130,7 @@ const PromotionStore = types
     ),
     activePages: 0,
     inactivePages: 0,
-    metricNetworks: types.optional(
+    sources: types.optional(
       types.array(types.string),
       [],
     ),
@@ -156,8 +188,8 @@ const PromotionStore = types
     },
     fetchPagesSuccess({ data }) {
       const networksInitState = {};
-      for (let i = 0; i < data.metricNetworks.length; i += 1) {
-        networksInitState[data.metricNetworks[i]] = {
+      for (let i = 0; i < data.sources.length; i += 1) {
+        networksInitState[data.sources[i]] = {
           cost: 0,
           clicks: 0,
         };
@@ -179,7 +211,7 @@ const PromotionStore = types
         id: item._id,
         inputs: flatInput[item._id],
       })));
-      self.metricNetworks.replace(data.metricNetworks);
+      self.sources.replace(data.sources);
       self.activePages = data.activePages;
       self.inactivePages = data.inactivePages;
       self.fetchPagesState = 'done';

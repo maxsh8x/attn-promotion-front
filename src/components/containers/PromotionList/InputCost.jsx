@@ -4,7 +4,7 @@ import { Table, InputNumber } from 'antd';
 
 
 const InputCost = ({ page }) => {
-  const networks = page.store.metricNetworks;
+  const networks = page.store.sources;
   const childItems = networks.map(network => (
     {
       title: network[0].toUpperCase() + network.substr(1),

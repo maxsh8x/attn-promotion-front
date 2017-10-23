@@ -46,7 +46,7 @@ class PromotionList extends Component {
 
   render() {
     const { promotionStore } = this.props;
-    const metricsCostColumns = promotionStore.metricNetworks.map(network => ({
+    const metricsCostColumns = promotionStore.sources.map(network => ({
       key: network,
       dataIndex: `inputs.${network}`,
       title: network[0].toUpperCase() + network.substr(1),

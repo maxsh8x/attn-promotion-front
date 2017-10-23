@@ -3,14 +3,15 @@ import PropTypes from 'prop-types';
 import { Card } from 'antd';
 import { observer } from 'mobx-react';
 import InputCost from './InputCost';
+import YandexMetrics from './YandexMetrics';
 
 const PageLayout = ({ page }) => (
   <div>
     <Card noHovering>
-      {<InputCost page={page} />}
+      <InputCost page={page} />
     </Card>
     <Card noHovering>
-      {/* <YandexMetrics pageID={pageID} rowIndex={rowIndex} /> */}
+      <YandexMetrics page={page} />
     </Card>
     <Card noHovering>
       {/* <PromotionChart /> */}
