@@ -1,5 +1,6 @@
-import { toJS } from 'mobx';
-import { types } from 'mobx-state-tree';
+import { toJS, reaction } from 'mobx';
+import { types, getRoot } from 'mobx-state-tree';
+import { message } from 'antd';
 import moment from 'moment';
 import axios from '../utils/axios';
 
@@ -22,6 +23,10 @@ const Page = types
       types.map(Input),
       {},
     ),
+    commitInputState: types.optional(
+      types.enumeration(fetchStates),
+      'done',
+    ),
   })
   .views(self => ({
     get total() {
@@ -31,14 +36,58 @@ const Page = types
         costPerClick: 0,
       };
       self.inputs.forEach((input) => {
-        result.cost = input.cost;
-        result.clicks = input.clicks;
+        result.cost += input.cost;
+        result.clicks += input.clicks;
       });
       if (result.cost && result.clicks) {
         result.costPerClick = (result.cost / result.clicks).toFixed(2);
       }
       return result;
     },
+    get store() {
+      return getRoot(self);
+    },
+    get inputData() {
+      return [{
+        ...self.inputs.toJSON(),
+        id: self.id,
+      }];
+    },
+  }))
+  .actions(self => ({
+    commitInput(network, type, value) {
+      self.inputs.get(network)[type] = parseFloat(value, 10);
+      return axios().post('v1/input', {
+        yDate: self.store.date,
+        source: network,
+        pageID: self.id,
+        value: parseFloat(value, 10),
+        type,
+      }).then(
+        self.commitInputSuccess,
+        self.commitInputError,
+      );
+    },
+    commitInputSuccess() {
+      message.info('Изменения сохранены');
+      self.commitInputState = 'done';
+    },
+    commitInputError() {
+      message.info('Ошибка при сохранении изменений');
+      self.commitInputState = 'error';
+    },
+    updateStatus(checked) {
+      return axios().patch(`v1/page/${self.id}/status`, {
+        active: checked,
+      }).then(
+        () => self.updateStatusSuccess(checked),
+        self.updateStatusFailed,
+      );
+    },
+    updateStatusSuccess(checked) {
+      self.active = checked;
+    },
+    updateStatusFailed() { },
   }));
 
 const PromotionStore = types
@@ -63,7 +112,7 @@ const PromotionStore = types
     ),
     isActiveTab: true,
     offset: 0,
-    limit: 50,
+    limit: 10,
   })
   .views(self => ({
     get pagesData() {
@@ -71,6 +120,20 @@ const PromotionStore = types
     },
   }))
   .actions(self => ({
+    afterCreate() {
+      reaction(
+        () => [self.date, self.offset, self.limit],
+        () => self.fetchPages(),
+      );
+    },
+    setPagination(current, pageSize) {
+      const offset = (current - 1) * pageSize;
+      self.offset = offset;
+      self.limit = pageSize;
+    },
+    setDate(date, dateString) {
+      self.date = dateString;
+    },
     switchTab(tabKey) {
       self.isActiveTab = tabKey === 'active';
       self.fetchPages();
@@ -92,10 +155,17 @@ const PromotionStore = types
       );
     },
     fetchPagesSuccess({ data }) {
-      const flatInput = {};
+      const networksInitState = {};
+      for (let i = 0; i < data.metricNetworks.length; i += 1) {
+        networksInitState[data.metricNetworks[i]] = {
+          cost: 0,
+          clicks: 0,
+        };
+      }
 
+      const flatInput = {};
       for (let i = 0; i < data.input.length; i += 1) {
-        flatInput[data.input[i]._id.page] = {};
+        flatInput[data.input[i]._id.page] = { ...networksInitState };
         for (let x = 0; x < data.input[i].sources.length; x += 1) {
           flatInput[data.input[i]._id.page][data.input[i].sources[x]] = {
             cost: data.input[i].cost[x],

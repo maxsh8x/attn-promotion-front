@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
 import { inject, observer } from 'mobx-react';
 import { Tabs, Table, DatePicker, Spin, Popover, Switch } from 'antd';
@@ -16,8 +15,10 @@ class PromotionList extends Component {
   getTotal = (rowIndex, type) =>
     this.props.promotionStore.pages[rowIndex].total[type];
 
-  expandedRowRender = (row, rowIndex) =>
-    <PageLayout rowIndex={rowIndex} />
+  expandedRowRender = (row, rowIndex) => {
+    const page = this.props.promotionStore.pages[rowIndex];
+    return <PageLayout page={page} />;
+  }
 
   metricRender = value => ((value && value.cost && value.clicks)
     ? (value.cost / value.clicks).toFixed(2)
@@ -38,9 +39,10 @@ class PromotionList extends Component {
     );
   }
 
-  renderStatus = (active, { _id: pageID }, rowIndex) => (
-    <Switch checked={active} />
-  )
+  renderStatus = (value, row, rowIndex) => {
+    const page = this.props.promotionStore.pages[rowIndex];
+    return <Switch checked={page.active} onChange={checked => page.updateStatus(checked)} />;
+  }
 
   render() {
     const { promotionStore } = this.props;
@@ -82,11 +84,15 @@ class PromotionList extends Component {
         ],
       },
     ];
+    const setPagination = ({ current, pageSize }) =>
+      promotionStore.setPagination(current, pageSize);
+    const title = () => 'Список продвигаемых страниц';
+
     return (
       <div>
         <div className={style.tableOperations}>
           <DatePicker
-            onChange={this.updateDate}
+            onChange={promotionStore.setDate}
             value={moment(promotionStore.date, 'YYYY-MM-DD')}
             allowClear={false}
           />
@@ -100,9 +106,10 @@ class PromotionList extends Component {
                 rowKey="id"
                 dataSource={promotionStore.pagesData}
                 columns={columns}
-                title={() => 'Список продвигаемых страниц'}
+                title={title}
                 expandedRowRender={this.expandedRowRender}
-                onChange={this.pagination}
+                onChange={setPagination}
+                pagination={{ total: promotionStore.activePages }}
               />
             </Tabs.TabPane>
             <Tabs.TabPane tab={`Неактивные (${promotionStore.inactivePages})`} key="inactive">
@@ -111,9 +118,10 @@ class PromotionList extends Component {
                 rowKey="id"
                 dataSource={promotionStore.pagesData}
                 columns={columns}
-                title={() => 'Список продвигаемых страниц'}
+                title={title}
                 expandedRowRender={this.expandedRowRender}
-                onChange={this.pagination}
+                onChange={setPagination}
+                pagination={{ total: promotionStore.inactivePages }}
               />
             </Tabs.TabPane>
           </Tabs>
