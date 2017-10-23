@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Table, Spin, Switch, Modal, Button } from 'antd';
-import AddPage from './AddPage/Main';
-import style from './PageList.css';
+import style from './PagesList.css';
 
 const renderPageURL = (pageURL) => {
   const urlParts = pageURL.split('/');
@@ -36,7 +35,7 @@ const basicColumns = [
 ];
 
 @observer
-class PageList extends Component {
+class PagesList extends Component {
   componentWillMount() {
     this.props.client.fetchPages();
   }
@@ -47,7 +46,6 @@ class PageList extends Component {
       const page = client.findPageById(id);
       return (
         <div>
-          <AddPage pageCreator={page.pageCreator} related />
           <Table
             rowKey="id"
             columns={basicColumns}
@@ -81,10 +79,9 @@ class PageList extends Component {
           footer={null}
           onCancel={client.pageCreator.toggleModal}
         >
-          <AddPage pageCreator={client.pageCreator} related={false} />
         </Modal>
         <div className={style.tableOperations}>
-          <Button onClick={client.pageCreator.toggleModal}>Создать клиента</Button>
+          <Button onClick={client.pageCreator.toggleModal}>Создать индивидуальную страницу</Button>
           <Spin spinning={spinning}>
             <Table
               rowKey="id"
@@ -103,4 +100,4 @@ class PageList extends Component {
   }
 }
 
-export default PageList;
+export default PagesList;

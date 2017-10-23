@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import { Table } from 'antd';
 
@@ -18,8 +17,8 @@ class YandexMetrics extends Component {
   }
 
   render() {
-    const { page } = this.props;
-    const metricsCostColumns = page.store.sources.map(network => ({
+    const { store, metricsData, totalClickCost } = this.props.page;
+    const metricsCostColumns = store.sources.map(network => ({
       key: network,
       dataIndex: `sources.${network}`,
       title: network[0].toUpperCase() + network.substr(1),
@@ -48,12 +47,16 @@ class YandexMetrics extends Component {
         ],
       },
     ];
+
+    // popup
     return (
       <Table
-        rowkey="metric"
+        rowKey="metric"
         columns={columns}
-        dataSource={page.metricsData}
+        dataSource={metricsData}
         size="small"
+        pagination={false}
+        footer={() => `Стоимость за клик: ${totalClickCost}`}
       />
     );
   }

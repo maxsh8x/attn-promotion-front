@@ -24,7 +24,7 @@ const PageMetaCreator = types
       types.string,
       moment().add(1, 'months').format('YYYY-MM-DD'),
     ),
-    type: types.enumeration(['group', 'individual', 'related']),
+    type: types.enumeration(['individual', 'related']),
   })
   .views(self => ({
     get client() {
@@ -110,7 +110,7 @@ const Client = types
     vatin: types.string,
     pages: types.optional(types.array(Page), []),
     fetchPagesState: types.optional(types.enumeration(fetchStates), 'pending'),
-    pageCreator: types.optional(PageMetaCreator, { type: 'group' }),
+    pageCreator: types.optional(PageMetaCreator, { type: 'individual' }),
   })
   .views(self => ({
     get pagesData() {
@@ -267,7 +267,10 @@ const ClientStore = types
       );
     },
     fetchClientsSuccess({ data }) {
-      self.clients.replace(data.map(item => ({ ...item, id: item._id })));
+      self.clients.replace(data.map(item => ({
+        ...item,
+        id: item._id
+      })));
       self.state = 'done';
     },
     fetchClientsError(error) {

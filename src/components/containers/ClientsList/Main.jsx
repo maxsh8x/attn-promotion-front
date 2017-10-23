@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { Table, Button, Modal, DatePicker, Input } from 'antd';
 import moment from 'moment';
-import PageList from './PageList';
+import PagesList from './PagesList';
 import ClientCreator from './ClientCreator';
 import style from './Main.css';
+import SearchFilter from '../SearchFilter';
 
 const { RangePicker } = DatePicker;
 
@@ -16,7 +17,7 @@ class ClientsList extends Component {
 
   expandedRowRender = ({ id, type }) => {
     const client = this.props.clientsStore.findClientById(id);
-    return <PageList client={client} type={type} />;
+    return <PagesList client={client} type={type} />;
   }
 
   updateDate = (dates, [startDate, endDate]) => {
@@ -36,6 +37,7 @@ class ClientsList extends Component {
       { dataIndex: 'name', title: 'Имя клиента' },
       { dataIndex: 'brand', title: 'Бренд' },
       { dataIndex: 'vatin', title: 'ИНН' },
+      { dataIndex: 'views', title: 'Просмотров' },
     ];
 
     return (
@@ -50,7 +52,10 @@ class ClientsList extends Component {
         </Modal>
         <div className={style.tableOperations}>
           <Button onClick={clientCreator.toggleModal}>Создать клиента</Button>
-          <Input placeholder="Фильтр по адресу страницы" name="url" style={{ width: 400 }} />
+          <SearchFilter
+            title="Фильтр по адресу страницы"
+            url="/v1/page/search"
+          />
         </div>
         <Table
           bordered

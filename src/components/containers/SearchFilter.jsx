@@ -1,17 +1,16 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Select, Form, Spin } from 'antd';
+import { Select, Spin } from 'antd';
 // TODO: Provider
-import Filter from '../../../../stores/filter-store';
+import Filter from '../../stores/filter-store';
 
 @observer
-class Group extends Component {
+class SearchFilter extends Component {
   constructor(props) {
     super(props);
-    const x = data => console.log(data, 'raised');
     this.pageFilter = Filter.create({}, {
-      url: '/v1/page/search',
-      fetch: x,
+      url: this.props.url,
+      callback: this.props.callback,
     });
   }
 
@@ -21,7 +20,7 @@ class Group extends Component {
         mode="multiple"
         labelInValue
         value={this.pageFilter.itemsData}
-        placeholder="Введите страницу для поиска"
+        placeholder={this.props.title}
         notFoundContent={this.pageFilter.state === 'done' ? <Spin size="small" /> : null}
         filterOption={false}
         onSearch={this.pageFilter.fetchData}
@@ -36,4 +35,4 @@ class Group extends Component {
   }
 }
 
-export default Group;
+export default SearchFilter;

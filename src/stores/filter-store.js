@@ -36,6 +36,10 @@ const Filter = types
     setFilter(items) {
       self.items.replace(items);
       self.data.clear();
+      const callback = getEnv(self).callback;
+      if (callback) {
+        callback(items.map(item => item.key));
+      }
       self.state = 'done';
     },
     fetchData(filter) {

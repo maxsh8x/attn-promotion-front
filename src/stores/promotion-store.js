@@ -55,6 +55,14 @@ const Page = types
       }
       return result;
     },
+    get totalClickCost() {
+      const { cost } = self.total;
+      const pageViews = self.metrics.find(item => item.metric === 'pageviews');
+      if (cost && pageViews && pageViews.metagroups.get('ad')) {
+        return (cost / pageViews.metagroups.get('ad')).toFixed(2);
+      }
+      return 0;
+    },
     get store() {
       return getRoot(self);
     },
@@ -145,6 +153,7 @@ const PromotionStore = types
     isActiveTab: true,
     offset: 0,
     limit: 10,
+    clientsFilter: '',
   })
   .views(self => ({
     get pagesData() {
@@ -154,9 +163,17 @@ const PromotionStore = types
   .actions(self => ({
     afterCreate() {
       reaction(
-        () => [self.date, self.offset, self.limit],
+        () => [
+          self.date,
+          self.offset,
+          self.limit,
+          self.clientsFilter,
+        ],
         () => self.fetchPages(),
       );
+    },
+    setClientsFilter(clients) {
+      self.clientsFilter = clients.join(',');
     },
     setPagination(current, pageSize) {
       const offset = (current - 1) * pageSize;
@@ -178,7 +195,7 @@ const PromotionStore = types
           active: self.isActiveTab,
           offset: self.offset,
           limit: self.limit,
-          clients: '',
+          clients: self.clientsFilter,
           filter: '',
         },
       }).then(

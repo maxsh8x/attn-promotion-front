@@ -4,7 +4,7 @@ import { inject, observer } from 'mobx-react';
 import { Tabs, Table, DatePicker, Spin, Popover, Switch } from 'antd';
 import style from './Main.css';
 import PageLayout from './PageLayout';
-
+import SearchFilter from '../SearchFilter';
 
 @inject('promotionStore') @observer
 class PromotionList extends Component {
@@ -95,6 +95,11 @@ class PromotionList extends Component {
             onChange={promotionStore.setDate}
             value={moment(promotionStore.date, 'YYYY-MM-DD')}
             allowClear={false}
+          />
+          <SearchFilter
+            title="Введите имя клиента для поиска"
+            url="/v1/client/search"
+            callback={promotionStore.setClientsFilter}
           />
         </div>
 

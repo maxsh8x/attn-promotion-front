@@ -4,6 +4,7 @@ import moment from 'moment';
 import { Table, Button, Modal, Popover } from 'antd';
 import { inject, observer } from 'mobx-react';
 import GroupQuestionCreator from './GroupQuestionCreator';
+import ClientsList from './ClientsList';
 import style from './Main.css';
 
 @inject('groupQuestionStore') @observer
@@ -12,12 +13,9 @@ class GroupQuestionsList extends Component {
     this.props.groupQuestionStore.fetchGroupQuestions();
   }
 
-  expandedRowRender = ({ id: pageID }) => {
-    return (
-      <div>
-        {pageID}
-      </div>
-    );
+  expandedRowRender = (row, rowIndex) => {
+    const groupQuestion = this.props.groupQuestionStore.groupQuestions[rowIndex];
+    return <ClientsList groupQuestion={groupQuestion} />;
   }
 
   renderPageURL = (pageURL) => {
