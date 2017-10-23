@@ -209,7 +209,9 @@ const PromotionStore = types
       self.pages.replace(data.pages.map(item => ({
         ...item,
         id: item._id,
-        inputs: flatInput[item._id],
+        inputs: flatInput[item._id]
+          ? { ...networksInitState, ...flatInput[item._id] }
+          : networksInitState,
       })));
       self.sources.replace(data.sources);
       self.activePages = data.activePages;
