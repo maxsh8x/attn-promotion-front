@@ -29,7 +29,7 @@ class QuestionList extends Component {
           footer={null}
           onCancel={clientsBinder.toggleModal}
         >
-          <BindClient />
+          <BindClient clientsBinder={clientsBinder} />
         </Modal>
         <div className={style.tableOperations}>
           <Button onClick={clientsBinder.toggleModal}>Привязать клиентов</Button>

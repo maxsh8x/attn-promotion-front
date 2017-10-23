@@ -63,6 +63,10 @@ const ClientBinder = types
     clients: '',
     minViews: 0,
     maxViews: 0,
+    bindClientStatus: types.optional(
+      types.enumeration(fetchStates),
+      'done',
+    ),
     startDate: types.optional(
       types.string,
       moment().add(1, 'days').format('YYYY-MM-DD'),
@@ -81,6 +85,21 @@ const ClientBinder = types
     toggleModal() {
       self.modalShown = !self.modalShown;
     },
+    bindClients() {
+      self.bindClientStatus = 'pending';
+      return axios().post('/v1/client/bind', {
+        clients: self.clients,
+        minViews: self.minViews,
+        maxViews: self.maxViews,
+        startDate: self.startDate,
+        endDate: self.endDate,
+      }).then(
+        self.bindClientsSuccess,
+        self.bindClientsError,
+      );
+    },
+    bindClientsSuccess() {},
+    bindClientsError() {},
     setClients(clients) {
       return axios().post('/v1/client/bind', {
         clients: clients.join(','),

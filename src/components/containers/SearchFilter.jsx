@@ -25,7 +25,7 @@ class SearchFilter extends Component {
         filterOption={false}
         onSearch={this.pageFilter.fetchData}
         onChange={this.pageFilter.setFilter}
-        style={{ width: 400 }}
+        style={{ width: this.props.width }}
       >
         {this.pageFilter.data.map(page =>
           <Select.Option key={page.value}>{page.text}</Select.Option>,
@@ -34,5 +34,9 @@ class SearchFilter extends Component {
     );
   }
 }
+
+SearchFilter.defaultProps = {
+  width: 400,
+};
 
 export default SearchFilter;
