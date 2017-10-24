@@ -1,5 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react';
+import moment from 'moment';
 import { Button, Form, InputNumber, DatePicker, Col } from 'antd';
 import SearchFilter from '../SearchFilter';
 
@@ -24,7 +25,7 @@ const BindClient = ({ clientsBinder, form }) => (
       <SearchFilter
         title="Введите имя клиента для поиска"
         url="/v1/client/search"
-        callback={clientsBinder.setClientsFilter}
+        callback={clientsBinder.setClients}
         width={300}
       />
     </Form.Item>
@@ -59,9 +60,17 @@ const BindClient = ({ clientsBinder, form }) => (
       label="Время показа"
       {...formItemLayout}
     >
-      <RangePicker
-        allowClear={false}
-      />
+      {form.getFieldDecorator('dateRange', {
+        rules: [{ type: 'array', required: true, message: 'Пожалуйста, укажите время' }],
+        onChange: (date, [startDate, endDate]) => clientsBinder.setDate(startDate, endDate),
+        getValueFromEvent: () => [
+          moment(clientsBinder.startDate, 'YYYY-MM-DD'),
+          moment(clientsBinder.endDate, 'YYYY-MM-DD'),
+        ],
+      })(
+        <RangePicker
+          allowClear={false}
+        />)}
     </Form.Item>
     <Form.Item
       {...buttonItemLayout}
@@ -73,7 +82,7 @@ const BindClient = ({ clientsBinder, form }) => (
           })}
         type="primary"
       >
-        Создать
+        Привязать
       </Button>
     </Form.Item>
   </Form>

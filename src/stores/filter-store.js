@@ -38,7 +38,7 @@ const Filter = types
       self.data.clear();
       const callback = getEnv(self).callback;
       if (callback) {
-        callback(items.map(item => item.key));
+        callback(self.itemsData);
       }
       self.state = 'done';
     },

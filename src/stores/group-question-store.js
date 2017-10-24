@@ -57,10 +57,19 @@ const Client = types
     vatin: types.string,
   });
 
+const ClientSelectorItem = types
+  .model('ClientSelectorItem', {
+    key: types.string,
+    label: types.string,
+  });
+
 const ClientBinder = types
   .model('ClientBinder', {
     modalShown: false,
-    clients: '',
+    clientSelector: types.optional(
+      types.array(ClientSelectorItem),
+      [],
+    ),
     minViews: 0,
     maxViews: 0,
     bindClientStatus: types.optional(
@@ -78,7 +87,7 @@ const ClientBinder = types
   })
   .views(self => ({
     get question() {
-      getParent(self);
+      return getParent(self);
     },
   }))
   .actions(self => ({
@@ -87,8 +96,9 @@ const ClientBinder = types
     },
     bindClients() {
       self.bindClientStatus = 'pending';
-      return axios().post('/v1/client/bind', {
-        clients: self.clients,
+      return axios().post('/v1/page/bind', {
+        page: self.question.id,
+        clients: self.clientSelector.map(item => parseInt(item.key, 10)),
         minViews: self.minViews,
         maxViews: self.maxViews,
         startDate: self.startDate,
@@ -98,13 +108,20 @@ const ClientBinder = types
         self.bindClientsError,
       );
     },
-    bindClientsSuccess() {},
-    bindClientsError() {},
+    bindClientsSuccess() { },
+    bindClientsError() { },
     setClients(clients) {
-      return axios().post('/v1/client/bind', {
-        clients: clients.join(','),
-        pageID: self.question.id,
-      });
+      self.clientSelector.replace(clients);
+    },
+    setMinViews(value) {
+      self.minViews = value;
+    },
+    setMaxViews(value) {
+      self.maxViews = value;
+    },
+    setDate(startDate, endDate) {
+      self.startDate = startDate;
+      self.endDate = endDate;
     },
   }));
 
@@ -129,9 +146,9 @@ const GroupQuestion = types
   .actions(self => ({
     fetchClients() {
       self.state = 'pending';
-      axios().get('v1/client', {
+      axios().get('v1/client/page', {
         params: {
-          filter: '',
+          pageID: self.id,
         },
       }).then(
         self.fetchClientsSuccess,
