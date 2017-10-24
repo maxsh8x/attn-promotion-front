@@ -108,6 +108,7 @@ const Client = types
     name: types.string,
     brand: types.string,
     vatin: types.string,
+    views: types.number,
     pages: types.optional(types.array(Page), []),
     fetchPagesState: types.optional(types.enumeration(fetchStates), 'pending'),
     pageCreator: types.optional(PageMetaCreator, { type: 'individual' }),
