@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import { Table, Button, Modal, Popover } from 'antd';
+import { Table, Button, Modal, DatePicker } from 'antd';
 import { inject, observer } from 'mobx-react';
 import GroupQuestionCreator from './GroupQuestionCreator';
 import ClientsList from './ClientsList';
 import style from './Main.css';
+
+const { RangePicker } = DatePicker;
 
 @inject('groupQuestionStore') @observer
 class GroupQuestionsList extends Component {
@@ -18,6 +20,10 @@ class GroupQuestionsList extends Component {
     return <ClientsList groupQuestion={groupQuestion} />;
   }
 
+  updateDate = (dates, [startDate, endDate]) => {
+    this.props.groupQuestionStore.setDate(startDate, endDate);
+  }
+
   renderPageURL = (pageURL) => {
     const urlParts = pageURL.split('/');
     return (
@@ -27,12 +33,19 @@ class GroupQuestionsList extends Component {
 
 
   render() {
-    const { groupQuestionCreator, groupQuestionsData } = this.props.groupQuestionStore;
+    const {
+      groupQuestionCreator,
+      groupQuestionsData,
+      startDate,
+      endDate,
+      setDate
+    } = this.props.groupQuestionStore;
 
     const columns = [
       { dataIndex: 'url', title: 'Адрес', render: this.renderPageURL },
       { dataIndex: 'title', title: 'Название' },
       { dataIndex: 'createdAt', title: 'Дата создания', render: value => moment(value).format('YYYY-MM-DD') },
+      { dataIndex: 'views', title: 'Просмотров' },
     ];
 
     return (
@@ -59,6 +72,14 @@ class GroupQuestionsList extends Component {
           dataSource={groupQuestionsData}
           title={() => 'Список групповых вопросов'}
           expandedRowRender={this.expandedRowRender}
+          footer={() => (
+            <div>
+              Подсчет просмотров за период: <RangePicker
+                defaultValue={[moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')]}
+                onChange={this.updateDate}
+                allowClear={false}
+              />
+            </div>)}
         />
       </div>
     );

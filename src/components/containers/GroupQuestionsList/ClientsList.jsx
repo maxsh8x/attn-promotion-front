@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import { Button, Modal, Table } from 'antd';
 import SearchFilter from '../SearchFilter';
@@ -12,13 +13,28 @@ class QuestionList extends Component {
     this.props.groupQuestion.fetchClients();
   }
 
+  renderDate = value => moment(value).format('YYYY-MM-DD')
+
   render() {
     const { clientsData, clientsBinder } = this.props.groupQuestion;
     const columns = [
       { dataIndex: 'name', title: 'Имя' },
       { dataIndex: 'vatin', title: 'Инн' },
       { dataIndex: 'brand', title: 'Бренд' },
-      { dataIndex: 'views', title: 'Просмотров' },
+      {
+        title: 'Дата',
+        children: [
+          { title: 'От', dataIndex: 'startDate', render: this.renderDate },
+          { title: 'До', dataIndex: 'endDate', render: this.renderDate },
+        ],
+      },
+      {
+        title: 'Показы',
+        children: [
+          { title: 'Min', dataIndex: 'minViews' },
+          { title: 'Max', dataIndex: 'maxViews' },
+        ],
+      },
     ];
 
     return (

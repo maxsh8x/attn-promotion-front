@@ -92,7 +92,7 @@ const Page = types
       return getParent(self, 2);
     },
     get pagesData() {
-      return self.pages.values().filter(page => page.parent === self.id);
+      return toJS(self.pages).filter(page => page.type === 'related');
     },
     get totalViews() {
       return self.pagesData.length > 0
@@ -131,11 +131,10 @@ const Client = types
   .actions(self => ({
     afterCreate() {
       reaction(
-        () => self.clientStore.startDate,
-        () => self.fetchPages(),
-      );
-      reaction(
-        () => self.clientStore.endDate,
+        () => [
+          self.clientStore.startDate,
+          self.clientStore.endDate,
+        ],
         () => self.fetchPages(),
       );
     },
@@ -153,10 +152,7 @@ const Client = types
       );
     },
     fetchPagesSuccess({ data }) {
-      for (let i = 0; i < data.length; i += 1) {
-        data[i].id = data[i]._id;
-        self.pages.put(data[i]);
-      }
+      self.pages.replace(data.map(page => ({ ...page, id: page._id })));
       self.fetchPagesState = 'done';
     },
     fetchPagesError() {
@@ -260,6 +256,8 @@ const ClientStore = types
       axios().get('v1/client', {
         params: {
           filter: '',
+          startDate: self.startDate,
+          endDate: self.endDate,
         },
       }).then(
         self.fetchClientsSuccess,

@@ -1,4 +1,4 @@
-import { toJS } from 'mobx';
+import { reaction, toJS } from 'mobx';
 import { types, getParent } from 'mobx-state-tree';
 import moment from 'moment';
 import axios from '../utils/axios';
@@ -55,6 +55,10 @@ const Client = types
     name: types.string,
     brand: types.string,
     vatin: types.string,
+    minViews: types.number,
+    maxViews: types.number,
+    startDate: types.string,
+    endDate: types.string,
   });
 
 const ClientSelectorItem = types
@@ -131,7 +135,7 @@ const GroupQuestion = types
     url: types.string,
     title: types.string,
     active: types.boolean,
-    views: 0, // null
+    views: types.number,
     clients: types.optional(
       types.array(Client),
       [],
@@ -158,7 +162,7 @@ const GroupQuestion = types
     fetchClientsSuccess({ data }) {
       self.clients.replace(data.map(item => ({
         ...item,
-        id: item._id
+        id: item._id,
       })));
       self.state = 'done';
     },
@@ -175,6 +179,14 @@ const GroupQuestionStore = types
       types.enumeration(fetchStates),
       'pending',
     ),
+    startDate: types.optional(
+      types.string,
+      moment().subtract(1, 'months').format('YYYY-MM-DD'),
+    ),
+    endDate: types.optional(
+      types.string,
+      moment().format('YYYY-MM-DD'),
+    ),
   })
   .views(self => ({
     get groupQuestionsData() {
@@ -182,6 +194,15 @@ const GroupQuestionStore = types
     },
   }))
   .actions(self => ({
+    afterCreate() {
+      reaction(
+        () => [
+          self.startDate,
+          self.endDate,
+        ],
+        () => self.fetchGroupQuestions(),
+      );
+    },
     setDate(startDate, endDate) {
       self.startDate = startDate;
       self.endDate = endDate;
@@ -191,6 +212,8 @@ const GroupQuestionStore = types
       axios().get('v1/page/group-questions', {
         params: {
           filter: '',
+          startDate: self.startDate,
+          endDate: self.endDate,
         },
       }).then(
         self.fetchGroupQuestionsSuccess,
