@@ -69,7 +69,7 @@ const PromotionChart = types
     },
     fetchChartSuccess({ data }) {
       self.state = 'done';
-      self.metrics.replace(data);
+      self.items.replace(data);
     },
     fetchChartError() {
       self.state = 'error';
@@ -189,6 +189,18 @@ const Page = types
       self.metrics.replace(data);
     },
     fetchMetricsError() { },
+    updateMetrics() {
+      return axios().post('/v1/metrics', {
+        yDate: self.store.date,
+        pageID: self.id,
+      }).then(
+        self.fetchMetrics(),
+        self.updateMetricsError(),
+      );
+    },
+    updateMetricsError() {
+      message.error('Ошибка при обновлении метрик');
+    },
   }));
 
 const PromotionStore = types
