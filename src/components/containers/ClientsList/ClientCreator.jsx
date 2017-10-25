@@ -19,7 +19,6 @@ const ClientCreator = ({ clientCreator, form }) => (
     >
       {form.getFieldDecorator('name', {
         rules: [{ required: true, message: 'Введите имя клиента', whitespace: true }],
-        getValueFromEvent: () => clientCreator.name,
         onChange: e => clientCreator.setName(e.target.value),
       })(<Input placeholder="ООО Ромашка" />)}
     </Form.Item>
@@ -29,7 +28,6 @@ const ClientCreator = ({ clientCreator, form }) => (
     >
       {form.getFieldDecorator('brand', {
         rules: [{ required: true, message: 'Введите название бренда', whitespace: true }],
-        getValueFromEvent: () => clientCreator.brand,
         onChange: e => clientCreator.setBrand(e.target.value),
       })(<Input placeholder="Детский центр" />)}
     </Form.Item>
@@ -39,7 +37,6 @@ const ClientCreator = ({ clientCreator, form }) => (
     >
       {form.getFieldDecorator('vatin', {
         rules: [{ required: true, message: 'Введите ИНН', whitespace: true }],
-        getValueFromEvent: () => clientCreator.vatin,
         onChange: e => clientCreator.setVATIN(e.target.value),
       })(<Input placeholder="430601071197" />)}
     </Form.Item>
@@ -52,7 +49,6 @@ const ClientCreator = ({ clientCreator, form }) => (
           { message: 'Введите ID счетчика', required: true },
           { message: 'Неверный ID счетчика', type: 'number', min: 10000000 },
         ],
-        getValueFromEvent: () => clientCreator.counterID,
         onChange: value => clientCreator.setCounterID(value),
       })(<InputNumber placeholder="41234234" />)}
     </Form.Item>
@@ -75,4 +71,21 @@ const ClientCreator = ({ clientCreator, form }) => (
 ClientCreator.propTypes = {
 };
 
-export default Form.create()(observer(ClientCreator));
+export default Form.create({
+  mapPropsToFields({ clientCreator }) {
+    return {
+      name: {
+        value: clientCreator.name,
+      },
+      brand: {
+        value: clientCreator.brand,
+      },
+      vatin: {
+        value: clientCreator.vatin,
+      },
+      counterID: {
+        value: clientCreator.counterID,
+      },
+    };
+  },
+})(observer(ClientCreator));

@@ -11,7 +11,6 @@ const GroupQuestionCreator = ({ groupQuestionCreator, form }) => (
             { required: true, message: 'Введите адрес страницы' },
             { message: 'Неверный формат ссылки', type: 'url' },
           ],
-          getValueFromEvent: () => groupQuestionCreator.url,
           onChange: e => groupQuestionCreator.setURL(e.target.value),
         })(<Input placeholder="Адрес страницы" style={{ width: 250 }} />)}
       </Form.Item>
@@ -21,7 +20,6 @@ const GroupQuestionCreator = ({ groupQuestionCreator, form }) => (
             { message: 'Введите ID счетчика', required: true },
             { message: 'Неверный ID счетчика', type: 'number', min: 10000000 },
           ],
-          getValueFromEvent: () => groupQuestionCreator.counterID,
           onChange: value => groupQuestionCreator.setCounterID(value),
         })(<InputNumber placeholder="41234234" />)}
       </Form.Item>
@@ -44,4 +42,15 @@ GroupQuestionCreator.propTypes = {
 
 };
 
-export default Form.create()(observer(GroupQuestionCreator));
+export default Form.create({
+  mapPropsToFields({ groupQuestionCreator }) {
+    return {
+      url: {
+        value: groupQuestionCreator.url,
+      },
+      counterID: {
+        value: groupQuestionCreator.counterID,
+      },
+    };
+  },
+})(observer(GroupQuestionCreator));

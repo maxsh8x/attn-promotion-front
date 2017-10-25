@@ -15,6 +15,11 @@ const GroupQuestionCreator = types
       'done',
     ),
   })
+  .views(self => ({
+    get store() {
+      return getParent(self);
+    },
+  }))
   .actions(self => ({
     setCounterID(value) {
       const counterID = parseInt(value, 10);
@@ -26,15 +31,19 @@ const GroupQuestionCreator = types
     },
     createGroupQuestion() {
       self.state = 'pending';
-      axios().post('v1/page/', {
+      axios().post('v1/page/group', {
         url: self.url,
         counterID: self.counterID,
       }).then(
-        self.fetchGroupQuestionsSuccess,
-        self.fetchGroupQuestionsError,
+        self.createGroupQuestionSuccess,
+        self.createGroupQuestionError,
       );
     },
     createGroupQuestionSuccess() {
+      self.toggleModal();
+      self.store.fetchGroupQuestions();
+      self.url = '';
+      self.counterID = null;
       self.state = 'done';
     },
     createGroupQuestionError() {
@@ -111,8 +120,17 @@ const ClientBinder = types
         self.createError,
       );
     },
-    createSuccess() { },
-    createError() { },
+    createSuccess() {
+      self.toggleModal();
+      self.question.fetchClients();
+      self.clientSelector.clear();
+      self.minViews = 0;
+      self.maxViews = 0;
+      self.status = 'done';
+    },
+    createError() {
+      self.status = 'error';
+    },
     setClients(clients) {
       self.clientSelector.replace(clients);
     },

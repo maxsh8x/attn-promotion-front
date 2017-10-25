@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import moment from 'moment';
-import PropTypes from 'prop-types';
 import { Button, Modal, Table } from 'antd';
-import SearchFilter from '../SearchFilter';
 import BindClient from './BindClient';
 import style from './ClientsList.css';
 

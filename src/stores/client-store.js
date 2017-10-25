@@ -73,7 +73,6 @@ const PageMetaCreator = types
     createSuccess(related, parent) {
       self.toggleModal();
       self.client.fetchPages();
-      self.setURL('');
       self.state = 'done';
     },
     createError() {
@@ -229,9 +228,12 @@ const ClientCreator = types
       );
     },
     createClientSuccess() {
-      self.setName('');
       self.toggleModal();
       self.store.fetchClients();
+      self.name = '';
+      self.brand = '';
+      self.vatin = '';
+      self.counterID = null;
       self.state = 'done';
     },
     createClientError() {

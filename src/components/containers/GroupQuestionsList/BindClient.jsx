@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 import { observer } from 'mobx-react';
 import { Form } from 'antd';
 import SearchFilter from '../SearchFilter';
@@ -31,4 +32,21 @@ BindClient.propTypes = {
 
 };
 
-export default Form.create()(observer(BindClient));
+export default Form.create({
+  mapPropsToFields({ clientsBinder }) {
+    return {
+      minViews: {
+        value: clientsBinder.minViews,
+      },
+      maxViews: {
+        value: clientsBinder.maxViews,
+      },
+      dateRange: {
+        value: [
+          moment(clientsBinder.startDate, 'YYYY-MM-DD'),
+          moment(clientsBinder.endDate, 'YYYY-MM-DD'),
+        ],
+      },
+    };
+  },
+})(observer(BindClient));

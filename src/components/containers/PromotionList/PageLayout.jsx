@@ -1,9 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Card } from 'antd';
 import { observer } from 'mobx-react';
 import InputCost from './InputCost';
 import YandexMetrics from './YandexMetrics';
+import PromotionChart from './PromotionChart';
 
 const PageLayout = ({ page }) => (
   <div>
@@ -14,7 +14,7 @@ const PageLayout = ({ page }) => (
       <YandexMetrics page={page} />
     </Card>
     <Card noHovering>
-      {/* <PromotionChart /> */}
+      <PromotionChart chart={page.chart} />
     </Card>
   </div>
 );

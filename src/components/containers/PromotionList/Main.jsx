@@ -96,11 +96,11 @@ class PromotionList extends Component {
             value={moment(promotionStore.date, 'YYYY-MM-DD')}
             allowClear={false}
           />
-          <SearchFilter
+          {/* <SearchFilter
             title="Введите имя клиента для поиска"
             url="/v1/client/search"
             callback={promotionStore.setClientsFilter}
-          />
+          /> */}
         </div>
 
         <Spin spinning={promotionStore.state === 'pending'} >

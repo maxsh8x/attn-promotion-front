@@ -21,7 +21,6 @@ const AddPage = ({ creator, form }) => (
           { required: true, message: 'Введите адрес страницы' },
           { message: 'Неверный формат ссылки', type: 'url' },
         ],
-        getValueFromEvent: () => creator.url,
         onChange: e => creator.setURL(e.target.value),
       })(<Input placeholder="https://www.the-answer.ru/questions/article-name/" style={{ width: 250 }} />)}
     </Form.Item>
@@ -33,4 +32,12 @@ AddPage.propTypes = {
 
 };
 
-export default Form.create()(observer(AddPage));
+export default Form.create({
+  mapPropsToFields({ creator }) {
+    return {
+      url: {
+        value: creator.url,
+      },
+    };
+  },
+})(observer(AddPage));

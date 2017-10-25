@@ -1,5 +1,5 @@
 import { toJS, reaction } from 'mobx';
-import { types, getRoot } from 'mobx-state-tree';
+import { types, getRoot, getParent } from 'mobx-state-tree';
 import { message } from 'antd';
 import moment from 'moment';
 import axios from '../utils/axios';
@@ -19,6 +19,63 @@ const Metric = types
     metagroups: types.map(types.number),
   });
 
+const ChartItem = types
+  .model({
+    x: types.string,
+    y: types.number,
+  });
+
+const PromotionChart = types
+  .model('PromotionChart', {
+    items: types.optional(
+      types.array(ChartItem),
+      [],
+    ),
+    state: types.optional(
+      types.enumeration(fetchStates),
+      'done',
+    ),
+    startDate: types.optional(
+      types.string,
+      moment().subtract(3, 'days').format('YYYY-MM-DD'),
+    ),
+    endDate: types.optional(
+      types.string,
+      moment().add(3, 'months').format('YYYY-MM-DD'),
+    ),
+  })
+  .views(self => ({
+    get page() {
+      return getParent(self);
+    },
+    get chartData() {
+      return toJS(self.items);
+    },
+  }))
+  .actions(self => ({
+    fetchChart() {
+      self.fetchPagesState = 'pending';
+      axios().get('v1/metrics/promotionChart', {
+        params: {
+          startDate: self.startDate,
+          endDate: self.endDate,
+          interval: 'days',
+          pageID: self.page.id,
+        },
+      }).then(
+        self.fetchChartSuccess,
+        self.fetchChartError,
+      );
+    },
+    fetchChartSuccess({ data }) {
+      self.state = 'done';
+      self.metrics.replace(data);
+    },
+    fetchChartError() {
+      self.state = 'error';
+    },
+  }));
+
 const Page = types
   .model('Page', {
     id: types.identifier(types.number),
@@ -37,6 +94,10 @@ const Page = types
     metrics: types.optional(
       types.array(Metric),
       [],
+    ),
+    chart: types.optional(
+      PromotionChart,
+      {},
     ),
   })
   .views(self => ({

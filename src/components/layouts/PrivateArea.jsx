@@ -30,7 +30,6 @@ const PrivateAreaLayout = ({ children, history }) => (
               <Menu.Item key="group-questions">
                 <NavLink to="/group-questions"><Icon type="question-circle-o" />Групповые вопросы</NavLink>
               </Menu.Item>
-              <Menu.Item key="2" disabled><Icon type="bank" />Источники рекламы</Menu.Item>
               <Menu.Item key="3" disabled><Icon type="bank" />Пользователи CRM</Menu.Item>
             </SubMenu>
             <SubMenu key="metrics" title={<span><Icon type="area-chart" />Метрики</span>}>
@@ -41,11 +40,7 @@ const PrivateAreaLayout = ({ children, history }) => (
           </Menu>
         </Sider>
         <Layout style={{ padding: '0 24px 24px' }}>
-          <Breadcrumb style={{ margin: '12px 0' }}>
-            <Breadcrumb.Item>Home</Breadcrumb.Item>
-            <Breadcrumb.Item>List</Breadcrumb.Item>
-            <Breadcrumb.Item>App</Breadcrumb.Item>
-          </Breadcrumb>
+          <Breadcrumb style={{ margin: '12px 0' }} />
           <Content style={{ background: '#fff', padding: 24, margin: 0, minHeight: 280 }}>
             {children}
           </Content>

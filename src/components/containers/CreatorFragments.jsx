@@ -1,6 +1,5 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import moment from 'moment';
 import { Button, Form, InputNumber, DatePicker, Col } from 'antd';
 
 const { RangePicker } = DatePicker;
@@ -25,8 +24,8 @@ const Creator = ({ creator, form }) => [
         {form.getFieldDecorator('minViews', {
           rules: [
             { message: 'Введите число', required: true },
+            { message: 'Укажите количество показов', type: 'number', min: 1 },
           ],
-          getValueFromEvent: () => creator.minViews,
           onChange: value => creator.setMinViews(value),
         })(<InputNumber placeholder="Min" min={0} />)}
       </Form.Item>
@@ -36,8 +35,8 @@ const Creator = ({ creator, form }) => [
         {form.getFieldDecorator('maxViews', {
           rules: [
             { message: 'Введите число', required: true },
+            { message: 'Укажите количество показов', type: 'number', min: 1 },
           ],
-          getValueFromEvent: () => creator.maxViews,
           onChange: value => creator.setMaxViews(value),
         })(<InputNumber placeholder="Max" min={0} />)}
       </Form.Item>
@@ -51,10 +50,6 @@ const Creator = ({ creator, form }) => [
     {form.getFieldDecorator('dateRange', {
       rules: [{ type: 'array', required: true, message: 'Пожалуйста, укажите время' }],
       onChange: (date, [startDate, endDate]) => creator.setDate(startDate, endDate),
-      getValueFromEvent: () => [
-        moment(creator.startDate, 'YYYY-MM-DD'),
-        moment(creator.endDate, 'YYYY-MM-DD'),
-      ],
     })(
       <RangePicker
         allowClear={false}

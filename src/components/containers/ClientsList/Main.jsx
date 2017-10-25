@@ -52,10 +52,10 @@ class ClientsList extends Component {
         </Modal>
         <div className={style.tableOperations}>
           <Button onClick={clientCreator.toggleModal}>Создать клиента</Button>
-          <SearchFilter
+          {/* <SearchFilter
             title="Фильтр по адресу страницы"
             url="/v1/page/search"
-          />
+          /> */}
         </div>
         <Table
           bordered
