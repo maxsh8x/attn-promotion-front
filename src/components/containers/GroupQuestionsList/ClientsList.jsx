@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import moment from 'moment';
-import { Button, Modal, Table } from 'antd';
+import { Button, Modal, Table, Badge } from 'antd';
 import BindClient from './BindClient';
 import style from './ClientsList.css';
+
 
 @observer
 class QuestionList extends Component {
@@ -12,6 +13,19 @@ class QuestionList extends Component {
   }
 
   renderDate = value => moment(value).format('YYYY-MM-DD')
+
+  renderViews = (value) => {
+    const { views } = this.props.groupQuestion;
+    const badgeStyle = value <= views
+      ? { backgroundColor: '#87d068' }
+      : {};
+    return (<Badge
+      count={value}
+      style={badgeStyle}
+      overflowCount={99999999}
+      showZero
+    />);
+  }
 
   render() {
     const { clientsData, clientsBinder } = this.props.groupQuestion;
@@ -29,8 +43,8 @@ class QuestionList extends Component {
       {
         title: 'Показы',
         children: [
-          { title: 'Min', dataIndex: 'minViews' },
-          { title: 'Max', dataIndex: 'maxViews' },
+          { title: 'Min', dataIndex: 'minViews', render: this.renderViews },
+          { title: 'Max', dataIndex: 'maxViews', render: this.renderViews },
         ],
       },
     ];
