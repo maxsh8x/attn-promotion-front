@@ -179,7 +179,8 @@ const GroupQuestion = types
     fetchClientsSuccess({ data }) {
       self.clients.replace(data.map(item => ({
         ...item,
-        id: item._id,
+        ...item.client,
+        id: item.client._id,
       })));
       self.state = 'done';
     },
