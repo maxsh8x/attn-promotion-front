@@ -1,16 +1,36 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { observer } from 'mobx-react';
+import { Form, Input } from 'antd';
 
-const AddPage = props => {
-  return (
-    <div>
-      
-    </div>
-  );
+import CreatorFragments from '../CreatorFragments';
+
+const formItemLayout = {
+  labelCol: { span: 6 },
+  wrapperCol: { span: 12 },
 };
+
+// TODO: check maxViews > minViews
+const AddPage = ({ creator, form }) => (
+  <Form>
+    <Form.Item
+      label="Адрес страницы"
+      {...formItemLayout}
+    >
+      {form.getFieldDecorator('url', {
+        rules: [
+          { required: true, message: 'Введите адрес страницы' },
+          { message: 'Неверный формат ссылки', type: 'url' },
+        ],
+        getValueFromEvent: () => creator.url,
+        onChange: e => creator.setURL(e.target.value),
+      })(<Input placeholder="https://www.the-answer.ru/questions/article-name/" style={{ width: 250 }} />)}
+    </Form.Item>
+    <CreatorFragments creator={creator} form={form} />
+  </Form >
+);
 
 AddPage.propTypes = {
-  
+
 };
 
-export default AddPage;
+export default Form.create()(observer(AddPage));

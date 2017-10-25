@@ -34,6 +34,12 @@ const PageMetaCreator = types
     },
   }))
   .actions(self => ({
+    setMinViews(value) {
+      self.minViews = value;
+    },
+    setMaxViews(value) {
+      self.maxViews = value;
+    },
     setDate(startDate, endDate) {
       self.startDate = startDate;
       self.endDate = endDate;
@@ -44,28 +50,33 @@ const PageMetaCreator = types
     setType(value) {
       self.type = value;
     },
-    createPage(related, parent) {
+    create(related, parent) {
       self.state = 'pending';
       const query = {
         url: self.url,
         title: self.title,
-        clientID: self.client.id,
+        client: self.client.id,
         type: self.type,
+        minViews: self.minViews,
+        maxViews: self.maxViews,
+        startDate: self.startDate,
+        endDate: self.endDate,
       };
       if (related) {
         query.parent = getParent(self).id;
       }
       axios().post('v1/page', query).then(
-        () => self.createPageSuccess(related, parent),
-        self.createPageError,
+        () => self.createSuccess(related, parent),
+        self.createError,
       );
     },
-    createPageSuccess(related, parent) {
+    createSuccess(related, parent) {
+      self.toggleModal();
       self.client.fetchPages();
       self.setURL('');
       self.state = 'done';
     },
-    createPageError() {
+    createError() {
       self.state = 'error';
     },
     toggleModal() {
@@ -108,7 +119,7 @@ const Client = types
     name: types.string,
     brand: types.string,
     vatin: types.string,
-    views: types.number,
+    views: 0,
     pages: types.optional(types.array(Page), []),
     fetchPagesState: types.optional(types.enumeration(fetchStates), 'pending'),
     pageCreator: types.optional(PageMetaCreator, { type: 'individual' }),
@@ -136,7 +147,10 @@ const Client = types
           self.clientStore.startDate,
           self.clientStore.endDate,
         ],
-        () => self.fetchPages(),
+        () => [
+          self.fetchPages(),
+          self.clientStore.fetchClients(true),
+        ],
       );
     },
     fetchPages() {
@@ -173,6 +187,11 @@ const ClientCreator = types
       'done',
     ),
   })
+  .views(self => ({
+    get store() {
+      return getParent(self);
+    },
+  }))
   .actions(self => ({
     setName(value) {
       self.name = value;
@@ -212,6 +231,7 @@ const ClientCreator = types
     createClientSuccess() {
       self.setName('');
       self.toggleModal();
+      self.store.fetchClients();
       self.state = 'done';
     },
     createClientError() {
@@ -252,7 +272,7 @@ const ClientStore = types
       self.startDate = startDate;
       self.endDate = endDate;
     },
-    fetchClients() {
+    fetchClients(onlyViews = false) {
       self.state = 'pending';
       axios().get('v1/client', {
         params: {
@@ -261,15 +281,21 @@ const ClientStore = types
           endDate: self.endDate,
         },
       }).then(
-        self.fetchClientsSuccess,
+        ({ data }) => self.fetchClientsSuccess(data, onlyViews),
         self.fetchClientsError,
       );
     },
-    fetchClientsSuccess({ data }) {
-      self.clients.replace(data.map(item => ({
-        ...item,
-        id: item._id
-      })));
+    fetchClientsSuccess({ clientsData, views }, onlyViews) {
+      if (onlyViews) {
+        self.clients.forEach((client) => {
+          client.views = views[client.id] || 0;
+        });
+      } else {
+        self.clients.replace(clientsData.map(item => ({
+          ...item,
+          id: item._id,
+        })));
+      }
       self.state = 'done';
     },
     fetchClientsError(error) {

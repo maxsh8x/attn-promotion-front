@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Table, Spin, Switch, Modal, Button } from 'antd';
 import style from './PagesList.css';
+import AddPage from './AddPage';
 
 const renderPageURL = (pageURL) => {
   const urlParts = pageURL.split('/');
@@ -79,6 +80,7 @@ class PagesList extends Component {
           footer={null}
           onCancel={client.pageCreator.toggleModal}
         >
+          <AddPage creator={client.pageCreator} />
         </Modal>
         <div className={style.tableOperations}>
           <Button onClick={client.pageCreator.toggleModal}>Создать индивидуальную страницу</Button>

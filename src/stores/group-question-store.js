@@ -29,7 +29,6 @@ const GroupQuestionCreator = types
       axios().post('v1/page/', {
         url: self.url,
         counterID: self.counterID,
-        type: 'group',
       }).then(
         self.fetchGroupQuestionsSuccess,
         self.fetchGroupQuestionsError,
@@ -76,7 +75,7 @@ const ClientBinder = types
     ),
     minViews: 0,
     maxViews: 0,
-    bindClientStatus: types.optional(
+    status: types.optional(
       types.enumeration(fetchStates),
       'done',
     ),
@@ -98,8 +97,8 @@ const ClientBinder = types
     toggleModal() {
       self.modalShown = !self.modalShown;
     },
-    bindClients() {
-      self.bindClientStatus = 'pending';
+    create() {
+      self.status = 'pending';
       return axios().post('/v1/page/bind', {
         page: self.question.id,
         clients: self.clientSelector.map(item => parseInt(item.key, 10)),
@@ -108,12 +107,12 @@ const ClientBinder = types
         startDate: self.startDate,
         endDate: self.endDate,
       }).then(
-        self.bindClientsSuccess,
-        self.bindClientsError,
+        self.createSuccess,
+        self.createError,
       );
     },
-    bindClientsSuccess() { },
-    bindClientsError() { },
+    createSuccess() { },
+    createError() { },
     setClients(clients) {
       self.clientSelector.replace(clients);
     },
@@ -200,14 +199,14 @@ const GroupQuestionStore = types
           self.startDate,
           self.endDate,
         ],
-        () => self.fetchGroupQuestions(),
+        () => self.fetchGroupQuestions(true),
       );
     },
     setDate(startDate, endDate) {
       self.startDate = startDate;
       self.endDate = endDate;
     },
-    fetchGroupQuestions() {
+    fetchGroupQuestions(onlyViews = false) {
       self.state = 'pending';
       axios().get('v1/page/group-questions', {
         params: {
@@ -216,16 +215,22 @@ const GroupQuestionStore = types
           endDate: self.endDate,
         },
       }).then(
-        self.fetchGroupQuestionsSuccess,
+        ({ data }) => self.fetchGroupQuestionsSuccess(data, onlyViews),
         self.fetchGroupQuestionsError,
       );
     },
-    fetchGroupQuestionsSuccess({ data }) {
-      self.groupQuestions.replace(data.map(item => ({
-        ...item,
-        id: item._id,
-      })));
-      self.state = 'done';
+    fetchGroupQuestionsSuccess({ pageData, views }, onlyViews) {
+      if (onlyViews) {
+        self.groupQuestions.forEach((question) => {
+          question.views = views[question.id] || 0;
+        });
+      } else {
+        self.groupQuestions.replace(pageData.map(item => ({
+          ...item,
+          id: item._id,
+        })));
+        self.state = 'done';
+      }
     },
     fetchGroupQuestionsError(error) {
       self.state = 'error';
