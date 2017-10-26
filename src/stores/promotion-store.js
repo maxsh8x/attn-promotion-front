@@ -35,6 +35,10 @@ const PromotionChart = types
       types.enumeration(fetchStates),
       'done',
     ),
+    interval: types.optional(
+      types.enumeration(['days', 'months']),
+      'days',
+    ),
     startDate: types.optional(
       types.string,
       moment().subtract(3, 'days').format('YYYY-MM-DD'),
@@ -53,13 +57,30 @@ const PromotionChart = types
     },
   }))
   .actions(self => ({
+    afterCreate() {
+      reaction(
+        () => [
+          self.startDate,
+          self.endDate,
+          self.interval,
+        ],
+        () => self.fetchChart(),
+      );
+    },
+    setInterval(value) {
+      self.interval = value;
+    },
+    setDate(startDate, endDate) {
+      self.startDate = startDate;
+      self.endDate = endDate;
+    },
     fetchChart() {
-      self.fetchPagesState = 'pending';
+      self.state = 'pending';
       axios().get('v1/metrics/promotionChart', {
         params: {
           startDate: self.startDate,
           endDate: self.endDate,
-          interval: 'days',
+          interval: self.interval,
           pageID: self.page.id,
         },
       }).then(
@@ -81,6 +102,7 @@ const Page = types
     id: types.identifier(types.number),
     createdAt: types.string,
     url: types.string,
+    title: types.string,
     type: types.string,
     active: types.boolean,
     inputs: types.optional(
