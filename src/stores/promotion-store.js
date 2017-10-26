@@ -138,6 +138,9 @@ const Page = types
     },
   }))
   .actions(self => ({
+    setInput(network, type, value) {
+      self.inputs.get(network)[type] = value;
+    },
     commitInput(network, type, value) {
       self.inputs.get(network)[type] = parseFloat(value, 10);
       return axios().post('v1/input', {
@@ -295,7 +298,6 @@ const PromotionStore = types
           };
         }
       }
-
       self.pages.replace(data.pages.map(item => ({
         ...item,
         id: item._id,

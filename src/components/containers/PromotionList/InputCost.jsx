@@ -4,27 +4,32 @@ import { Table, InputNumber } from 'antd';
 
 
 const InputCost = ({ page }) => {
+  const { inputData, commitInput, setInput } = page;
   const networks = page.store.sources;
   const childItems = networks.map(network => (
     {
       title: network[0].toUpperCase() + network.substr(1),
       children: [
         {
+          key: `${network}.clicks`,
           title: 'Кликов',
           dataIndex: `${network}.clicks`,
           render: value => (
             <InputNumber
-              defaultValue={value}
-              onBlur={e => page.commitInput(network, 'clicks', e.target.value)}
+              value={value}
+              onBlur={e => commitInput(network, 'clicks', e.target.value)}
+              onChange={nextValue => setInput(network, 'clicks', nextValue)}
             />),
         },
         {
+          key: `${network}.cost`,
           title: 'Потрачено',
           dataIndex: `${network}.cost`,
           render: value => (
             <InputNumber
-              defaultValue={value}
-              onBlur={e => page.commitInput(network, 'cost', e.target.value)}
+              value={value}
+              onBlur={e => commitInput(network, 'cost', e.target.value)}
+              onChange={nextValue => setInput(network, 'cost', nextValue)}
             />),
         },
       ],
@@ -36,12 +41,11 @@ const InputCost = ({ page }) => {
       children: childItems,
     },
   ];
-
   return (
     <Table
       rowKey="id"
       columns={columns}
-      dataSource={page.inputData}
+      dataSource={inputData}
       size="small"
       pagination={false}
     />
