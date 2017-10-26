@@ -28,7 +28,7 @@ class QuestionList extends Component {
   }
 
   render() {
-    const { clientsData, clientsBinder } = this.props.groupQuestion;
+    const { clientsData, clientsBinder, views } = this.props.groupQuestion;
     const columns = [
       { dataIndex: 'name', title: 'Имя' },
       { dataIndex: 'vatin', title: 'Инн' },
