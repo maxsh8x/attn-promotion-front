@@ -113,6 +113,10 @@ const Page = types
       types.enumeration(fetchStates),
       'done',
     ),
+    fetchMetricsState: types.optional(
+      types.enumeration(fetchStates),
+      'done',
+    ),
     metrics: types.optional(
       types.array(Metric),
       [],
@@ -197,6 +201,7 @@ const Page = types
     },
     updateStatusFailed() { },
     fetchMetrics() {
+      self.fetchMetricsState = 'pending';
       return axios().get(
         'v1/metrics',
         {
@@ -211,9 +216,12 @@ const Page = types
       );
     },
     fetchMetricsSuccess({ data }) {
+      self.fetchMetricsState = 'done';
       self.metrics.replace(data);
     },
-    fetchMetricsError() { },
+    fetchMetricsError() {
+      self.fetchMetricsState = 'error';
+    },
     updateMetrics() {
       return axios().post('/v1/metrics', {
         yDate: self.store.date,
@@ -286,7 +294,7 @@ const PromotionStore = types
       self.fetchPages();
     },
     fetchPages() {
-      self.fetchPagesState = 'pending';
+      self.state = 'pending';
       axios().get('v1/page', {
         params: {
           yDate: self.date,
@@ -330,10 +338,10 @@ const PromotionStore = types
       self.sources.replace(data.sources);
       self.activePages = data.activePages;
       self.inactivePages = data.inactivePages;
-      self.fetchPagesState = 'done';
+      self.state = 'done';
     },
     fetchPagesError() {
-      self.fetchPagesState = 'error';
+      self.state = 'error';
     },
   }));
 

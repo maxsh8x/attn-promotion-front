@@ -33,6 +33,9 @@ const PageMetaCreator = types
         ? getParent(self, 3)
         : getParent(self);
     },
+    get store() {
+      return getRoot(self);
+    },
   }))
   .actions(self => ({
     setMinViews(value) {
@@ -71,9 +74,10 @@ const PageMetaCreator = types
         self.createError,
       );
     },
-    createSuccess(related, parent) {
+    createSuccess() {
       self.toggleModal();
       self.client.fetchPages();
+      self.store.fetchClients(true);
       self.state = 'done';
     },
     createError() {

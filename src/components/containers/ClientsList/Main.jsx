@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Table, Button, Modal, DatePicker, Input } from 'antd';
+import { Table, Button, Modal, DatePicker, Spin } from 'antd';
 import moment from 'moment';
 import PagesList from './PagesList';
 import ClientCreator from './ClientCreator';
@@ -31,6 +31,7 @@ class ClientsList extends Component {
       groupQuestionCreator,
       startDate,
       endDate,
+      state
     } = this.props.clientsStore;
     const columns = [
       { dataIndex: 'counterID', title: 'ID счетчика', width: 100 },
@@ -57,22 +58,24 @@ class ClientsList extends Component {
             url="/v1/page/search"
           /> */}
         </div>
-        <Table
-          bordered
-          rowKey="id"
-          columns={columns}
-          dataSource={clientsData}
-          title={() => 'Список клиентов'}
-          footer={() => (
-            <div>
-              Подсчет просмотров за период: <RangePicker
-                defaultValue={[moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')]}
-                onChange={this.updateDate}
-                allowClear={false}
-              />
-            </div>)}
-          expandedRowRender={this.expandedRowRender}
-        />
+        <Spin spinning={state === 'pending'}>
+          <Table
+            bordered
+            rowKey="id"
+            columns={columns}
+            dataSource={clientsData}
+            title={() => 'Список клиентов'}
+            footer={() => (
+              <div>
+                Подсчет просмотров за период: <RangePicker
+                  defaultValue={[moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')]}
+                  onChange={this.updateDate}
+                  allowClear={false}
+                />
+              </div>)}
+            expandedRowRender={this.expandedRowRender}
+          />
+        </Spin>
       </div>
     );
   }

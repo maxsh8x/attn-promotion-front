@@ -15,6 +15,9 @@ class PromotionList extends Component {
   getTotal = (rowIndex, type) =>
     this.props.promotionStore.pages[rowIndex].total[type];
 
+  setPagination = ({ current, pageSize }) =>
+    this.props.promotionStore.setPagination(current, pageSize);
+
   expandedRowRender = (row, rowIndex) => {
     const page = this.props.promotionStore.pages[rowIndex];
     return <PageLayout page={page} />;
@@ -44,9 +47,20 @@ class PromotionList extends Component {
     return <Switch checked={page.active} onChange={checked => page.updateStatus(checked)} />;
   }
 
+
   render() {
-    const { promotionStore } = this.props;
-    const metricsCostColumns = promotionStore.sources.map(network => ({
+    const {
+      sources,
+      setPagination,
+      setDate,
+      state,
+      date,
+      switchTab,
+      activePages,
+      inactivePages,
+      pagesData,
+    } = this.props.promotionStore;
+    const metricsCostColumns = sources.map(network => ({
       key: network,
       dataIndex: `inputs.${network}`,
       title: network[0].toUpperCase() + network.substr(1),
@@ -84,16 +98,15 @@ class PromotionList extends Component {
         ],
       },
     ];
-    const setPagination = ({ current, pageSize }) =>
-      promotionStore.setPagination(current, pageSize);
+
     const title = () => 'Список продвигаемых страниц';
 
     return (
       <div>
         <div className={style.tableOperations}>
           <DatePicker
-            onChange={promotionStore.setDate}
-            value={moment(promotionStore.date, 'YYYY-MM-DD')}
+            onChange={setDate}
+            value={moment(date, 'YYYY-MM-DD')}
             allowClear={false}
           />
           {/* <SearchFilter
@@ -103,30 +116,30 @@ class PromotionList extends Component {
           /> */}
         </div>
 
-        <Spin spinning={promotionStore.state === 'pending'} >
-          <Tabs defaultActiveKey="active" onChange={promotionStore.switchTab} animated={false}>
-            <Tabs.TabPane tab={`Активные (${promotionStore.activePages})`} key="active">
+        <Spin spinning={state === 'pending'}>
+          <Tabs defaultActiveKey="active" onChange={switchTab} animated={false}>
+            <Tabs.TabPane tab={`Активные (${activePages})`} key="active">
               <Table
                 bordered
                 rowKey="id"
-                dataSource={promotionStore.pagesData}
+                dataSource={pagesData}
                 columns={columns}
                 title={title}
                 expandedRowRender={this.expandedRowRender}
-                onChange={setPagination}
-                pagination={{ total: promotionStore.activePages }}
+                onChange={this.setPagination}
+                pagination={{ total: activePages }}
               />
             </Tabs.TabPane>
-            <Tabs.TabPane tab={`Неактивные (${promotionStore.inactivePages})`} key="inactive">
+            <Tabs.TabPane tab={`Неактивные (${inactivePages})`} key="inactive">
               <Table
                 bordered
                 rowKey="id"
-                dataSource={promotionStore.pagesData}
+                dataSource={pagesData}
                 columns={columns}
                 title={title}
                 expandedRowRender={this.expandedRowRender}
-                onChange={setPagination}
-                pagination={{ total: promotionStore.inactivePages }}
+                onChange={this.setPagination}
+                pagination={{ total: inactivePages }}
               />
             </Tabs.TabPane>
           </Tabs>

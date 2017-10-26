@@ -1,9 +1,9 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { Button, Form, Input, InputNumber } from 'antd';
+import { Button, Form, Input, InputNumber, Spin } from 'antd';
 
 const GroupQuestionCreator = ({ groupQuestionCreator, form }) => (
-  <div>
+  <Spin spinning={groupQuestionCreator.state === 'pending'}>
     <Form layout="inline">
       <Form.Item>
         {form.getFieldDecorator('url', {
@@ -35,7 +35,7 @@ const GroupQuestionCreator = ({ groupQuestionCreator, form }) => (
         </Button>
       </Form.Item>
     </Form>
-  </div>
+  </Spin>
 );
 
 GroupQuestionCreator.propTypes = {

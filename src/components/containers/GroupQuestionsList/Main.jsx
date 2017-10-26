@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
-import { Table, Button, Modal, DatePicker } from 'antd';
+import { Table, Button, Modal, DatePicker, Spin } from 'antd';
 import { inject, observer } from 'mobx-react';
 import GroupQuestionCreator from './GroupQuestionCreator';
 import ClientsList from './ClientsList';
@@ -38,7 +37,8 @@ class GroupQuestionsList extends Component {
       groupQuestionsData,
       startDate,
       endDate,
-      setDate
+      setDate,
+      state
     } = this.props.groupQuestionStore;
 
     const columns = [
@@ -65,22 +65,24 @@ class GroupQuestionsList extends Component {
             Создать групповой вопрос
           </Button>
         </div>
-        <Table
-          bordered
-          rowKey="id"
-          columns={columns}
-          dataSource={groupQuestionsData}
-          title={() => 'Список групповых вопросов'}
-          expandedRowRender={this.expandedRowRender}
-          footer={() => (
-            <div>
-              Подсчет просмотров за период: <RangePicker
-                defaultValue={[moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')]}
-                onChange={this.updateDate}
-                allowClear={false}
-              />
-            </div>)}
-        />
+        <Spin spinning={state === 'pending'}>
+          <Table
+            bordered
+            rowKey="id"
+            columns={columns}
+            dataSource={groupQuestionsData}
+            title={() => 'Список групповых вопросов'}
+            expandedRowRender={this.expandedRowRender}
+            footer={() => (
+              <div>
+                Подсчет просмотров за период: <RangePicker
+                  defaultValue={[moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')]}
+                  onChange={this.updateDate}
+                  allowClear={false}
+                />
+              </div>)}
+          />
+        </Spin>
       </div>
     );
   }
