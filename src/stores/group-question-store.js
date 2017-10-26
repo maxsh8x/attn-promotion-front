@@ -1,5 +1,6 @@
 import { reaction, toJS } from 'mobx';
 import { types, getParent } from 'mobx-state-tree';
+import { message } from 'antd';
 import moment from 'moment';
 import axios from '../utils/axios';
 
@@ -46,7 +47,12 @@ const GroupQuestionCreator = types
       self.counterID = null;
       self.state = 'done';
     },
-    createGroupQuestionError() {
+    createGroupQuestionError(error) {
+      if (error.response.data.message === 'INVALID_COUNTER_ID') {
+        message.error('Неверный ID счетчика');
+      } else {
+        message.error('Ошибка при создании клиента');
+      }
       self.state = 'error';
     },
     setURL(value) {
