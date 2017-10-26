@@ -1,5 +1,6 @@
 import { reaction, toJS } from 'mobx';
 import { types, getRoot, getParent } from 'mobx-state-tree';
+import { message } from 'antd';
 import moment from 'moment';
 import axios from '../utils/axios';
 
@@ -236,7 +237,12 @@ const ClientCreator = types
       self.counterID = null;
       self.state = 'done';
     },
-    createClientError() {
+    createClientError(error) {
+      if (error.response.data.message === 'INVALID_COUNTER_ID') {
+        message.error('Неверный ID счетчика');
+      } else {
+        message.error('Ошибка при создании клиента');
+      }
       self.state = 'error';
     },
     toggleModal() {
