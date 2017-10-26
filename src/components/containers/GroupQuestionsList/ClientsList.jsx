@@ -27,6 +27,17 @@ class QuestionList extends Component {
     />);
   }
 
+  renderRowClassName = (now, { startDate, endDate }) => {
+    const start = new Date(startDate).getTime();
+    const end = new Date(endDate).getTime();
+    if (start <= now && now <= end) {
+      return style.rowStarted;
+    } else if (start > now) {
+      return style.rowWaited;
+    }
+    return style.rowDone;
+  }
+
   render() {
     const { clientsData, clientsBinder, views } = this.props.groupQuestion;
     const columns = [
@@ -49,6 +60,7 @@ class QuestionList extends Component {
       },
     ];
 
+    const now = new Date().getTime();
     return (
       <div>
         <Modal
@@ -68,6 +80,7 @@ class QuestionList extends Component {
           columns={columns}
           dataSource={clientsData}
           pagination={false}
+          rowClassName={row => this.renderRowClassName(now, row)}
         />
       </div>
     );

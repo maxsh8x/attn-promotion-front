@@ -94,6 +94,10 @@ const Page = types
     url: types.string,
     title: types.string,
     type: types.string,
+    minViews: types.number,
+    maxViews: types.number,
+    startDate: types.string,
+    endDate: types.string,
     parent: types.maybe(types.number),
     active: types.boolean,
     views: 0, // null
@@ -171,7 +175,11 @@ const Client = types
       );
     },
     fetchPagesSuccess({ data }) {
-      self.pages.replace(data.map(page => ({ ...page, id: page._id })));
+      self.pages.replace(data.map(page => ({
+        ...page,
+        id: page._id,
+        ...page.meta[0],
+      })));
       self.fetchPagesState = 'done';
     },
     fetchPagesError() {

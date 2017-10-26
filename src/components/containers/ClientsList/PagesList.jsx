@@ -1,42 +1,55 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Table, Spin, Switch, Modal, Button } from 'antd';
+import moment from 'moment';
+import { Table, Spin, Switch, Modal, Button, Badge } from 'antd';
 import style from './PagesList.css';
 import AddPage from './AddPage';
-
-const renderPageURL = (pageURL) => {
-  const urlParts = pageURL.split('/');
-  return <a href={pageURL}>{urlParts[urlParts.length - 2]}</a>;
-};
 
 const typeNames = {
   individual: 'Индивидуальный',
   group: 'Групповой',
 };
 
-const basicColumns = [
-  {
-    dataIndex: 'active',
-    title: 'Статус',
-    render: active => <Switch checked={active} />,
-  },
-  {
-    dataIndex: 'url',
-    title: 'Адрес',
-    render: renderPageURL,
-  },
-  {
-    dataIndex: 'title',
-    title: 'Название',
-  },
-  {
-    dataIndex: 'views',
-    title: 'Просмотров',
-  },
-];
-
 @observer
 class PagesList extends Component {
+  constructor(props) {
+    super(props);
+    this.basicColumns = [
+      {
+        dataIndex: 'active',
+        title: 'Статус',
+        render: active => <Switch checked={active} />,
+      },
+      {
+        dataIndex: 'url',
+        title: 'Адрес',
+        render: this.renderPageURL,
+      },
+      {
+        dataIndex: 'title',
+        title: 'Название',
+      },
+      {
+        dataIndex: 'views',
+        title: 'Просмотров',
+      },
+      {
+        title: 'Дата',
+        children: [
+          { title: 'От', dataIndex: 'startDate', render: this.renderDate },
+          { title: 'До', dataIndex: 'endDate', render: this.renderDate },
+        ],
+      },
+      {
+        title: 'Показы',
+        children: [
+          { title: 'Min', dataIndex: 'minViews', render: this.renderViews },
+          { title: 'Max', dataIndex: 'maxViews', render: this.renderViews },
+        ],
+      },
+    ];
+  }
+
   componentWillMount() {
     this.props.client.fetchPages();
   }
@@ -49,7 +62,7 @@ class PagesList extends Component {
         <div>
           <Table
             rowKey="id"
-            columns={basicColumns}
+            columns={this.basicColumns}
             dataSource={page.pagesData}
             size="small"
             pagination={false}
@@ -62,16 +75,49 @@ class PagesList extends Component {
     return null;
   }
 
+  renderPageURL = (pageURL) => {
+    const urlParts = pageURL.split('/');
+    return <a href={pageURL}>{urlParts[urlParts.length - 2]}</a>;
+  };
+
+  renderDate = value => moment(value).format('YYYY-MM-DD')
+
+  renderViews = (value, { views }) => {
+    const badgeStyle = value <= views
+      ? { backgroundColor: '#87d068' }
+      : {};
+    return (<Badge
+      count={value}
+      style={badgeStyle}
+      overflowCount={99999999}
+      showZero
+    />);
+  }
+
+  renderRowClassName = (now, { startDate, endDate }) => {
+    const start = new Date(startDate).getTime();
+    const end = new Date(endDate).getTime();
+    if (start <= now && now <= end) {
+      return style.rowStarted;
+    } else if (start > now) {
+      return style.rowWaited;
+    }
+    return style.rowDone;
+  }
+
   render() {
     const { client } = this.props;
     const spinning = !(client.fetchPagesState === 'done');
-    const columns = basicColumns.concat([
+
+    const columns = this.basicColumns.concat([
       {
         dataIndex: 'type',
         title: 'Тип',
         render: type => typeNames[type],
       },
     ]);
+
+    const now = new Date().getTime();
     return (
       <div>
         <Modal
@@ -94,6 +140,7 @@ class PagesList extends Component {
               title={() => 'Список страниц клиента'}
               footer={() => `Всего просмотров: ${client.totalViews}`}
               expandedRowRender={this.expandedRowRender}
+              rowClassName={row => this.renderRowClassName(now, row)}
             />
           </Spin>
         </div>

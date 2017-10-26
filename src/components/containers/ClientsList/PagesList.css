@@ -2,3 +2,15 @@
   margin-right: 8px;
   margin-bottom: 16px;
 }
+
+.rowWaited {
+  background-color: #fffaeb;
+}
+
+.rowStarted {
+  background-color: #ebf8f2;
+}
+
+.rowDone {
+  background-color: #fef0ef;
+}
