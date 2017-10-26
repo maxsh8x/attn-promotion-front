@@ -60,6 +60,9 @@ class PromotionList extends Component {
       inactivePages,
       pagesData,
       setClientsFilter,
+      setExpandedPages,
+      current,
+      pageSize
     } = this.props.promotionStore;
     const metricsCostColumns = sources.map(network => ({
       key: network,
@@ -101,6 +104,7 @@ class PromotionList extends Component {
     ];
 
     const title = () => 'Список продвигаемых страниц';
+    const paginationParams = { current, pageSize}
 
     return (
       <div>
@@ -128,7 +132,7 @@ class PromotionList extends Component {
                 title={title}
                 expandedRowRender={this.expandedRowRender}
                 onChange={this.setPagination}
-                pagination={{ total: activePages }}
+                pagination={{ ...paginationParams, total: activePages }}
               />
             </Tabs.TabPane>
             <Tabs.TabPane tab={`Неактивные (${inactivePages})`} key="inactive">
@@ -140,7 +144,7 @@ class PromotionList extends Component {
                 title={title}
                 expandedRowRender={this.expandedRowRender}
                 onChange={this.setPagination}
-                pagination={{ total: inactivePages }}
+                pagination={{ ...paginationParams, total: inactivePages }}
               />
             </Tabs.TabPane>
           </Tabs>

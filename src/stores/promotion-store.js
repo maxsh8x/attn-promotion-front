@@ -41,11 +41,11 @@ const PromotionChart = types
     ),
     startDate: types.optional(
       types.string,
-      moment().subtract(3, 'days').format('YYYY-MM-DD'),
+      moment().subtract(1, 'month').format('YYYY-MM-DD'),
     ),
     endDate: types.optional(
       types.string,
-      moment().add(3, 'months').format('YYYY-MM-DD'),
+      moment().format('YYYY-MM-DD'),
     ),
   })
   .views(self => ({
@@ -55,11 +55,15 @@ const PromotionChart = types
     get chartData() {
       return toJS(self.items);
     },
+    get store() {
+      return getRoot(self);
+    },
   }))
   .actions(self => ({
     afterCreate() {
       reaction(
         () => [
+          self.store.date,
           self.startDate,
           self.endDate,
           self.interval,
@@ -227,9 +231,12 @@ const Page = types
         yDate: self.store.date,
         pageID: self.id,
       }).then(
-        self.fetchMetrics(),
-        self.updateMetricsError(),
+        self.updateMetricsSucess,
+        self.updateMetricsError,
       );
+    },
+    updateMetricsSucess() {
+      self.fetchMetrics();
     },
     updateMetricsError() {
       message.error('Ошибка при обновлении метрик');
@@ -257,8 +264,8 @@ const PromotionStore = types
       'done',
     ),
     isActiveTab: true,
-    offset: 0,
-    limit: 10,
+    current: 1,
+    pageSize: 10,
     clientsFilter: '',
   })
   .views(self => ({
@@ -270,11 +277,14 @@ const PromotionStore = types
     afterCreate() {
       reaction(
         () => [
-          self.date,
-          self.offset,
-          self.limit,
+          self.current,
+          self.pageSize,
           self.clientsFilter,
         ],
+        () => self.fetchPages(),
+      );
+      reaction(
+        () => self.date,
         () => self.fetchPages(),
       );
     },
@@ -282,9 +292,8 @@ const PromotionStore = types
       self.clientsFilter = clients.join(',');
     },
     setPagination(current, pageSize) {
-      const offset = (current - 1) * pageSize;
-      self.offset = offset;
-      self.limit = pageSize;
+      self.current = current;
+      self.pageSize = pageSize;
     },
     setDate(date, dateString) {
       self.date = dateString;
@@ -299,8 +308,8 @@ const PromotionStore = types
         params: {
           yDate: self.date,
           active: self.isActiveTab,
-          offset: self.offset,
-          limit: self.limit,
+          offset: (self.current - 1) * self.pageSize,
+          limit: self.pageSize,
           clients: self.clientsFilter,
           filter: '',
         },
@@ -309,7 +318,7 @@ const PromotionStore = types
         self.fetchPagesError,
       );
     },
-    fetchPagesSuccess({ data }) {
+    fetchPagesSuccess({ data }, onlyMetrics = false) {
       const networksInitState = {};
       for (let i = 0; i < data.sources.length; i += 1) {
         networksInitState[data.sources[i]] = {
