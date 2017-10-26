@@ -254,8 +254,8 @@ const GroupQuestionStore = types
           ...item,
           id: item._id,
         })));
-        self.state = 'done';
       }
+      self.state = 'done';
     },
     fetchGroupQuestionsError(error) {
       self.state = 'error';
