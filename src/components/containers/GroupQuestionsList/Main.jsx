@@ -42,8 +42,7 @@ class GroupQuestionsList extends Component {
     } = this.props.groupQuestionStore;
 
     const columns = [
-      { dataIndex: 'url', title: 'Адрес', render: this.renderPageURL },
-      { dataIndex: 'title', title: 'Название' },
+      { dataIndex: 'title', title: 'Название', render: (title, { url }) => <a href={url}>{title}</a> },
       { dataIndex: 'createdAt', title: 'Дата создания', render: value => moment(value).format('YYYY-MM-DD') },
       { dataIndex: 'views', title: 'Просмотров' },
     ];

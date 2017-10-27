@@ -34,10 +34,11 @@ class PromotionList extends Component {
       </div>
     );
 
-    const urlParts = pageURL.split('/');
+    // const urlParts = pageURL.split('/');
+    // urlParts[urlParts.length - 2]
     return (
-      <Popover content={content} title={title}>
-        <a href={pageURL}>{urlParts[urlParts.length - 2]}</a>
+      <Popover content={content}>
+        <a href={pageURL}>{title}</a>
       </Popover>
     );
   }

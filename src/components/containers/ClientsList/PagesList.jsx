@@ -20,14 +20,15 @@ class PagesList extends Component {
         title: 'Статус',
         render: active => <Switch checked={active} />,
       },
-      {
-        dataIndex: 'url',
-        title: 'Адрес',
-        render: this.renderPageURL,
-      },
+      // {
+      //   dataIndex: 'url',
+      //   title: 'Адрес',
+      //   render: this.renderPageURL,
+      // },
       {
         dataIndex: 'title',
         title: 'Название',
+        render: (title, { url }) => <a href={url}>{title}</a>,
       },
       {
         dataIndex: 'views',
