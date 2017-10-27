@@ -15,8 +15,8 @@ class ClientsList extends Component {
     this.props.clientsStore.fetchClients();
   }
 
-  expandedRowRender = ({ id, type }) => {
-    const client = this.props.clientsStore.findClientById(id);
+  expandedRowRender = ({ id, type }, rowIndex) => {
+    const client = this.props.clientsStore.clients[rowIndex];
     return <PagesList client={client} type={type} />;
   }
 
