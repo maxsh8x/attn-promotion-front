@@ -79,12 +79,48 @@ const UserCreator = types
     },
   }));
 
-const ClientBinder = types
-  .model(self => ({
+const ClientSelectorItem = types
+  .model('ClientSelectorItem', {
+    key: types.string,
+    label: types.string,
+  });
+
+const ClientsBinder = types
+  .model('ClientsBinder', {
     state: types.optional(
       types.enumeration(fetchStates),
       'done',
     ),
+    clientSelector: types.optional(
+      types.array(ClientSelectorItem),
+      [],
+    ),
+  })
+  .views(self => ({
+    get user() {
+      return getParent(self);
+    },
+  }))
+  .actions(self => ({
+    setClients(clients) {
+      self.clientSelector.replace(clients);
+    },
+    bind() {
+      self.state = 'pending';
+      axios().post('v1/user/bind', {
+        user: self.user.id,
+        clients: self.clientSelector.map(item => parseInt(item.key, 10)),
+      }).then(
+        self.fetchClientsSuccess,
+        self.fetchClientsError,
+      );
+    },
+    bindSuccess() {
+      self.state = 'done';
+    },
+    bindFailed() {
+      self.state = 'error';
+    },
   }));
 
 const Client = types
@@ -94,7 +130,7 @@ const Client = types
     brand: types.string,
     vatin: types.string,
     counterID: types.number,
-    views: types.number,
+    views: 0,
   });
 
 const User = types
@@ -108,8 +144,8 @@ const User = types
       types.array(Client),
       [],
     ),
-    clientBinder: types.optional(
-      ClientBinder,
+    clientsBinder: types.optional(
+      ClientsBinder,
       {},
     ),
   })
@@ -126,6 +162,7 @@ const User = types
       self.state = 'pending';
       axios().get('v1/client', {
         params: {
+          user: self.id,
           filter: '',
           startDate: self.store.startDate,
           endDate: self.store.endDate,

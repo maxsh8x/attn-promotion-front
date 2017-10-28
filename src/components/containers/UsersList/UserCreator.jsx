@@ -53,7 +53,7 @@ const UserCreator = ({ creator, form }) => (
         })(<Input placeholder="nikolay.sobolev@mail.com" />)}
       </Form.Item>
       <Form.Item
-        label="Название бренда"
+        label="Роль"
         {...formItemLayout}
       >
         {form.getFieldDecorator('role', {
