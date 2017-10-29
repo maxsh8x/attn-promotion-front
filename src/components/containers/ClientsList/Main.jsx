@@ -5,7 +5,7 @@ import moment from 'moment';
 import PagesList from './PagesList';
 import ClientCreator from './ClientCreator';
 import style from './Main.css';
-import SearchFilter from '../SearchFilter';
+import permissions from '../../../utils/permissions';
 
 const { RangePicker } = DatePicker;
 
@@ -51,13 +51,15 @@ class ClientsList extends Component {
         >
           <ClientCreator clientCreator={clientCreator} />
         </Modal>
-        <div className={style.tableOperations}>
-          <Button onClick={clientCreator.toggleModal}>Создать клиента</Button>
-          {/* <SearchFilter
+        {permissions(['root']) &&
+          <div className={style.tableOperations}>
+            <Button onClick={clientCreator.toggleModal}>Создать клиента</Button>
+            {/* <SearchFilter
             title="Фильтр по адресу страницы"
             url="/v1/page/search"
           /> */}
-        </div>
+          </div>
+        }
         <Spin spinning={state === 'pending'}>
           <Table
             bordered

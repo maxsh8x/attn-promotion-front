@@ -2,6 +2,7 @@ import { toJS, reaction } from 'mobx';
 import { types, getRoot, getParent } from 'mobx-state-tree';
 import { message } from 'antd';
 import moment from 'moment';
+import debounce from 'lodash.debounce';
 import axios from '../utils/axios';
 
 const fetchStates = ['pending', 'done', 'error'];
@@ -63,7 +64,6 @@ const PromotionChart = types
     afterCreate() {
       reaction(
         () => [
-          self.store.date,
           self.startDate,
           self.endDate,
           self.interval,
@@ -267,6 +267,7 @@ const PromotionStore = types
     current: 1,
     pageSize: 10,
     clientsFilter: '',
+    pageFilter: '',
   })
   .views(self => ({
     get pagesData() {
@@ -287,9 +288,17 @@ const PromotionStore = types
         () => self.date,
         () => self.fetchPages(),
       );
+      reaction(
+        () => self.pageFilter,
+        () => self.fetchPages(),
+        { delay: 1000 },
+      );
     },
     setClientsFilter(clients) {
       self.clientsFilter = clients.join(',');
+    },
+    setPageFilter(value) {
+      self.pageFilter = value;
     },
     setPagination(current, pageSize) {
       self.current = current;
@@ -311,7 +320,7 @@ const PromotionStore = types
           offset: (self.current - 1) * self.pageSize,
           limit: self.pageSize,
           clients: self.clientsFilter,
-          filter: '',
+          filter: self.pageFilter,
         },
       }).then(
         self.fetchPagesSuccess,

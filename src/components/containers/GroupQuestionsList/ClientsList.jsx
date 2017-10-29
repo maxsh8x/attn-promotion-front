@@ -4,6 +4,8 @@ import moment from 'moment';
 import { Button, Modal, Table, Badge } from 'antd';
 import BindClient from './BindClient';
 import style from './ClientsList.css';
+import permissions from '../../../utils/permissions';
+import InfoBadges from '../InfoBadges';
 
 
 @observer
@@ -71,15 +73,18 @@ class QuestionList extends Component {
         >
           <BindClient clientsBinder={clientsBinder} />
         </Modal>
-        <div className={style.tableOperations}>
-          <Button onClick={clientsBinder.toggleModal}>Привязать клиентов</Button>
-        </div>
+        {permissions(['root']) &&
+          <div className={style.tableOperations}>
+            <Button onClick={clientsBinder.toggleModal}>Привязать клиентов</Button>
+          </div>}
         <Table
+          bordered
           size="small"
           rowKey="id"
           columns={columns}
           dataSource={clientsData}
           pagination={false}
+          footer={() => <InfoBadges />}
           rowClassName={row => this.renderRowClassName(now, row)}
         />
       </div>

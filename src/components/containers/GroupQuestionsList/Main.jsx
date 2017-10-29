@@ -5,6 +5,7 @@ import { inject, observer } from 'mobx-react';
 import GroupQuestionCreator from './GroupQuestionCreator';
 import ClientsList from './ClientsList';
 import style from './Main.css';
+import permissions from '../../../utils/permissions';
 
 const { RangePicker } = DatePicker;
 
@@ -57,13 +58,15 @@ class GroupQuestionsList extends Component {
         >
           <GroupQuestionCreator groupQuestionCreator={groupQuestionCreator} />
         </Modal>
-        <div className={style.tableOperations}>
-          <Button
-            onClick={groupQuestionCreator.toggleModal}
-          >
-            Создать групповой вопрос
-          </Button>
-        </div>
+        {permissions(['root']) &&
+          <div className={style.tableOperations}>
+            <Button
+              onClick={groupQuestionCreator.toggleModal}
+            >
+              Создать групповой вопрос
+            </Button>
+          </div>
+        }
         <Spin spinning={state === 'pending'}>
           <Table
             bordered

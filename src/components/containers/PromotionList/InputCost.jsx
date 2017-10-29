@@ -43,6 +43,7 @@ const InputCost = ({ page }) => {
   ];
   return (
     <Table
+      bordered
       rowKey="id"
       columns={columns}
       dataSource={inputData}

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Layout, LocaleProvider, Menu, Icon, Breadcrumb } from 'antd';
 import ruRU from 'antd/lib/locale-provider/ru_RU';
 import Navbar from './Navbar';
+import permissions from '../../utils/permissions';
 
 const { SubMenu } = Menu;
 const { Content, Sider } = Layout;
@@ -30,17 +31,21 @@ const PrivateAreaLayout = ({ children, history }) => (
               <Menu.Item key="group-questions">
                 <NavLink to="/group-questions"><Icon type="question-circle-o" />Групповые вопросы</NavLink>
               </Menu.Item>
-              <Menu.Item key="users">
-                <NavLink to="/users">
-                  <Icon type="team" />Пользователи
-                </NavLink>
-              </Menu.Item>
+              {permissions(['root', 'buchhalter']) &&
+                <Menu.Item key="users">
+                  <NavLink to="/users">
+                    <Icon type="team" />Пользователи
+                  </NavLink>
+                </Menu.Item>
+              }
             </SubMenu>
-            <SubMenu key="metrics" title={<span><Icon type="area-chart" />Метрики</span>}>
-              <Menu.Item key="promotion">
-                <NavLink to="/promotion">Продвижение страниц</NavLink>
-              </Menu.Item>
-            </SubMenu>
+            {permissions(['root']) &&
+              <SubMenu key="metrics" title={<span><Icon type="area-chart" />Метрики</span>}>
+                <Menu.Item key="promotion">
+                  <NavLink to="/promotion">Продвижение страниц</NavLink>
+                </Menu.Item>
+              </SubMenu>
+            }
           </Menu>
         </Sider>
         <Layout style={{ padding: '0 24px 24px' }}>

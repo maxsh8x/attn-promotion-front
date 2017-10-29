@@ -110,12 +110,14 @@ const ClientsBinder = types
       axios().post('v1/user/bind', {
         user: self.user.id,
         clients: self.clientSelector.map(item => parseInt(item.key, 10)),
+        action: 'bind',
       }).then(
-        self.fetchClientsSuccess,
-        self.fetchClientsError,
+        self.bindSuccess,
+        self.bindFailed,
       );
     },
     bindSuccess() {
+      self.user.fetchClients();
       self.state = 'done';
     },
     bindFailed() {
@@ -131,7 +133,36 @@ const Client = types
     vatin: types.string,
     counterID: types.number,
     views: 0,
-  });
+    state: types.optional(
+      types.enumeration(fetchStates),
+      'done',
+    ),
+  })
+  .views(self => ({
+    get user() {
+      return getParent(self, 2);
+    },
+  }))
+  .actions(self => ({
+    unbind() {
+      self.state = 'pending';
+      axios().post('v1/user/bind', {
+        user: self.user.id,
+        clients: [self.id],
+        action: 'unbind',
+      }).then(
+        self.unbindSuccess,
+        self.unbindFailed,
+      );
+    },
+    unbindSuccess() {
+      self.user.fetchClients();
+      self.state = 'done';
+    },
+    unbindFailed() {
+      self.state = 'error';
+    },
+  }));
 
 const User = types
   .model('User', {

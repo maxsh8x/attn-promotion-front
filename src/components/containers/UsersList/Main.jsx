@@ -5,6 +5,7 @@ import moment from 'moment';
 import UserCreator from './UserCreator';
 import ClientsList from './ClientsList';
 import style from './Main.css';
+import permissions from '../../../utils/permissions';
 
 const { RangePicker } = DatePicker;
 
@@ -20,9 +21,12 @@ class UsersList extends Component {
     this.props.usersStore.fetchUsers();
   }
 
-  expandedRowRender = ({ id, type }, rowIndex) => {
-    const user = this.props.usersStore.users[rowIndex];
-    return <ClientsList user={user} />;
+  expandedRowRender = ({ role }, rowIndex) => {
+    if (role === 'manager') {
+      const user = this.props.usersStore.users[rowIndex];
+      return <ClientsList user={user} />;
+    }
+    return null;
   }
 
   render() {
@@ -43,9 +47,11 @@ class UsersList extends Component {
         >
           <UserCreator creator={userCreator} />
         </Modal>
-        <div className={style.tableOperations}>
-          <Button onClick={userCreator.toggleModal}>Создать пользователя</Button>
-        </div>
+        {permissions(['root']) &&
+          <div className={style.tableOperations}>
+            <Button onClick={userCreator.toggleModal}>Создать пользователя</Button>
+          </div>
+        }
         <Table
           bordered
           rowKey="id"

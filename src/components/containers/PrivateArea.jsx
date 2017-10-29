@@ -1,17 +1,17 @@
 import React from 'react';
-import jwtDecode from 'jwt-decode';
-// import { observer, inject } from 'mobx-react';
-import RootMain from './root/Main';
+import { Route } from 'react-router-dom';
+import ClientsList from './ClientsList/Main';
+import PromotionList from './PromotionList/Main';
+import GroupQuestionsList from './GroupQuestionsList/Main';
+import UsersList from './UsersList/Main';
 
-const PrivateArea = () => {
-  const token = localStorage.getItem('token');
-  const { role } = jwtDecode(token);
-  switch (role) {
-    case 'root':
-      return <RootMain />;
-    default:
-      return null;
-  }
-};
+const PrivateArea = () => (
+  <div>
+    <Route path="/clients" component={ClientsList} />
+    <Route path="/group-questions" component={GroupQuestionsList} />
+    <Route path="/promotion" component={PromotionList} />
+    <Route path="/users" component={UsersList} />
+  </div>
+);
 
 export default PrivateArea;

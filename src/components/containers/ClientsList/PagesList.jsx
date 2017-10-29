@@ -4,6 +4,8 @@ import moment from 'moment';
 import { Table, Spin, Switch, Modal, Button, Badge } from 'antd';
 import style from './PagesList.css';
 import AddPage from './AddPage';
+import InfoBadges from '../InfoBadges';
+import permissions from '../../../utils/permissions';
 
 const typeNames = {
   individual: 'Индивидуальный',
@@ -67,7 +69,6 @@ class PagesList extends Component {
             dataSource={page.pagesData}
             size="small"
             pagination={false}
-            footer={() => `Всего просмотров: ${page.totalViews}`}
             title={() => 'Список страниц группового вопроса'}
           />
         </div>
@@ -129,22 +130,26 @@ class PagesList extends Component {
         >
           <AddPage creator={client.pageCreator} />
         </Modal>
-        <div className={style.tableOperations}>
-          <Button onClick={client.pageCreator.toggleModal}>Создать индивидуальную страницу</Button>
-          <Spin spinning={spinning}>
-            <Table
-              rowKey="id"
-              columns={columns}
-              dataSource={client.pagesData}
-              size="small"
-              pagination={false}
-              title={() => 'Список страниц клиента'}
-              footer={() => `Всего просмотров: ${client.totalViews}`}
-              expandedRowRender={this.expandedRowRender}
-              rowClassName={row => this.renderRowClassName(now, row)}
-            />
-          </Spin>
-        </div>
+        {permissions(['root']) &&
+          <div className={style.tableOperations}>
+            <Button onClick={client.pageCreator.toggleModal}>
+              Создать индивидуальную страницу
+            </Button>
+          </div>}
+        <Spin spinning={spinning}>
+          <Table
+            bordered
+            rowKey="id"
+            columns={columns}
+            dataSource={client.pagesData}
+            size="small"
+            pagination={false}
+            title={() => 'Список страниц клиента'}
+            footer={() => <InfoBadges />}
+            expandedRowRender={this.expandedRowRender}
+            rowClassName={row => this.renderRowClassName(now, row)}
+          />
+        </Spin>
       </div>
     );
   }

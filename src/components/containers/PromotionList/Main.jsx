@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import moment from 'moment';
 import { inject, observer } from 'mobx-react';
-import { Tabs, Table, DatePicker, Spin, Popover, Switch } from 'antd';
+import { Tabs, Table, DatePicker, Spin, Popover, Switch, Input } from 'antd';
 import style from './Main.css';
 import PageLayout from './PageLayout';
 import SearchFilter from '../SearchFilter';
@@ -61,9 +61,11 @@ class PromotionList extends Component {
       inactivePages,
       pagesData,
       setClientsFilter,
+      setPageFilter,
       setExpandedPages,
       current,
-      pageSize
+      pageSize,
+      pageFilter
     } = this.props.promotionStore;
     const metricsCostColumns = sources.map(network => ({
       key: network,
@@ -119,6 +121,12 @@ class PromotionList extends Component {
             title="Введите имя клиента для поиска"
             url="/v1/client/search"
             callback={clients => setClientsFilter(clients.map(client => client.key))}
+          />
+          <Input
+            placeholder="Введите название страницы"
+            className={style.searchPage}
+            onChange={e => setPageFilter(e.target.value)}
+            value={pageFilter}
           />
         </div>
 

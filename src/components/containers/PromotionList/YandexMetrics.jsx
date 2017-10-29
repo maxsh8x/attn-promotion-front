@@ -60,6 +60,7 @@ class YandexMetrics extends Component {
       <div>
         <Spin spinning={fetchMetricsState === 'pending'}>
           <Table
+            bordered
             title={() => <Button onClick={updateMetrics}>Обновить данные за {date}</Button>}
             rowKey="metric"
             columns={columns}
