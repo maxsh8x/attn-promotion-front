@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Tag } from 'antd';
+import { Tag, Spin } from 'antd';
 
 @observer
 class ClientsList extends Component {
@@ -9,9 +9,12 @@ class ClientsList extends Component {
   }
 
   render() {
-    const { clientsNamesData } = this.props.page;
+    const {
+      clientsNamesData,
+      fetchClientsNamesState
+    } = this.props.page;
     return (
-      <div>
+      <Spin spinning={fetchClientsNamesState === 'pending'}>
         {
           clientsNamesData.length > 0
             ? <h4 style={{ marginBottom: 16 }}>Клиенты: </h4>
@@ -20,7 +23,7 @@ class ClientsList extends Component {
         {
           clientsNamesData.map(name => <Tag>{name}</Tag>)
         }
-      </div>
+      </Spin>
     );
   }
 }

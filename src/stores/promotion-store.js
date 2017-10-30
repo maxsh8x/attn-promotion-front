@@ -122,11 +122,11 @@ const Page = types
     ),
     fetchMetricsState: types.optional(
       types.enumeration(fetchStates),
-      'done',
+      'pending',
     ),
     fetchClientsNamesState: types.optional(
       types.enumeration(fetchStates),
-      'done',
+      'pending',
     ),
     metrics: types.optional(
       types.array(Metric),
