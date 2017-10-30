@@ -1,6 +1,6 @@
 import { toJS } from 'mobx';
 import { types, getEnv } from 'mobx-state-tree';
-// import debounce from 'lodash.debounce';
+import { message } from 'antd';
 import axios from '../utils/axios';
 
 const fetchStates = ['pending', 'done', 'error'];
@@ -69,6 +69,7 @@ const Filter = types
       self.state = 'done';
     },
     fetchDataError() {
+      message.error('Ошибка при получении данных');
       self.state = 'error';
     },
   }));

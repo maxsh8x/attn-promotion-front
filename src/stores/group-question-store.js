@@ -202,6 +202,7 @@ const GroupQuestion = types
       self.state = 'done';
     },
     fetchClientsError(error) {
+      message.error('Ошибка при получении клиентов');
       self.state = 'error';
     },
   }));
@@ -269,6 +270,7 @@ const GroupQuestionStore = types
       self.state = 'done';
     },
     fetchGroupQuestionsError(error) {
+      message.error('Ошибка при получении групповых вопросов');
       self.state = 'error';
     },
   }));

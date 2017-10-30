@@ -121,6 +121,7 @@ const ClientsBinder = types
       self.state = 'done';
     },
     bindFailed() {
+      message.error('Ошибка при привязке пользователя');
       self.state = 'error';
     },
   }));
@@ -160,6 +161,7 @@ const Client = types
       self.state = 'done';
     },
     unbindFailed() {
+      message.error('Ошибка при отвязке пользователя');
       self.state = 'error';
     },
   }));
@@ -211,6 +213,7 @@ const User = types
       self.state = 'done';
     },
     fetchClientsError(error) {
+      message.error('Ошибка при получении клиентов');
       self.state = 'error';
     },
   }));

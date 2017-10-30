@@ -4,9 +4,13 @@ import { observer } from 'mobx-react';
 import InputCost from './InputCost';
 import YandexMetrics from './YandexMetrics';
 import PromotionChart from './PromotionChart';
+import ClientsList from './ClientsList';
 
 const PageLayout = ({ page }) => (
   <div>
+    <Card noHovering>
+      <ClientsList page={page} />
+    </Card>
     <Card noHovering>
       <InputCost page={page} />
     </Card>

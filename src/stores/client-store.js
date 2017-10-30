@@ -190,6 +190,7 @@ const Client = types
       self.fetchPagesState = 'done';
     },
     fetchPagesError() {
+      message.error('Ошибка при получении страниц');
       self.fetchPagesState = 'error';
     },
   }));
@@ -327,6 +328,7 @@ const ClientStore = types
       self.state = 'done';
     },
     fetchClientsError(error) {
+      message.error('Ошибка при получении клиентов');
       self.state = 'error';
     },
   }));

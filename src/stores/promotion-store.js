@@ -2,7 +2,6 @@ import { toJS, reaction } from 'mobx';
 import { types, getRoot, getParent } from 'mobx-state-tree';
 import { message } from 'antd';
 import moment from 'moment';
-import debounce from 'lodash.debounce';
 import axios from '../utils/axios';
 
 const fetchStates = ['pending', 'done', 'error'];
@@ -109,6 +108,10 @@ const Page = types
     title: types.string,
     type: types.string,
     active: types.boolean,
+    clientsNames: types.optional(
+      types.array(types.string),
+      [],
+    ),
     inputs: types.optional(
       types.map(Input),
       {},
@@ -118,6 +121,10 @@ const Page = types
       'done',
     ),
     fetchMetricsState: types.optional(
+      types.enumeration(fetchStates),
+      'done',
+    ),
+    fetchClientsNamesState: types.optional(
       types.enumeration(fetchStates),
       'done',
     ),
@@ -131,6 +138,9 @@ const Page = types
     ),
   })
   .views(self => ({
+    get clientsNamesData() {
+      return toJS(self.clientsNames);
+    },
     get total() {
       const result = {
         cost: 0,
@@ -173,7 +183,7 @@ const Page = types
     },
     commitInput(network, type, value) {
       self.inputs.get(network)[type] = parseFloat(value, 10);
-      return axios().post('v1/input', {
+      axios().post('v1/input', {
         yDate: self.store.date,
         source: network,
         pageID: self.id,
@@ -193,7 +203,7 @@ const Page = types
       self.commitInputState = 'error';
     },
     updateStatus(checked) {
-      return axios().patch(`v1/page/${self.id}/status`, {
+      axios().patch(`v1/page/${self.id}/status`, {
         active: checked,
       }).then(
         () => self.updateStatusSuccess(checked),
@@ -206,7 +216,7 @@ const Page = types
     updateStatusFailed() { },
     fetchMetrics() {
       self.fetchMetricsState = 'pending';
-      return axios().get(
+      axios().get(
         'v1/metrics',
         {
           params: {
@@ -224,16 +234,34 @@ const Page = types
       self.metrics.replace(data);
     },
     fetchMetricsError() {
+      message.error('Ошибка при получении метрик');
       self.fetchMetricsState = 'error';
     },
     updateMetrics() {
-      return axios().post('/v1/metrics', {
+      axios().post('/v1/metrics', {
         yDate: self.store.date,
         pageID: self.id,
       }).then(
         self.updateMetricsSucess,
         self.updateMetricsError,
       );
+    },
+    fetchClientsNames() {
+      self.fetchClientsNamesState = 'pending';
+      return axios().get('/v1/page/clientsList', {
+        params: { pageID: self.id },
+      }).then(
+        self.fetchClientsNamesSuccess,
+        self.fetchClientsNamesError,
+      );
+    },
+    fetchClientsNamesSuccess({ data }) {
+      self.clientsNames.replace(data);
+      self.fetchClientsNamesState = 'done';
+    },
+    fetchClientsNamesError() {
+      message.error('Ошибка при получении имен клиентов');
+      self.fetchClientsNamesState = 'error';
     },
     updateMetricsSucess() {
       self.fetchMetrics();
@@ -359,6 +387,7 @@ const PromotionStore = types
       self.state = 'done';
     },
     fetchPagesError() {
+      message.error('Ошибка при получении страниц');
       self.state = 'error';
     },
   }));

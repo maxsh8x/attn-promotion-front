@@ -37,7 +37,6 @@ class PromotionList extends Component {
 
     // const urlParts = pageURL.split('/');
     // urlParts[urlParts.length - 2]
-    console.log(answerURL)
     return (
       <Popover content={content}>
         <a href={answerURL + pageURL}>{title}</a>
