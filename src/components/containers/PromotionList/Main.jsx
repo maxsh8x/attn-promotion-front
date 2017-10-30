@@ -20,8 +20,9 @@ class PromotionList extends Component {
     this.props.promotionStore.setPagination(current, pageSize);
 
   expandedRowRender = (row, rowIndex) => {
+    const date = this.props.promotionStore.date;
     const page = this.props.promotionStore.pages[rowIndex];
-    return <PageLayout page={page} />;
+    return <PageLayout page={page} date={date} />;
   }
 
   metricRender = value => ((value && value.cost && value.clicks)

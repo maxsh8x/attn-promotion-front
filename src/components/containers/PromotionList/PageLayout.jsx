@@ -6,7 +6,7 @@ import YandexMetrics from './YandexMetrics';
 import PromotionChart from './PromotionChart';
 import ClientsList from './ClientsList';
 
-const PageLayout = ({ page }) => (
+const PageLayout = ({ page, date }) => (
   <div>
     <Card noHovering>
       <ClientsList page={page} />
@@ -15,7 +15,7 @@ const PageLayout = ({ page }) => (
       <InputCost page={page} />
     </Card>
     <Card noHovering>
-      <YandexMetrics page={page} />
+      <YandexMetrics page={page} key={page + date} />
     </Card>
     <Card noHovering>
       <PromotionChart chart={page.chart} />

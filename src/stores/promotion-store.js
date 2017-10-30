@@ -313,12 +313,8 @@ const PromotionStore = types
         () => self.fetchPages(),
       );
       reaction(
-        () => self.date,
-        () => self.fetchPages(),
-      );
-      reaction(
         () => self.pageFilter,
-        () => self.fetchPages(),
+        () => self.fetchPages,
         { delay: 1000 },
       );
     },
@@ -355,7 +351,7 @@ const PromotionStore = types
         self.fetchPagesError,
       );
     },
-    fetchPagesSuccess({ data }, onlyMetrics = false) {
+    fetchPagesSuccess({ data }) {
       const networksInitState = {};
       for (let i = 0; i < data.sources.length; i += 1) {
         networksInitState[data.sources[i]] = {
