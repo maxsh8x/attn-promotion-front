@@ -149,8 +149,8 @@ const Page = types
     get totalClickCost() {
       const { cost } = self.total;
       const pageViews = self.metrics.find(item => item.metric === 'pageviews');
-      if (cost && pageViews && pageViews.metagroups.get('ad')) {
-        return (cost / pageViews.metagroups.get('ad')).toFixed(2);
+      if (cost && pageViews && pageViews.metagroups.get('total')) {
+        return (cost / pageViews.metagroups.get('total')).toFixed(2);
       }
       return 0;
     },

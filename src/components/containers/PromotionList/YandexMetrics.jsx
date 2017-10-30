@@ -50,7 +50,7 @@ class YandexMetrics extends Component {
               { dataIndex: 'metagroups.direct', title: 'Прямые заходы' },
             ],
           },
-          { dataIndex: 'total', title: 'Итого' },
+          { dataIndex: 'metagroups.total', title: 'Итого' },
         ],
       },
     ];
