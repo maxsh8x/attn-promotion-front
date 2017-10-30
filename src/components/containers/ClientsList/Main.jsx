@@ -39,6 +39,7 @@ class ClientsList extends Component {
       { dataIndex: 'brand', title: 'Бренд' },
       { dataIndex: 'vatin', title: 'ИНН' },
       { dataIndex: 'views', title: 'Просмотров' },
+      { dataIndex: 'costPerClick', title: 'Цена за период', render: (costPerClick, { views }) => views * costPerClick },
     ];
 
     return (

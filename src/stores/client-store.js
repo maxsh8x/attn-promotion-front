@@ -17,6 +17,7 @@ const PageMetaCreator = types
     title: '',
     minViews: 0,
     maxViews: 0,
+    costPerClick: 0,
     startDate: types.optional(
       types.string,
       moment().format('YYYY-MM-DD'),
@@ -44,6 +45,9 @@ const PageMetaCreator = types
     setMaxViews(value) {
       self.maxViews = value;
     },
+    setCostPerClick(value) {
+      self.costPerClick = value;
+    },
     setDate(startDate, endDate) {
       self.startDate = startDate;
       self.endDate = endDate;
@@ -63,6 +67,7 @@ const PageMetaCreator = types
         type: self.type,
         minViews: self.minViews,
         maxViews: self.maxViews,
+        costPerClick: self.costPerClick,
         startDate: self.startDate,
         endDate: self.endDate,
       };
@@ -96,6 +101,7 @@ const Page = types
     type: types.string,
     minViews: types.number,
     maxViews: types.number,
+    costPerClick: types.number,
     startDate: types.string,
     endDate: types.string,
     parent: types.maybe(types.number),
@@ -128,6 +134,7 @@ const Client = types
     brand: types.string,
     vatin: types.string,
     views: 0,
+    costPerClick: 0,
     pages: types.optional(types.array(Page), []),
     fetchPagesState: types.optional(types.enumeration(fetchStates), 'pending'),
     pageCreator: types.optional(PageMetaCreator, { type: 'individual' }),
@@ -292,7 +299,7 @@ const ClientStore = types
       self.startDate = startDate;
       self.endDate = endDate;
     },
-    fetchClients(onlyViews = false) {
+    fetchClients(onlyMeta = false) {
       self.state = 'pending';
       axios().get('v1/client', {
         params: {
@@ -301,14 +308,15 @@ const ClientStore = types
           endDate: self.endDate,
         },
       }).then(
-        ({ data }) => self.fetchClientsSuccess(data, onlyViews),
+        ({ data }) => self.fetchClientsSuccess(data, onlyMeta),
         self.fetchClientsError,
       );
     },
-    fetchClientsSuccess({ clientsData, views }, onlyViews) {
-      if (onlyViews) {
+    fetchClientsSuccess({ clientsData, views, costPerClick }, onlyMeta) {
+      if (onlyMeta) {
         self.clients.forEach((client) => {
           client.views = views[client.id] || 0;
+          client.costPerClick = costPerClick[client.id] || 0;
         });
       } else {
         self.clients.replace(clientsData.map(item => ({

@@ -6,6 +6,7 @@ import style from './PagesList.css';
 import AddPage from './AddPage';
 import InfoBadges from '../InfoBadges';
 import permissions from '../../../utils/permissions';
+import { answerURL } from '../../../constants';
 
 const typeNames = {
   individual: 'Индивидуальный',
@@ -30,11 +31,18 @@ class PagesList extends Component {
       {
         dataIndex: 'title',
         title: 'Название',
-        render: (title, { url }) => <a href={url}>{title}</a>,
+        render: (title, { url }) => <a href={answerURL + url}>{title}</a>,
       },
       {
         dataIndex: 'views',
         title: 'Просмотров',
+      },
+      {
+        title: 'Цена',
+        children: [
+          { dataIndex: 'costPerClick', title: 'Клик' },
+          { title: 'Период', render: this.renderPeriodCost },
+        ],
       },
       {
         title: 'Дата',
@@ -79,7 +87,7 @@ class PagesList extends Component {
 
   renderPageURL = (pageURL) => {
     const urlParts = pageURL.split('/');
-    return <a href={pageURL}>{urlParts[urlParts.length - 2]}</a>;
+    return <a href={answerURL + pageURL}>{urlParts[urlParts.length - 2]}</a>;
   };
 
   renderDate = value => moment(value).format('YYYY-MM-DD')
@@ -106,6 +114,8 @@ class PagesList extends Component {
     }
     return style.rowDone;
   }
+
+  renderPeriodCost = (k, { views, costPerClick }) => costPerClick * views;
 
   render() {
     const { client } = this.props;

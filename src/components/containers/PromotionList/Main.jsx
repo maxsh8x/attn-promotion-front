@@ -5,6 +5,7 @@ import { Tabs, Table, DatePicker, Spin, Popover, Switch, Input } from 'antd';
 import style from './Main.css';
 import PageLayout from './PageLayout';
 import SearchFilter from '../SearchFilter';
+import { answerURL } from '../../../constants';
 
 @inject('promotionStore') @observer
 class PromotionList extends Component {
@@ -36,9 +37,10 @@ class PromotionList extends Component {
 
     // const urlParts = pageURL.split('/');
     // urlParts[urlParts.length - 2]
+    console.log(answerURL)
     return (
       <Popover content={content}>
-        <a href={pageURL}>{title}</a>
+        <a href={answerURL + pageURL}>{title}</a>
       </Popover>
     );
   }

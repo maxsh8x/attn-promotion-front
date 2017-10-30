@@ -6,6 +6,7 @@ import GroupQuestionCreator from './GroupQuestionCreator';
 import ClientsList from './ClientsList';
 import style from './Main.css';
 import permissions from '../../../utils/permissions';
+import { answerURL } from '../../../constants';
 
 const { RangePicker } = DatePicker;
 
@@ -24,14 +25,6 @@ class GroupQuestionsList extends Component {
     this.props.groupQuestionStore.setDate(startDate, endDate);
   }
 
-  renderPageURL = (pageURL) => {
-    const urlParts = pageURL.split('/');
-    return (
-      <a href={pageURL}>{urlParts[urlParts.length - 2]}</a>
-    );
-  }
-
-
   render() {
     const {
       groupQuestionCreator,
@@ -43,7 +36,11 @@ class GroupQuestionsList extends Component {
     } = this.props.groupQuestionStore;
 
     const columns = [
-      { dataIndex: 'title', title: 'Название', render: (title, { url }) => <a href={url}>{title}</a> },
+      {
+        dataIndex: 'title',
+        title: 'Название',
+        render: (title, { url }) => <a href={answerURL + url}>{title}</a>,
+      },
       { dataIndex: 'createdAt', title: 'Дата создания', render: value => moment(value).format('YYYY-MM-DD') },
       { dataIndex: 'views', title: 'Просмотров' },
     ];

@@ -29,6 +29,12 @@ class QuestionList extends Component {
     />);
   }
 
+  renderPeriodCost = (k, { costPerClick }, rowIndex) => {
+    const client = this.props.groupQuestion.clients[rowIndex];
+    const views = client.question.views;
+    return costPerClick * views;
+  }
+
   renderRowClassName = (now, { startDate, endDate }) => {
     const start = new Date(startDate).getTime();
     const end = new Date(endDate).getTime();
@@ -46,6 +52,13 @@ class QuestionList extends Component {
       { dataIndex: 'name', title: 'Имя' },
       { dataIndex: 'vatin', title: 'Инн' },
       { dataIndex: 'brand', title: 'Бренд' },
+      {
+        title: 'Цена',
+        children: [
+          { dataIndex: 'costPerClick', title: 'Клик' },
+          { title: 'Период', render: this.renderPeriodCost },
+        ],
+      },
       {
         title: 'Дата',
         children: [

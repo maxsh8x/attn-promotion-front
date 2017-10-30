@@ -71,9 +71,15 @@ const Client = types
     vatin: types.string,
     minViews: types.number,
     maxViews: types.number,
+    costPerClick: types.number,
     startDate: types.string,
     endDate: types.string,
-  });
+  })
+  .views(self => ({
+    get question() {
+      return getParent(self, 2);
+    },
+  }));
 
 const ClientSelectorItem = types
   .model('ClientSelectorItem', {
@@ -90,6 +96,7 @@ const ClientBinder = types
     ),
     minViews: 0,
     maxViews: 0,
+    costPerClick: 0,
     status: types.optional(
       types.enumeration(fetchStates),
       'done',
@@ -119,6 +126,7 @@ const ClientBinder = types
         clients: self.clientSelector.map(item => parseInt(item.key, 10)),
         minViews: self.minViews,
         maxViews: self.maxViews,
+        costPerClick: self.costPerClick,
         startDate: self.startDate,
         endDate: self.endDate,
       }).then(
@@ -145,6 +153,9 @@ const ClientBinder = types
     },
     setMaxViews(value) {
       self.maxViews = value;
+    },
+    setCostPerClick(value) {
+      self.costPerClick = value;
     },
     setDate(startDate, endDate) {
       self.startDate = startDate;
