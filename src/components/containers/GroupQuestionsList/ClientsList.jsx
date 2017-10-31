@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import moment from 'moment';
 import { Button, Modal, Table, Badge } from 'antd';
 import BindClient from './BindClient';
-import style from './ClientsList.css';
+import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
 import InfoBadges from '../InfoBadges';
 

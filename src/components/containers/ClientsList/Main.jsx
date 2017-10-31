@@ -4,7 +4,7 @@ import { Table, Button, Modal, DatePicker, Spin } from 'antd';
 import moment from 'moment';
 import PagesList from './PagesList';
 import ClientCreator from './ClientCreator';
-import style from './Main.css';
+import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
 
 const { RangePicker } = DatePicker;

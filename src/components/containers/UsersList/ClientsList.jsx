@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Table, Button } from 'antd';
 import SearchFilter from '../SearchFilter';
-import style from './ClientsList.css';
+import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
 
 @observer

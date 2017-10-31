@@ -4,7 +4,7 @@ import { Table, Button, Modal, DatePicker, Spin } from 'antd';
 import { inject, observer } from 'mobx-react';
 import GroupQuestionCreator from './GroupQuestionCreator';
 import ClientsList from './ClientsList';
-import style from './Main.css';
+import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
 import { answerURL } from '../../../constants';
 

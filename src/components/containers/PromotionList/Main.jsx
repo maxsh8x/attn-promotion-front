@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import moment from 'moment';
 import { inject, observer } from 'mobx-react';
 import { Tabs, Table, DatePicker, Spin, Popover, Switch, Input } from 'antd';
-import style from './Main.css';
+import style from '../../../style.css';
 import PageLayout from './PageLayout';
 import SearchFilter from '../SearchFilter';
 import { answerURL } from '../../../constants';

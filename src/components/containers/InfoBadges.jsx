@@ -1,6 +1,6 @@
 import React from 'react';
 import { Badge } from 'antd';
-import style from './InfoBadges.css';
+import style from '../../style.css';
 
 const InfoBadges = () => (<div className={style.infoBadges}>
   <Badge status="warning" text="Не началось" />

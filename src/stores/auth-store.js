@@ -1,36 +1,44 @@
-import { action, observable } from 'mobx';
+import { types } from 'mobx-state-tree';
+import { message } from 'antd';
 import axios from '../utils/axios';
+import { fetchStates } from '../constants';
 
-class AuthStore {
-  @observable username = ''
-  @observable password = ''
-  @observable state = 'pending'
+const AuthStore = types
+  .model('AuthStore', {
+    username: '',
+    password: '',
+    state: types.optional(
+      types.enumeration(fetchStates),
+      'done',
+    ),
+  })
+  .actions(self => ({
+    setUsername(value) {
+      self.username = value;
+    },
+    setPassword(value) {
+      self.password = value;
+    },
+    login() {
+      axios().post('v1/login', {
+        username: self.username,
+        password: self.password,
+      }).then(
+        self.loginSuccess,
+        self.loginFailed,
+      );
+    },
+    loginSuccess({ data }) {
+      localStorage.setItem('token', data.token);
+      window.location.href = '/';
+      self.state = 'done';
+    },
+    loginFailed() {
+      message.error('Ошибка при авторизации');
+      self.state = 'failed';
+    },
+  }));
 
-  // TODO: refactor userInput
-  @action updateInput(name, value) {
-    this[name] = value;
-  }
-
-  @action login() {
-    return axios().post('v1/login', {
-      username: this.username,
-      password: this.password,
-    }).then(
-      action('login success', ({ data }) => {
-        const { token } = data;
-        localStorage.setItem('token', token);
-        this.state = 'success';
-        window.location.href = '/';
-      }),
-      action('login failed', () => {
-        this.state = 'failed';
-      }),
-    );
-  }
-}
-
-const authStore = new AuthStore();
+const authStore = AuthStore.create({});
 
 export default authStore;
-
-export { AuthStore };

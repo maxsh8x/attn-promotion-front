@@ -2,8 +2,7 @@ import { toJS } from 'mobx';
 import { types, getEnv } from 'mobx-state-tree';
 import { message } from 'antd';
 import axios from '../utils/axios';
-
-const fetchStates = ['pending', 'done', 'error'];
+import { fetchStates } from '../constants';
 
 const Page = types
   .model({

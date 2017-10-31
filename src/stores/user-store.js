@@ -3,8 +3,7 @@ import { types, getParent, getRoot } from 'mobx-state-tree';
 import { message } from 'antd';
 import moment from 'moment';
 import axios from '../utils/axios';
-
-const fetchStates = ['pending', 'done', 'error'];
+import { fetchStates } from '../constants';
 
 const UserCreator = types
   .model('UserCreator', {

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import moment from 'moment';
 import { Table, Spin, Switch, Modal, Button, Badge } from 'antd';
-import style from './PagesList.css';
+import style from '../../../style.css';
 import AddPage from './AddPage';
 import InfoBadges from '../InfoBadges';
 import permissions from '../../../utils/permissions';

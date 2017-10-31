@@ -3,8 +3,7 @@ import { types, getRoot, getParent } from 'mobx-state-tree';
 import { message } from 'antd';
 import moment from 'moment';
 import axios from '../utils/axios';
-
-const fetchStates = ['pending', 'done', 'error'];
+import { fetchStates } from '../constants';
 
 const PageMetaCreator = types
   .model('PageMetaCreator', {
@@ -119,11 +118,6 @@ const Page = types
     get pagesData() {
       return toJS(self.pages).filter(page => page.type === 'related');
     },
-    // get totalViews() {
-    //   return self.pagesData.length > 0
-    //     ? self.pagesData.reduce((a, b) => a + b.views, 0)
-    //     : 0;
-    // },
   }));
 
 const Client = types
@@ -143,11 +137,6 @@ const Client = types
     get pagesData() {
       return toJS(self.pages).filter(page => page.type !== 'related');
     },
-    // get totalViews() {
-    //   return self.pagesData.length > 0
-    //     ? self.pagesData.reduce((a, b) => a + b.views, 0)
-    //     : 0;
-    // },
     get clientStore() {
       return getRoot(self);
     },

@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import moment from 'moment';
 import { DatePicker, Select, Button, Spin } from 'antd';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
-import style from './PromotionChart.css';
+import style from '../../../style.css';
 
 const { RangePicker } = DatePicker;
 const Option = Select.Option;
