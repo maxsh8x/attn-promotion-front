@@ -49,7 +49,7 @@ class ClientsList extends Component {
       { dataIndex: 'costPerClick', title: 'Цена за период', render: (costPerClick, { views }) => views * costPerClick },
     ];
 
-    const paginationParams = { current, pageSize };
+    const paginationParams = { current, pageSize, total };
 
     return (
       <div>
@@ -87,7 +87,7 @@ class ClientsList extends Component {
               </div>)}
             onChange={this.setPagination}
             expandedRowRender={this.expandedRowRender}
-            pagination={{ ...paginationParams, total }}
+            pagination={paginationParams}
           />
         </Spin>
       </div>

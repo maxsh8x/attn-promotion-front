@@ -1,15 +1,25 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Table, Button } from 'antd';
+import { Table, Button, Spin } from 'antd';
 import SearchFilter from '../SearchFilter';
 import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
+import shallowCompare from '../../../utils/helper';
 
 @observer
 class ClientsList extends Component {
   componentWillMount() {
     this.props.user.fetchClients();
   }
+
+  componentWillReceiveProps({ dates }) {
+    if (!(shallowCompare(dates, this.props.dates))) {
+      this.props.user.fetchClients();
+    }
+  }
+
+  setPagination = ({ current, pageSize }) =>
+    this.props.user.setPagination(current, pageSize);
 
   renderActions = (value, row, rowIndex) => {
     const client = this.props.user.clients[rowIndex];
@@ -25,7 +35,14 @@ class ClientsList extends Component {
   }
 
   render() {
-    const { clientsData, clientsBinder } = this.props.user;
+    const {
+      clientsData,
+      clientsBinder,
+      current,
+      pageSize,
+      total,
+      state,
+    } = this.props.user;
     const columns = [
       { dataIndex: 'counterID', title: 'ID счетчика', width: 100 },
       { dataIndex: 'name', title: 'Имя клиента' },
@@ -34,6 +51,8 @@ class ClientsList extends Component {
       { dataIndex: 'views', title: 'Просмотров' },
       { title: 'Действия', render: this.renderActions },
     ];
+
+    const paginationParams = { current, pageSize, total };
 
     return (
       <div>
@@ -48,14 +67,17 @@ class ClientsList extends Component {
             <Button onClick={clientsBinder.bind}>Привязать</Button>
           </div>
         }
-        <Table
-          bordered
-          rowKey="id"
-          size="small"
-          columns={columns}
-          dataSource={clientsData}
-          pagination={false}
-        />
+        <Spin spinning={state === 'pending'}>
+          <Table
+            bordered
+            rowKey="id"
+            size="small"
+            columns={columns}
+            dataSource={clientsData}
+            onChange={this.setPagination}
+            pagination={paginationParams}
+          />
+        </Spin>
       </div>
     );
   }

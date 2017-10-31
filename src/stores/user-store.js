@@ -1,4 +1,4 @@
-import { toJS } from 'mobx';
+import { toJS, reaction } from 'mobx';
 import { types, getParent, getRoot } from 'mobx-state-tree';
 import { message } from 'antd';
 import moment from 'moment';
@@ -180,6 +180,13 @@ const User = types
       ClientsBinder,
       {},
     ),
+    state: types.optional(
+      types.enumeration(fetchStates),
+      'pending',
+    ),
+    current: 1,
+    pageSize: 2,
+    total: 0,
   })
   .views(self => ({
     get store() {
@@ -190,12 +197,29 @@ const User = types
     },
   }))
   .actions(self => ({
+    afterCreate() {
+      reaction(
+        () => [
+          self.current,
+          self.pageSize,
+        ],
+        () => {
+          self.fetchClients();
+        },
+      );
+    },
+    setPagination(current, pageSize) {
+      self.current = current;
+      self.pageSize = pageSize;
+    },
     fetchClients() {
       self.state = 'pending';
       axios().get('v1/client', {
         params: {
           user: self.id,
           filter: '',
+          limit: self.pageSize,
+          offset: (self.current - 1) * self.pageSize,
           startDate: self.store.startDate,
           endDate: self.store.endDate,
         },
@@ -209,6 +233,7 @@ const User = types
         ...item,
         id: item._id,
       })));
+      self.total = data.total;
       self.state = 'done';
     },
     fetchClientsError(error) {
@@ -246,6 +271,10 @@ const UserStore = types
     },
   }))
   .actions(self => ({
+    setDate(startDate, endDate) {
+      self.startDate = startDate;
+      self.endDate = endDate;
+    },
     fetchUsers() {
       self.state = 'pending';
       axios().get('v1/user', {

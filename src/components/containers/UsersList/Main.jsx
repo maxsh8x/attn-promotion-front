@@ -23,10 +23,15 @@ class UsersList extends Component {
 
   expandedRowRender = ({ role }, rowIndex) => {
     if (role === 'manager') {
-      const user = this.props.usersStore.users[rowIndex];
-      return <ClientsList user={user} />;
+      const { users, startDate, endDate } = this.props.usersStore;
+      const user = users[rowIndex];
+      return <ClientsList dates={[startDate, endDate]} user={user} />;
     }
     return null;
+  }
+
+  updateDate = (dates, [startDate, endDate]) => {
+    this.props.usersStore.setDate(startDate, endDate);
   }
 
   render() {
