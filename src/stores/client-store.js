@@ -1,5 +1,5 @@
 import { reaction, toJS } from 'mobx';
-import { types, getRoot, getParent, destroy } from 'mobx-state-tree';
+import { types, getRoot, getParent } from 'mobx-state-tree';
 import { message } from 'antd';
 import moment from 'moment';
 import axios from '../utils/axios';
@@ -264,7 +264,7 @@ const ClientStore = types
       moment().format('YYYY-MM-DD'),
     ),
     current: 1,
-    pageSize: 2,
+    pageSize: 10,
     total: 0,
   })
   .views(self => ({

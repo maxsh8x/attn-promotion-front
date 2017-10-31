@@ -313,7 +313,7 @@ const PromotionStore = types
       );
       reaction(
         () => self.pageFilter,
-        () => self.fetchPages,
+        () => self.fetchPages(),
         { delay: 1000 },
       );
     },
