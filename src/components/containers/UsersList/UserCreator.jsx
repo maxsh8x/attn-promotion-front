@@ -27,7 +27,10 @@ const UserCreator = ({ creator, form }) => (
         {...formItemLayout}
       >
         {form.getFieldDecorator('username', {
-          rules: [{ required: true, message: 'Введите ник пользователя', whitespace: true }],
+          rules: [
+            { required: true, message: 'Введите ник пользователя', whitespace: true },
+            { message: 'Ник должен быть более 5 символов', min: 5 },
+          ],
           onChange: e => creator.setUsername(e.target.value),
         })(<Input placeholder="nikolay.sobolev" />)}
       </Form.Item>
