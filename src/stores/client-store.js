@@ -1,5 +1,5 @@
 import { reaction, toJS } from 'mobx';
-import { types, getRoot, getParent } from 'mobx-state-tree';
+import { types, getRoot, getParent, destroy } from 'mobx-state-tree';
 import { message } from 'antd';
 import moment from 'moment';
 import axios from '../utils/axios';
@@ -145,18 +145,6 @@ const Client = types
     },
   }))
   .actions(self => ({
-    afterCreate() {
-      reaction(
-        () => [
-          self.clientStore.startDate,
-          self.clientStore.endDate,
-        ],
-        () => [
-          self.fetchPages(),
-          self.clientStore.fetchClients(true),
-        ],
-      );
-    },
     fetchPages() {
       self.fetchPagesState = 'pending';
       axios().get('v1/page/client', {
@@ -275,6 +263,9 @@ const ClientStore = types
       types.string,
       moment().format('YYYY-MM-DD'),
     ),
+    current: 1,
+    pageSize: 2,
+    total: 0,
   })
   .views(self => ({
     get clientsData() {
@@ -285,6 +276,30 @@ const ClientStore = types
     },
   }))
   .actions(self => ({
+    afterCreate() {
+      reaction(
+        () => [
+          self.current,
+          self.pageSize,
+        ],
+        () => {
+          self.fetchClients();
+        },
+      );
+      reaction(
+        () => [
+          self.startDate,
+          self.endDate,
+        ],
+        () => [
+          self.fetchClients(true),
+        ],
+      );
+    },
+    setPagination(current, pageSize) {
+      self.current = current;
+      self.pageSize = pageSize;
+    },
     setDate(startDate, endDate) {
       self.startDate = startDate;
       self.endDate = endDate;
@@ -294,6 +309,8 @@ const ClientStore = types
       axios().get('v1/client', {
         params: {
           filter: '',
+          offset: (self.current - 1) * self.pageSize,
+          limit: self.pageSize,
           startDate: self.startDate,
           endDate: self.endDate,
         },
@@ -302,7 +319,8 @@ const ClientStore = types
         self.fetchClientsError,
       );
     },
-    fetchClientsSuccess({ clientsData, views, costPerClick }, onlyMeta) {
+    fetchClientsSuccess({ clientsData, views, costPerClick, total }, onlyMeta) {
+      self.total = total;
       if (onlyMeta) {
         self.clients.forEach((client) => {
           client.views = views[client.id] || 0;

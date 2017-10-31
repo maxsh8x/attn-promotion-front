@@ -15,13 +15,17 @@ class ClientsList extends Component {
     this.props.clientsStore.fetchClients();
   }
 
-  expandedRowRender = ({ id, type }, rowIndex) => {
-    const client = this.props.clientsStore.clients[rowIndex];
-    return <PagesList client={client} type={type} />;
-  }
+  setPagination = ({ current, pageSize }) =>
+    this.props.clientsStore.setPagination(current, pageSize);
 
   updateDate = (dates, [startDate, endDate]) => {
     this.props.clientsStore.setDate(startDate, endDate);
+  }
+
+  expandedRowRender = ({ id, type }, rowIndex) => {
+    const { clients, startDate, endDate } = this.props.clientsStore;
+    const client = clients[rowIndex];
+    return <PagesList dates={[startDate, endDate]} client={client} type={type} />;
   }
 
   render() {
@@ -31,7 +35,10 @@ class ClientsList extends Component {
       groupQuestionCreator,
       startDate,
       endDate,
-      state
+      state,
+      total,
+      current,
+      pageSize,
     } = this.props.clientsStore;
     const columns = [
       { dataIndex: 'counterID', title: 'ID счетчика', width: 100 },
@@ -41,6 +48,8 @@ class ClientsList extends Component {
       { dataIndex: 'views', title: 'Просмотров' },
       { dataIndex: 'costPerClick', title: 'Цена за период', render: (costPerClick, { views }) => views * costPerClick },
     ];
+
+    const paginationParams = { current, pageSize };
 
     return (
       <div>
@@ -76,7 +85,9 @@ class ClientsList extends Component {
                   allowClear={false}
                 />
               </div>)}
+            onChange={this.setPagination}
             expandedRowRender={this.expandedRowRender}
+            pagination={{ ...paginationParams, total }}
           />
         </Spin>
       </div>

@@ -6,6 +6,7 @@ import style from '../../../style.css';
 import AddPage from './AddPage';
 import InfoBadges from '../InfoBadges';
 import permissions from '../../../utils/permissions';
+import shallowCompare from '../../../utils/helper';
 import { answerURL } from '../../../constants';
 
 const typeNames = {
@@ -58,6 +59,12 @@ class PagesList extends Component {
 
   componentWillMount() {
     this.props.client.fetchPages();
+  }
+
+  componentWillReceiveProps({dates}) {
+    if (!(shallowCompare(dates, this.props.dates))) {
+      this.props.client.fetchPages();
+    }
   }
 
   expandedRowRender = ({ id, type }) => {

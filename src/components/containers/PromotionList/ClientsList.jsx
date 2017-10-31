@@ -21,7 +21,7 @@ class ClientsList extends Component {
             : <h4>Клиенты не привязаны</h4>
         }
         {
-          clientsNamesData.map(name => <Tag>{name}</Tag>)
+          clientsNamesData.map(name => <Tag key={name}>{name}</Tag>)
         }
       </Spin>
     );

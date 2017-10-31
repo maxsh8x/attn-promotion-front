@@ -109,7 +109,7 @@ class PromotionList extends Component {
     ];
 
     const title = () => 'Список продвигаемых страниц';
-    const paginationParams = { current, pageSize}
+    const paginationParams = { current, pageSize };
 
     return (
       <div>
