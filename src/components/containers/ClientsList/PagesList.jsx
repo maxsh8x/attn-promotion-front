@@ -23,11 +23,6 @@ class PagesList extends Component {
         title: 'Статус',
         render: active => <Switch checked={active} />,
       },
-      // {
-      //   dataIndex: 'url',
-      //   title: 'Адрес',
-      //   render: this.renderPageURL,
-      // },
       {
         dataIndex: 'title',
         title: 'Название',
@@ -40,22 +35,22 @@ class PagesList extends Component {
       {
         title: 'Цена',
         children: [
-          { dataIndex: 'costPerClick', title: 'Клик' },
-          { title: 'Период', render: this.renderPeriodCost },
+          { key: 'costPerClick', dataIndex: 'costPerClick', title: 'Клик' },
+          { key: 'period', title: 'Период', render: this.renderPeriodCost },
         ],
       },
       {
         title: 'Дата',
         children: [
-          { title: 'От', dataIndex: 'startDate', render: this.renderDate },
-          { title: 'До', dataIndex: 'endDate', render: this.renderDate },
+          { key: 'startDate', title: 'От', dataIndex: 'startDate', render: this.renderDate },
+          { key: 'endDate', title: 'До', dataIndex: 'endDate', render: this.renderDate },
         ],
       },
       {
         title: 'Показы',
         children: [
-          { title: 'Min', dataIndex: 'minViews', render: this.renderViews },
-          { title: 'Max', dataIndex: 'maxViews', render: this.renderViews },
+          { key: 'minViews', title: 'Min', dataIndex: 'minViews', render: this.renderViews },
+          { key: 'maxViews', title: 'Max', dataIndex: 'maxViews', render: this.renderViews },
         ],
       },
     ];
