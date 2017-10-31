@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Table, Button, Modal, DatePicker } from 'antd';
+import { Table, Button, Modal, DatePicker, Spin } from 'antd';
 import moment from 'moment';
 import UserCreator from './UserCreator';
 import ClientsList from './ClientsList';
@@ -35,7 +35,13 @@ class UsersList extends Component {
   }
 
   render() {
-    const { usersData, userCreator, startDate, endDate } = this.props.usersStore;
+    const {
+      usersData,
+      userCreator,
+      startDate,
+      endDate,
+      state,
+    } = this.props.usersStore;
     const columns = [
       { dataIndex: 'username', title: 'Имя пользователя' },
       { dataIndex: 'name', title: 'Имя' },
@@ -57,21 +63,23 @@ class UsersList extends Component {
             <Button onClick={userCreator.toggleModal}>Создать пользователя</Button>
           </div>
         }
-        <Table
-          bordered
-          rowKey="id"
-          columns={columns}
-          dataSource={usersData}
-          expandedRowRender={this.expandedRowRender}
-          footer={() => (
-            <div>
-              Подсчет просмотров за период: <RangePicker
-                defaultValue={[moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')]}
-                onChange={this.updateDate}
-                allowClear={false}
-              />
-            </div>)}
-        />
+        <Spin spinning={state === 'pending'}>
+          <Table
+            bordered
+            rowKey="id"
+            columns={columns}
+            dataSource={usersData}
+            expandedRowRender={this.expandedRowRender}
+            footer={() => (
+              <div>
+                Подсчет просмотров за период: <RangePicker
+                  defaultValue={[moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')]}
+                  onChange={this.updateDate}
+                  allowClear={false}
+                />
+              </div>)}
+          />
+        </Spin>
       </div>
     );
   }

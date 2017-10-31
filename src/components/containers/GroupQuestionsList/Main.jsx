@@ -16,6 +16,9 @@ class GroupQuestionsList extends Component {
     this.props.groupQuestionStore.fetchGroupQuestions();
   }
 
+  setPagination = ({ current, pageSize }) =>
+    this.props.groupQuestionStore.setPagination(current, pageSize);
+
   expandedRowRender = (row, rowIndex) => {
     const groupQuestion = this.props.groupQuestionStore.groupQuestions[rowIndex];
     return <ClientsList groupQuestion={groupQuestion} />;
@@ -32,8 +35,13 @@ class GroupQuestionsList extends Component {
       startDate,
       endDate,
       setDate,
-      state
+      state,
+      current,
+      pageSize,
+      total,
     } = this.props.groupQuestionStore;
+
+    const paginationParams = { current, pageSize, total };
 
     const columns = [
       {
@@ -72,6 +80,8 @@ class GroupQuestionsList extends Component {
             dataSource={groupQuestionsData}
             title={() => 'Список групповых вопросов'}
             expandedRowRender={this.expandedRowRender}
+            onChange={this.setPagination}
+            pagination={paginationParams}
             footer={() => (
               <div>
                 Подсчет просмотров за период: <RangePicker

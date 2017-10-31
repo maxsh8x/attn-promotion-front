@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import moment from 'moment';
-import { Button, Modal, Table, Badge } from 'antd';
+import { Button, Modal, Table, Badge, Spin } from 'antd';
 import BindClient from './BindClient';
 import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
@@ -47,7 +47,12 @@ class QuestionList extends Component {
   }
 
   render() {
-    const { clientsData, clientsBinder, views } = this.props.groupQuestion;
+    const {
+      clientsData,
+      clientsBinder,
+      views,
+      state,
+    } = this.props.groupQuestion;
     const columns = [
       { dataIndex: 'name', title: 'Имя' },
       { dataIndex: 'vatin', title: 'Инн' },
@@ -90,16 +95,18 @@ class QuestionList extends Component {
           <div className={style.tableOperations}>
             <Button onClick={clientsBinder.toggleModal}>Привязать клиентов</Button>
           </div>}
-        <Table
-          bordered
-          size="small"
-          rowKey="id"
-          columns={columns}
-          dataSource={clientsData}
-          pagination={false}
-          footer={() => <InfoBadges />}
-          rowClassName={row => this.renderRowClassName(now, row)}
-        />
+        <Spin spinning={state === 'pending'}>
+          <Table
+            bordered
+            size="small"
+            rowKey="id"
+            columns={columns}
+            dataSource={clientsData}
+            pagination={false}
+            footer={() => <InfoBadges />}
+            rowClassName={row => this.renderRowClassName(now, row)}
+          />
+        </Spin>
       </div>
     );
   }

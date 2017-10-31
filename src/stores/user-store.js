@@ -185,7 +185,7 @@ const User = types
       'pending',
     ),
     current: 1,
-    pageSize: 2,
+    pageSize: 10,
     total: 0,
   })
   .views(self => ({

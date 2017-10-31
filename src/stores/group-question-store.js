@@ -222,6 +222,9 @@ const GroupQuestionStore = types
       types.string,
       moment().format('YYYY-MM-DD'),
     ),
+    current: 1,
+    pageSize: 1,
+    total: 0,
   })
   .views(self => ({
     get groupQuestionsData() {
@@ -232,11 +235,22 @@ const GroupQuestionStore = types
     afterCreate() {
       reaction(
         () => [
+          self.current,
+          self.pageSize,
+        ],
+        () => self.fetchGroupQuestions(),
+      );
+      reaction(
+        () => [
           self.startDate,
           self.endDate,
         ],
         () => self.fetchGroupQuestions(true),
       );
+    },
+    setPagination(current, pageSize) {
+      self.current = current;
+      self.pageSize = pageSize;
     },
     setDate(startDate, endDate) {
       self.startDate = startDate;
@@ -247,6 +261,8 @@ const GroupQuestionStore = types
       axios().get('v1/page/group-questions', {
         params: {
           filter: '',
+          limit: self.pageSize,
+          offset: (self.current - 1) * self.pageSize,
           startDate: self.startDate,
           endDate: self.endDate,
         },
@@ -255,7 +271,7 @@ const GroupQuestionStore = types
         self.fetchGroupQuestionsError,
       );
     },
-    fetchGroupQuestionsSuccess({ pageData, views }, onlyViews) {
+    fetchGroupQuestionsSuccess({ pageData, views, total }, onlyViews) {
       if (onlyViews) {
         self.groupQuestions.forEach((question) => {
           question.views = views[question.id] || 0;
@@ -266,6 +282,7 @@ const GroupQuestionStore = types
           id: item._id,
         })));
       }
+      self.total = total;
       self.state = 'done';
     },
     fetchGroupQuestionsError(error) {
