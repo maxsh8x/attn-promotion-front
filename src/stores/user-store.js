@@ -264,6 +264,9 @@ const UserStore = types
       types.string,
       moment().format('YYYY-MM-DD'),
     ),
+    current: 1,
+    pageSize: 3,
+    total: 0,
   })
   .views(self => ({
     get usersData() {
@@ -271,6 +274,21 @@ const UserStore = types
     },
   }))
   .actions(self => ({
+    afterCreate() {
+      reaction(
+        () => [
+          self.current,
+          self.pageSize,
+        ],
+        () => {
+          self.fetchUsers();
+        },
+      );
+    },
+    setPagination(current, pageSize) {
+      self.current = current;
+      self.pageSize = pageSize;
+    },
     setDate(startDate, endDate) {
       self.startDate = startDate;
       self.endDate = endDate;
@@ -278,17 +296,21 @@ const UserStore = types
     fetchUsers() {
       self.state = 'pending';
       axios().get('v1/user', {
-        params: {},
+        params: {
+          limit: self.pageSize,
+          offset: (self.current - 1) * self.pageSize,
+        },
       }).then(
         self.fetchUsersSuccess,
         self.fetchUsersError,
       );
     },
     fetchUsersSuccess({ data }) {
-      self.users.replace(data.map(user => ({
+      self.users.replace(data.usersData.map(user => ({
         ...user,
         id: user._id,
       })));
+      self.total = data.total;
       self.state = 'done';
     },
     fetchUsersError() {

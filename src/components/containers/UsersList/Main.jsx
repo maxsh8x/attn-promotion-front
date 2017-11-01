@@ -21,6 +21,9 @@ class UsersList extends Component {
     this.props.usersStore.fetchUsers();
   }
 
+  setPagination = ({ current, pageSize }) =>
+    this.props.usersStore.setPagination(current, pageSize);
+
   expandedRowRender = ({ role }, rowIndex) => {
     if (role === 'manager') {
       const { users, startDate, endDate } = this.props.usersStore;
@@ -41,6 +44,9 @@ class UsersList extends Component {
       startDate,
       endDate,
       state,
+      current,
+      pageSize,
+      total,
     } = this.props.usersStore;
     const columns = [
       { dataIndex: 'username', title: 'Имя пользователя' },
@@ -48,6 +54,8 @@ class UsersList extends Component {
       { dataIndex: 'email', title: 'Email' },
       { dataIndex: 'role', title: 'Роль', render: role => roleLables[role] },
     ];
+
+    const paginationParams = { current, pageSize, total };
     return (
       <div>
         <Modal
@@ -70,6 +78,8 @@ class UsersList extends Component {
             columns={columns}
             dataSource={usersData}
             expandedRowRender={this.expandedRowRender}
+            onChange={this.setPagination}
+            pagination={paginationParams}
             footer={() => (
               <div>
                 Подсчет просмотров за период: <RangePicker
