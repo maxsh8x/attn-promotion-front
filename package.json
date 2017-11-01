@@ -34,7 +34,7 @@
     "webpack-dev-server": "2.7.1"
   },
   "dependencies": {
-    "antd": "^2.13.3",
+    "antd": "^2.13.8",
     "axios": "^0.16.2",
     "jwt-decode": "^2.2.0",
     "mobx": "^3.3.0",
