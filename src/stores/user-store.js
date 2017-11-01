@@ -265,7 +265,7 @@ const UserStore = types
       moment().format('YYYY-MM-DD'),
     ),
     current: 1,
-    pageSize: 3,
+    pageSize: 10,
     total: 0,
   })
   .views(self => ({

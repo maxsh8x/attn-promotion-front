@@ -132,6 +132,9 @@ const Client = types
     pages: types.optional(types.array(Page), []),
     fetchPagesState: types.optional(types.enumeration(fetchStates), 'pending'),
     pageCreator: types.optional(PageMetaCreator, { type: 'individual' }),
+    current: 1,
+    pageSize: 1,
+    total: 0,
   })
   .views(self => ({
     get pagesData() {
@@ -145,11 +148,17 @@ const Client = types
     },
   }))
   .actions(self => ({
+    setPagination(current, pageSize) {
+      self.current = current;
+      self.pageSize = pageSize;
+    },
     fetchPages() {
       self.fetchPagesState = 'pending';
       axios().get('v1/page/client', {
         params: {
           clientID: self.id,
+          offset: (self.current - 1) * self.pageSize,
+          limit: self.pageSize,
           startDate: self.clientStore.startDate,
           endDate: self.clientStore.endDate,
         },
@@ -159,11 +168,12 @@ const Client = types
       );
     },
     fetchPagesSuccess({ data }) {
-      self.pages.replace(data.map(page => ({
+      self.pages.replace(data.pagesData.map(page => ({
         ...page,
         id: page._id,
         ...page.meta[0],
       })));
+      self.total = data.total;
       self.fetchPagesState = 'done';
     },
     fetchPagesError() {

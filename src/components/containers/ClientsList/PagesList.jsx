@@ -61,11 +61,14 @@ class PagesList extends Component {
     this.props.client.fetchPages();
   }
 
-  componentWillReceiveProps({dates}) {
+  componentWillReceiveProps({ dates }) {
     if (!(shallowCompare(dates, this.props.dates))) {
       this.props.client.fetchPages();
     }
   }
+
+  setPagination = ({ current, pageSize }) =>
+    this.props.client.setPagination(current, pageSize);
 
   expandedRowRender = ({ id, type }) => {
     if (type === 'group') {
@@ -120,8 +123,15 @@ class PagesList extends Component {
   renderPeriodCost = (k, { views, costPerClick }) => costPerClick * views;
 
   render() {
-    const { client } = this.props;
-    const spinning = !(client.fetchPagesState === 'done');
+    const {
+      fetchPagesState,
+      pageCreator,
+      pagesData,
+      current,
+      pageSize,
+      total,
+    } = this.props.client;
+    const spinning = !(fetchPagesState === 'done');
 
     const columns = this.basicColumns.concat([
       {
@@ -131,20 +141,21 @@ class PagesList extends Component {
       },
     ]);
 
+    const paginationParams = { current, pageSize, total };
     const now = new Date().getTime();
     return (
       <div>
         <Modal
-          visible={client.pageCreator.modalShown}
+          visible={pageCreator.modalShown}
           title="Информация о странице"
           footer={null}
-          onCancel={client.pageCreator.toggleModal}
+          onCancel={pageCreator.toggleModal}
         >
-          <AddPage creator={client.pageCreator} />
+          <AddPage creator={pageCreator} />
         </Modal>
         {permissions(['root']) &&
           <div className={style.tableOperations}>
-            <Button onClick={client.pageCreator.toggleModal}>
+            <Button onClick={pageCreator.toggleModal}>
               Создать индивидуальную страницу
             </Button>
           </div>}
@@ -153,12 +164,13 @@ class PagesList extends Component {
             bordered
             rowKey="id"
             columns={columns}
-            dataSource={client.pagesData}
+            dataSource={pagesData}
             size="small"
-            pagination={false}
             title={() => 'Список страниц клиента'}
             footer={() => <InfoBadges />}
             expandedRowRender={this.expandedRowRender}
+            onChange={this.setPagination}
+            pagination={paginationParams}
             rowClassName={row => this.renderRowClassName(now, row)}
           />
         </Spin>
