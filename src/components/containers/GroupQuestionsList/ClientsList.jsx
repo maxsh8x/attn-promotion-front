@@ -14,6 +14,9 @@ class QuestionList extends Component {
     this.props.groupQuestion.fetchClients();
   }
 
+  setPagination = ({ current, pageSize }) =>
+    this.props.groupQuestion.setPagination(current, pageSize);
+
   renderDate = value => moment(value).format('YYYY-MM-DD')
 
   renderViews = (value) => {
@@ -52,6 +55,9 @@ class QuestionList extends Component {
       clientsBinder,
       views,
       state,
+      current,
+      pageSize,
+      total,
     } = this.props.groupQuestion;
     const columns = [
       { dataIndex: 'name', title: 'Имя' },
@@ -80,6 +86,7 @@ class QuestionList extends Component {
       },
     ];
 
+    const paginationParams = { current, pageSize, total };
     const now = new Date().getTime();
     return (
       <div>
@@ -102,7 +109,8 @@ class QuestionList extends Component {
             rowKey="id"
             columns={columns}
             dataSource={clientsData}
-            pagination={false}
+            onChange={this.setPagination}
+            pagination={paginationParams}
             footer={() => <InfoBadges />}
             rowClassName={row => this.renderRowClassName(now, row)}
           />

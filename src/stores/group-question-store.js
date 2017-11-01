@@ -174,6 +174,13 @@ const GroupQuestion = types
       [],
     ),
     clientsBinder: types.optional(ClientBinder, {}),
+    current: 1,
+    pageSize: 10,
+    total: 0,
+    state: types.optional(
+      types.enumeration(fetchStates),
+      'pending',
+    ),
   })
   .views(self => ({
     get clientsData() {
@@ -181,11 +188,26 @@ const GroupQuestion = types
     },
   }))
   .actions(self => ({
+    afterCreate() {
+      reaction(
+        () => [
+          self.current,
+          self.pageSize,
+        ],
+        () => self.fetchClients(),
+      );
+    },
+    setPagination(current, pageSize) {
+      self.current = current;
+      self.pageSize = pageSize;
+    },
     fetchClients() {
       self.state = 'pending';
       axios().get('v1/client/page', {
         params: {
           pageID: self.id,
+          limit: self.pageSize,
+          offset: (self.current - 1) * self.pageSize,
         },
       }).then(
         self.fetchClientsSuccess,
@@ -193,11 +215,12 @@ const GroupQuestion = types
       );
     },
     fetchClientsSuccess({ data }) {
-      self.clients.replace(data.map(item => ({
+      self.clients.replace(data.clientsData.map(item => ({
         ...item,
         ...item.client,
         id: item.client._id,
       })));
+      self.total = data.total;
       self.state = 'done';
     },
     fetchClientsError(error) {

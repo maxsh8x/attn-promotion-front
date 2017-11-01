@@ -133,7 +133,7 @@ const Client = types
     fetchPagesState: types.optional(types.enumeration(fetchStates), 'pending'),
     pageCreator: types.optional(PageMetaCreator, { type: 'individual' }),
     current: 1,
-    pageSize: 1,
+    pageSize: 10,
     total: 0,
   })
   .views(self => ({
