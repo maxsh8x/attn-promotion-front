@@ -30,7 +30,7 @@ const UserCreator = ({ creator, form }) => (
           rules: [
             { required: true, message: 'Введите ник пользователя', whitespace: true },
             { message: 'Ник должен быть более 4 символов', min: 4 },
-            { message: 'В нике разрешены цифры, буквы или точка', pattern: /^[a-zA-Z0-9.]+$/ },
+            { message: 'В нике разрешены цифры, буквы или точка', pattern: /^[a-z0-9.]+$/ },
           ],
           onChange: e => creator.setUsername(e.target.value),
         })(<Input placeholder="nikolay.sobolev" />)}

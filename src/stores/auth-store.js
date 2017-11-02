@@ -33,9 +33,14 @@ const AuthStore = types
       window.location.href = '/';
       self.state = 'done';
     },
-    loginFailed() {
-      message.error('Ошибка при авторизации');
-      self.state = 'failed';
+    loginFailed(error) {
+      // TODO: check response const
+      if (error.response.status === 404) {
+        message.error('Пара логин/пароль неверна');
+      } else {
+        message.error('Ошибка при авторизации');
+      }
+      self.state = 'error';
     },
   }));
 
