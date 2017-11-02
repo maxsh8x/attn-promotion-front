@@ -28,7 +28,7 @@ const ClientCreator = ({ clientCreator, form }) => (
         {...formItemLayout}
       >
         {form.getFieldDecorator('brand', {
-          rules: [{ required: true, message: 'Введите название бренда', whitespace: true }],
+          rules: [],
           onChange: e => clientCreator.setBrand(e.target.value),
         })(<Input placeholder="Детский центр" />)}
       </Form.Item>
@@ -37,7 +37,10 @@ const ClientCreator = ({ clientCreator, form }) => (
         {...formItemLayout}
       >
         {form.getFieldDecorator('vatin', {
-          rules: [{ required: true, message: 'Введите ИНН', whitespace: true }],
+          rules: [
+            { len: 12, message: 'Длина ИНН 12 цифр' },
+            { pattern: /^[0-9]+$/, message: 'ИНН должен состоять из цифр' },
+          ],
           onChange: e => clientCreator.setVATIN(e.target.value),
         })(<Input placeholder="430601071197" />)}
       </Form.Item>
