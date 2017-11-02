@@ -29,7 +29,8 @@ const UserCreator = ({ creator, form }) => (
         {form.getFieldDecorator('username', {
           rules: [
             { required: true, message: 'Введите ник пользователя', whitespace: true },
-            { message: 'Ник должен быть более 5 символов', min: 5 },
+            { message: 'Ник должен быть более 4 символов', min: 4 },
+            { message: 'В нике разрешены цифры, буквы или точка', pattern: /^[a-zA-Z0-9.]+$/ },
           ],
           onChange: e => creator.setUsername(e.target.value),
         })(<Input placeholder="nikolay.sobolev" />)}
