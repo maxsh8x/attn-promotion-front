@@ -7,6 +7,7 @@ import ClientsList from './ClientsList';
 import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
 import { answerURL } from '../../../constants';
+import TextWithDots from '../TextWithDots';
 
 const { RangePicker } = DatePicker;
 
@@ -28,6 +29,11 @@ class GroupQuestionsList extends Component {
     this.props.groupQuestionStore.setDate(startDate, endDate);
   }
 
+  renderPageURL = (title, { url }) =>
+    (<a href={answerURL + url}>
+      <TextWithDots text={title} length={100} />
+    </a>);
+
   render() {
     const {
       groupQuestionCreator,
@@ -47,7 +53,7 @@ class GroupQuestionsList extends Component {
       {
         dataIndex: 'title',
         title: 'Название',
-        render: (title, { url }) => <a href={answerURL + url}>{title}</a>,
+        render: this.renderPageURL,
       },
       { dataIndex: 'createdAt', title: 'Дата создания', render: value => moment(value).format('YYYY-MM-DD') },
       { dataIndex: 'views', title: 'Просмотров' },

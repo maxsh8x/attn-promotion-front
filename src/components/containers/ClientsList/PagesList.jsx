@@ -8,6 +8,7 @@ import InfoBadges from '../InfoBadges';
 import permissions from '../../../utils/permissions';
 import shallowCompare from '../../../utils/helper';
 import { answerURL } from '../../../constants';
+import TextWithDots from '../TextWithDots';
 
 const typeNames = {
   individual: 'Индивидуальный',
@@ -27,7 +28,7 @@ class PagesList extends Component {
       {
         dataIndex: 'title',
         title: 'Название',
-        render: (title, { url }) => <a href={answerURL + url}>{title}</a>,
+        render: this.renderPageURL,
       },
       {
         dataIndex: 'views',
@@ -89,11 +90,10 @@ class PagesList extends Component {
     }
     return null;
   }
-
-  renderPageURL = (pageURL) => {
-    const urlParts = pageURL.split('/');
-    return <a href={answerURL + pageURL}>{urlParts[urlParts.length - 2]}</a>;
-  };
+  renderPageURL = (title, { url }) =>
+    (<a href={answerURL + url}>
+      <TextWithDots text={title} length={80} />
+    </a>);
 
   renderDate = value => moment(value).format('YYYY-MM-DD')
 

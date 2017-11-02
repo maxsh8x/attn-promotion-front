@@ -5,6 +5,7 @@ import { Tabs, Table, DatePicker, Spin, Popover, Switch, Input } from 'antd';
 import style from '../../../style.css';
 import PageLayout from './PageLayout';
 import SearchFilter from '../SearchFilter';
+import TextWithDots from '../TextWithDots';
 import { answerURL } from '../../../constants';
 
 @inject('promotionStore') @observer
@@ -40,7 +41,9 @@ class PromotionList extends Component {
     // urlParts[urlParts.length - 2]
     return (
       <Popover content={content}>
-        <a href={answerURL + pageURL}>{title}</a>
+        <a href={answerURL + pageURL}>
+          <TextWithDots text={title} length={100} />
+        </a>
       </Popover>
     );
   }
