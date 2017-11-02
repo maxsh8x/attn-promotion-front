@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Table, Button, Modal, DatePicker, Spin } from 'antd';
+import { Table, Button, Modal, DatePicker, Spin, Radio } from 'antd';
 import moment from 'moment';
 import PagesList from './PagesList';
 import ClientCreator from './ClientCreator';
+import ControlBar from '../ControlBar';
 import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
 
 const { RangePicker } = DatePicker;
+
 
 @inject('clientsStore') @observer
 class ClientsList extends Component {
@@ -61,15 +63,18 @@ class ClientsList extends Component {
         >
           <ClientCreator clientCreator={clientCreator} />
         </Modal>
-        {permissions(['root']) &&
-          <div className={style.tableOperations}>
-            <Button onClick={clientCreator.toggleModal}>Создать клиента</Button>
-            {/* <SearchFilter
-            title="Фильтр по адресу страницы"
-            url="/v1/page/search"
-          /> */}
-          </div>
-        }
+        <Modal
+          visible={false}
+          title="Настройки таблицы"
+          footer={null}
+          /* onCancel={} */
+        >
+          <ControlBar />
+        </Modal>
+        <div className={style.tableOperations}>
+          {permissions(['root']) && <Button onClick={clientCreator.toggleModal}>Создать клиента</Button>}
+          <Button onClick={clientCreator.toggleModal}>Создать клиента</Button>
+        </div>
         <Spin spinning={state === 'pending'}>
           <Table
             bordered
