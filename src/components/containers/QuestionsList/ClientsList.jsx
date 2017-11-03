@@ -58,6 +58,7 @@ class QuestionList extends Component {
       current,
       pageSize,
       total,
+      store,
     } = this.props.groupQuestion;
     const columns = [
       { dataIndex: 'name', title: 'Имя' },
@@ -98,10 +99,14 @@ class QuestionList extends Component {
         >
           <BindClient clientsBinder={clientsBinder} />
         </Modal>
-        {permissions(['root']) &&
+
+        {store.tableType === 'folded' &&
           <div className={style.tableOperations}>
-            <Button onClick={clientsBinder.toggleModal}>Привязать клиентов</Button>
-          </div>}
+            {permissions(['root']) &&
+              <Button onClick={clientsBinder.toggleModal}>Привязать клиентов</Button>
+            }
+          </div>
+        }
         <Spin spinning={state === 'pending'}>
           <Table
             bordered

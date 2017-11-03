@@ -1,5 +1,5 @@
 import { reaction, toJS } from 'mobx';
-import { types, getParent } from 'mobx-state-tree';
+import { types, getParent, onSnapshot } from 'mobx-state-tree';
 import { message } from 'antd';
 import moment from 'moment';
 import axios from '../utils/axios';
@@ -187,6 +187,9 @@ const Question = types
     get clientsData() {
       return toJS(self.clients);
     },
+    get store() {
+      return getParent(self, 2);
+    },
   }))
   .actions(self => ({
     afterCreate() {
@@ -230,13 +233,29 @@ const Question = types
     },
   }));
 
+const TableSettings = types
+  .model('TableSettings', {
+    columnsEnabled: types.optional(
+      types.array(types.string),
+      [],
+    ),
+    columnsAvailable: types.optional(
+      types.array(types.string),
+      [],
+    ),
+    tableType: types.optional(
+      types.enumeration(['folded', 'unfolded']),
+      'folded',
+    ),
+  });
+
 const QuestionStore = types
   .model('QuestionStore', {
     tableType: types.optional(
       types.enumeration(['folded', 'unfolded']),
       'folded',
     ),
-    questionsType: types.optional(
+    activeTab: types.optional(
       types.enumeration(['group', 'individual']),
       'group',
     ),
@@ -281,8 +300,11 @@ const QuestionStore = types
       );
     },
     switchTab(tabKey) {
-      self.questionsType = tabKey;
+      self.activeTab = tabKey;
       self.fetchQuestions();
+    },
+    setTableType(value) {
+      self.tableType = value;
     },
     setPagination(current, pageSize) {
       self.current = current;
@@ -297,7 +319,7 @@ const QuestionStore = types
       axios().get('v1/page/questions', {
         params: {
           filter: '',
-          type: self.questionsType,
+          type: self.activeTab,
           limit: self.pageSize,
           offset: (self.current - 1) * self.pageSize,
           startDate: self.startDate,

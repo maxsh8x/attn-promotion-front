@@ -45,19 +45,13 @@ class QuestionsList extends Component {
       <TextWithDots text={title} length={100} />
     </a>);
 
-  renderExtraActions = (
-    <Radio.Group defaultValue="folded">
-      <Radio.Button value="folded">Свернутый</Radio.Button>
-      <Radio.Button value="unfolded">Развернутый</Radio.Button>
-    </Radio.Group>
-  );
-
-
   render() {
     const {
       groupQuestionCreator,
       questionsData,
       switchTab,
+      tableType,
+      setTableType,
       state,
       current,
       pageSize,
@@ -76,6 +70,17 @@ class QuestionsList extends Component {
       { dataIndex: 'views', title: 'Просмотров' },
     ];
 
+    const renderExtraActions = (<Radio.Group
+      defaultValue="folded"
+      value={tableType}
+      onChange={(e) => {
+        setTableType(e.target.value);
+      }}
+    >
+      <Radio.Button value="folded">Свернутый</Radio.Button>
+      <Radio.Button value="unfolded">Развернутый</Radio.Button>
+    </Radio.Group>);
+
     return (
       <div>
         <Modal
@@ -89,7 +94,7 @@ class QuestionsList extends Component {
         <Spin spinning={state === 'pending'}>
           <Tabs
             defaultActiveKey="group"
-            tabBarExtraContent={this.renderExtraActions}
+            tabBarExtraContent={renderExtraActions}
             onChange={switchTab}
           >
             <Tabs.TabPane tab={<span><Icon type="team" />Групповые</span>} key="group">
@@ -109,6 +114,7 @@ class QuestionsList extends Component {
                 dataSource={questionsData}
                 title={() => 'Список групповых вопросов'}
                 expandedRowRender={this.expandedRowRender}
+                defaultExpandAllRows={tableType === 'unfolded'}
                 onChange={this.setPagination}
                 pagination={paginationParams}
                 footer={this.footer}
