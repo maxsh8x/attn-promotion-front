@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Table, Button, Modal, DatePicker, Spin, Radio } from 'antd';
-import moment from 'moment';
+import { Table, Button, Modal, DatePicker, Spin } from 'antd';
 import PagesList from './PagesList';
 import ClientCreator from './ClientCreator';
-import ControlBar from '../ControlBar';
 import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
-
-const { RangePicker } = DatePicker;
+import ViewsPeriod from '../ViewsPeriod';
 
 
 @inject('clientsStore') @observer
@@ -20,14 +17,25 @@ class ClientsList extends Component {
   setPagination = ({ current, pageSize }) =>
     this.props.clientsStore.setPagination(current, pageSize);
 
-  updateDate = (dates, [startDate, endDate]) => {
-    this.props.clientsStore.setDate(startDate, endDate);
-  }
-
   expandedRowRender = ({ id, type }, rowIndex) => {
     const { clients, startDate, endDate } = this.props.clientsStore;
     const client = clients[rowIndex];
     return <PagesList dates={[startDate, endDate]} client={client} type={type} />;
+  }
+
+  footer = () => {
+    const {
+      startDate,
+      endDate,
+      setDate,
+    } = this.props.clientsStore;
+    return (
+      <ViewsPeriod
+        startDate={startDate}
+        endDate={endDate}
+        setDate={setDate}
+      />
+    );
   }
 
   render() {
@@ -35,8 +43,6 @@ class ClientsList extends Component {
       clientsData,
       clientCreator,
       groupQuestionCreator,
-      startDate,
-      endDate,
       state,
       total,
       current,
@@ -63,14 +69,6 @@ class ClientsList extends Component {
         >
           <ClientCreator clientCreator={clientCreator} />
         </Modal>
-        <Modal
-          visible={false}
-          title="Настройки таблицы"
-          footer={null}
-          /* onCancel={} */
-        >
-          <ControlBar />
-        </Modal>
         <div className={style.tableOperations}>
           {permissions(['root']) && <Button onClick={clientCreator.toggleModal}>Создать клиента</Button>}
         </div>
@@ -81,14 +79,7 @@ class ClientsList extends Component {
             columns={columns}
             dataSource={clientsData}
             title={() => 'Список клиентов'}
-            footer={() => (
-              <div>
-                Подсчет просмотров за период: <RangePicker
-                  defaultValue={[moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')]}
-                  onChange={this.updateDate}
-                  allowClear={false}
-                />
-              </div>)}
+            footer={this.footer}
             onChange={this.setPagination}
             expandedRowRender={this.expandedRowRender}
             pagination={paginationParams}

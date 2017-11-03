@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Table, Button, Spin } from 'antd';
+import { Table, Button, Spin, Icon } from 'antd';
 
 const metricName = {
   pageviews: 'Просмотры',
@@ -61,7 +61,12 @@ class YandexMetrics extends Component {
         <Spin spinning={fetchMetricsState === 'pending'}>
           <Table
             bordered
-            title={() => <Button onClick={updateMetrics}>Обновить данные за {date}</Button>}
+            title={() => (
+              <Button onClick={updateMetrics}>
+                <Icon type="reload" />
+                Обновить данные за {date}
+              </Button>
+            )}
             rowKey="metric"
             columns={columns}
             dataSource={metricsData}

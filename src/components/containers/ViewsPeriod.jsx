@@ -1,6 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 import { DatePicker } from 'antd';
+import { observer } from 'mobx-react';
 
 const { RangePicker } = DatePicker;
 
@@ -18,4 +19,4 @@ ViewsPeriod.propTypes = {
 
 };
 
-export default ViewsPeriod;
+export default observer(ViewsPeriod);

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Table, Button, Modal, DatePicker, Spin, Tabs, Icon } from 'antd';
+import { Table, Button, Modal, Spin, Tabs, Icon, Radio } from 'antd';
 import { inject, observer } from 'mobx-react';
 import GroupQuestionCreator from './GroupQuestionCreator';
 import ClientsList from './ClientsList';
@@ -10,7 +10,6 @@ import { answerURL } from '../../../constants';
 import TextWithDots from '../TextWithDots';
 import ViewsPeriod from '../ViewsPeriod';
 
-const { RangePicker } = DatePicker;
 
 @inject('questionStore') @observer
 class QuestionsList extends Component {
@@ -26,18 +25,39 @@ class QuestionsList extends Component {
     return <ClientsList groupQuestion={groupQuestion} />;
   }
 
+  footer = () => {
+    const {
+      startDate,
+      endDate,
+      setDate,
+    } = this.props.questionStore;
+    return (
+      <ViewsPeriod
+        startDate={startDate}
+        endDate={endDate}
+        setDate={setDate}
+      />
+    );
+  }
+
   renderPageURL = (title, { url }) =>
     (<a href={answerURL + url}>
       <TextWithDots text={title} length={100} />
     </a>);
 
+  renderExtraActions = (
+    <Radio.Group defaultValue="folded">
+      <Radio.Button value="folded">Свернутый</Radio.Button>
+      <Radio.Button value="unfolded">Развернутый</Radio.Button>
+    </Radio.Group>
+  );
+
+
   render() {
     const {
       groupQuestionCreator,
       questionsData,
-      startDate,
-      endDate,
-      setDate,
+      switchTab,
       state,
       current,
       pageSize,
@@ -67,8 +87,12 @@ class QuestionsList extends Component {
           <GroupQuestionCreator groupQuestionCreator={groupQuestionCreator} />
         </Modal>
         <Spin spinning={state === 'pending'}>
-          <Tabs defaultActiveKey="group">
-            <Tabs.TabPane tab={<span><Icon type="team" />Групповой</span>} key="group">
+          <Tabs
+            defaultActiveKey="group"
+            tabBarExtraContent={this.renderExtraActions}
+            onChange={switchTab}
+          >
+            <Tabs.TabPane tab={<span><Icon type="team" />Групповые</span>} key="group">
               {permissions(['root']) &&
                 <div className={style.tableOperations}>
                   <Button
@@ -87,10 +111,21 @@ class QuestionsList extends Component {
                 expandedRowRender={this.expandedRowRender}
                 onChange={this.setPagination}
                 pagination={paginationParams}
-                footer={() => <ViewsPeriod startDate={startDate} endDate={endDate} setDate={setDate} />}
+                footer={this.footer}
               />
             </Tabs.TabPane>
-            <Tabs.TabPane tab={<span><Icon type="user" />Индивидуальный</span>} key="individual">
+            <Tabs.TabPane tab={<span><Icon type="user" />Индивидуальные</span>} key="individual">
+              <Table
+                bordered
+                rowKey="id"
+                columns={columns}
+                dataSource={questionsData}
+                title={() => 'Список индивидуальных вопросов'}
+                expandedRowRender={this.expandedRowRender}
+                onChange={this.setPagination}
+                pagination={paginationParams}
+                footer={this.footer}
+              />
             </Tabs.TabPane>
           </Tabs>
         </Spin>

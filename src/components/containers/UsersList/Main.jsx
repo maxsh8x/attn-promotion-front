@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Table, Button, Modal, DatePicker, Spin } from 'antd';
-import moment from 'moment';
+import { Table, Button, Modal, Spin } from 'antd';
 import UserCreator from './UserCreator';
 import ClientsList from './ClientsList';
+import ViewsPeriod from '../ViewsPeriod';
 import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
-
-const { RangePicker } = DatePicker;
 
 const roleLables = {
   root: 'Администратор',
@@ -33,16 +31,25 @@ class UsersList extends Component {
     return null;
   }
 
-  updateDate = (dates, [startDate, endDate]) => {
-    this.props.usersStore.setDate(startDate, endDate);
+  footer = () => {
+    const {
+      startDate,
+      endDate,
+      setDate,
+    } = this.props.usersStore;
+    return (
+      <ViewsPeriod
+        startDate={startDate}
+        endDate={endDate}
+        setDate={setDate}
+      />
+    );
   }
 
   render() {
     const {
       usersData,
       userCreator,
-      startDate,
-      endDate,
       state,
       current,
       pageSize,
@@ -77,17 +84,11 @@ class UsersList extends Component {
             rowKey="id"
             columns={columns}
             dataSource={usersData}
+            title={() => 'Список пользователей'}
             expandedRowRender={this.expandedRowRender}
             onChange={this.setPagination}
             pagination={paginationParams}
-            footer={() => (
-              <div>
-                Подсчет просмотров за период: <RangePicker
-                  defaultValue={[moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')]}
-                  onChange={this.updateDate}
-                  allowClear={false}
-                />
-              </div>)}
+            footer={this.footer}
           />
         </Spin>
       </div>

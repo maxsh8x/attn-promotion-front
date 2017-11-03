@@ -232,6 +232,14 @@ const Question = types
 
 const QuestionStore = types
   .model('QuestionStore', {
+    tableType: types.optional(
+      types.enumeration(['folded', 'unfolded']),
+      'folded',
+    ),
+    questionsType: types.optional(
+      types.enumeration(['group', 'individual']),
+      'group',
+    ),
     questions: types.optional(types.array(Question), []),
     groupQuestionCreator: types.optional(GroupQuestionCreator, {}),
     state: types.optional(
@@ -247,7 +255,7 @@ const QuestionStore = types
       moment().format('YYYY-MM-DD'),
     ),
     current: 1,
-    pageSize: 1,
+    pageSize: 10,
     total: 0,
   })
   .views(self => ({
@@ -272,6 +280,10 @@ const QuestionStore = types
         () => self.fetchQuestions(true),
       );
     },
+    switchTab(tabKey) {
+      self.questionsType = tabKey;
+      self.fetchQuestions();
+    },
     setPagination(current, pageSize) {
       self.current = current;
       self.pageSize = pageSize;
@@ -285,6 +297,7 @@ const QuestionStore = types
       axios().get('v1/page/questions', {
         params: {
           filter: '',
+          type: self.questionsType,
           limit: self.pageSize,
           offset: (self.current - 1) * self.pageSize,
           startDate: self.startDate,
