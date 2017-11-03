@@ -292,7 +292,7 @@ const PromotionStore = types
     ),
     isActiveTab: true,
     current: 1,
-    pageSize: 1,
+    pageSize: 10,
     clientsFilter: '',
     pageFilter: '',
   })
