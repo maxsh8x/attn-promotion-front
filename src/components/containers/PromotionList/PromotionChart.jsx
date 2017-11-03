@@ -43,7 +43,7 @@ class PromotionChart extends Component {
         <Spin spinning={state === 'pending'}>
           <ResponsiveContainer width="95%" height={300}>
             <AreaChart data={chartData} >
-              <Area name="Просмотры" type="monotone" dataKey="y" stroke="#8884d8" fill="#82ca9d" />
+              <Area name="Стоимость за клик" type="monotone" dataKey="y" stroke="#8884d8" fill="#82ca9d" />
               <XAxis dataKey="x" />
               <YAxis />
               <Tooltip />

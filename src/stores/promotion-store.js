@@ -292,7 +292,7 @@ const PromotionStore = types
     ),
     isActiveTab: true,
     current: 1,
-    pageSize: 10,
+    pageSize: 1,
     clientsFilter: '',
     pageFilter: '',
   })
@@ -310,6 +310,12 @@ const PromotionStore = types
           self.clientsFilter,
         ],
         () => self.fetchPages(),
+      );
+      reaction(
+        () => [
+          self.date,
+        ],
+        () => self.fetchPages(true),
       );
       reaction(
         () => self.pageFilter,
@@ -334,7 +340,7 @@ const PromotionStore = types
       self.isActiveTab = tabKey === 'active';
       self.fetchPages();
     },
-    fetchPages() {
+    fetchPages(onlyInputs = false) {
       self.state = 'pending';
       axios().get('v1/page', {
         params: {
@@ -346,39 +352,48 @@ const PromotionStore = types
           filter: self.pageFilter,
         },
       }).then(
-        self.fetchPagesSuccess,
+        ({ data }) => self.fetchPagesSuccess(data, onlyInputs),
         self.fetchPagesError,
       );
     },
-    fetchPagesSuccess({ data }) {
+    fetchPagesSuccess({ sources, input, pages, activePages, inactivePages }, onlyInputs) {
       const networksInitState = {};
-      for (let i = 0; i < data.sources.length; i += 1) {
-        networksInitState[data.sources[i]] = {
+      for (let i = 0; i < sources.length; i += 1) {
+        networksInitState[sources[i]] = {
           cost: 0,
           clicks: 0,
         };
       }
 
       const flatInput = {};
-      for (let i = 0; i < data.input.length; i += 1) {
-        flatInput[data.input[i]._id.page] = { ...networksInitState };
-        for (let x = 0; x < data.input[i].sources.length; x += 1) {
-          flatInput[data.input[i]._id.page][data.input[i].sources[x]] = {
-            cost: data.input[i].cost[x],
-            clicks: data.input[i].clicks[x],
+      for (let i = 0; i < input.length; i += 1) {
+        flatInput[input[i]._id.page] = { ...networksInitState };
+        for (let x = 0; x < input[i].sources.length; x += 1) {
+          flatInput[input[i]._id.page][input[i].sources[x]] = {
+            cost: input[i].cost[x],
+            clicks: input[i].clicks[x],
           };
         }
       }
-      self.pages.replace(data.pages.map(item => ({
-        ...item,
-        id: item._id,
-        inputs: flatInput[item._id]
-          ? { ...networksInitState, ...flatInput[item._id] }
-          : networksInitState,
-      })));
-      self.sources.replace(data.sources);
-      self.activePages = data.activePages;
-      self.inactivePages = data.inactivePages;
+      if (onlyInputs) {
+        for (let i = 0; i < self.pages.length; i += 1) {
+          self.pages[i].inputs.clear();
+          self.pages[i].inputs = flatInput[self.pages[i].id]
+            ? { ...networksInitState, ...flatInput[self.pages[i].id] }
+            : networksInitState;
+        }
+      } else {
+        self.pages.replace(pages.map(item => ({
+          ...item,
+          id: item._id,
+          inputs: flatInput[item._id]
+            ? { ...networksInitState, ...flatInput[item._id] }
+            : networksInitState,
+        })));
+      }
+      self.sources.replace(sources);
+      self.activePages = activePages;
+      self.inactivePages = inactivePages;
       self.state = 'done';
     },
     fetchPagesError() {
