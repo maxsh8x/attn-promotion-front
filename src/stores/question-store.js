@@ -50,7 +50,7 @@ const GroupQuestionCreator = types
       if (error.response.data.message === 'INVALID_COUNTER_ID') {
         message.error('Неверный ID счетчика');
       } else {
-        message.error('Ошибка при создании клиента');
+        message.error('Ошибка при создании группового вопроса');
       }
       self.state = 'error';
     },
@@ -142,6 +142,7 @@ const ClientBinder = types
       self.status = 'done';
     },
     createError() {
+      message.error('Ошибка при привязке клиентов');
       self.status = 'error';
     },
     setClients(clients) {
@@ -162,8 +163,8 @@ const ClientBinder = types
     },
   }));
 
-const GroupQuestion = types
-  .model('GroupQuestion', {
+const Question = types
+  .model('Question', {
     id: types.identifier(types.number),
     url: types.string,
     title: types.string,
@@ -229,9 +230,9 @@ const GroupQuestion = types
     },
   }));
 
-const GroupQuestionStore = types
-  .model('GroupQuestionStore', {
-    groupQuestions: types.optional(types.array(GroupQuestion), []),
+const QuestionStore = types
+  .model('QuestionStore', {
+    questions: types.optional(types.array(Question), []),
     groupQuestionCreator: types.optional(GroupQuestionCreator, {}),
     state: types.optional(
       types.enumeration(fetchStates),
@@ -250,8 +251,8 @@ const GroupQuestionStore = types
     total: 0,
   })
   .views(self => ({
-    get groupQuestionsData() {
-      return toJS(self.groupQuestions);
+    get questionsData() {
+      return toJS(self.questions);
     },
   }))
   .actions(self => ({
@@ -261,14 +262,14 @@ const GroupQuestionStore = types
           self.current,
           self.pageSize,
         ],
-        () => self.fetchGroupQuestions(),
+        () => self.fetchQuestions(),
       );
       reaction(
         () => [
           self.startDate,
           self.endDate,
         ],
-        () => self.fetchGroupQuestions(true),
+        () => self.fetchQuestions(true),
       );
     },
     setPagination(current, pageSize) {
@@ -279,9 +280,9 @@ const GroupQuestionStore = types
       self.startDate = startDate;
       self.endDate = endDate;
     },
-    fetchGroupQuestions(onlyViews = false) {
+    fetchQuestions(onlyViews = false) {
       self.state = 'pending';
-      axios().get('v1/page/group-questions', {
+      axios().get('v1/page/questions', {
         params: {
           filter: '',
           limit: self.pageSize,
@@ -290,17 +291,17 @@ const GroupQuestionStore = types
           endDate: self.endDate,
         },
       }).then(
-        ({ data }) => self.fetchGroupQuestionsSuccess(data, onlyViews),
-        self.fetchGroupQuestionsError,
+        ({ data }) => self.fetchQuestionsSuccess(data, onlyViews),
+        self.fetchQuestionsError,
       );
     },
-    fetchGroupQuestionsSuccess({ pageData, views, total }, onlyViews) {
+    fetchQuestionsSuccess({ pageData, views, total }, onlyViews) {
       if (onlyViews) {
-        self.groupQuestions.forEach((question) => {
+        self.questions.forEach((question) => {
           question.views = views[question.id] || 0;
         });
       } else {
-        self.groupQuestions.replace(pageData.map(item => ({
+        self.questions.replace(pageData.map(item => ({
           ...item,
           id: item._id,
         })));
@@ -308,12 +309,12 @@ const GroupQuestionStore = types
       self.total = total;
       self.state = 'done';
     },
-    fetchGroupQuestionsError(error) {
-      message.error('Ошибка при получении групповых вопросов');
+    fetchQuestionsError(error) {
+      message.error('Ошибка при получении вопросов');
       self.state = 'error';
     },
   }));
 
-const groupQuestionStore = GroupQuestionStore.create({});
+const questionStore = QuestionStore.create({});
 
-export default groupQuestionStore;
+export default questionStore;

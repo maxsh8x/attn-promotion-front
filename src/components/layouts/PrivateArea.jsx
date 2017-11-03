@@ -28,8 +28,8 @@ const PrivateAreaLayout = ({ children, history }) => (
               <Menu.Item key="clients">
                 <NavLink to="/clients"><Icon type="team" />Клиенты</NavLink>
               </Menu.Item>
-              <Menu.Item key="group-questions">
-                <NavLink to="/group-questions"><Icon type="question-circle-o" />Групповые вопросы</NavLink>
+              <Menu.Item key="questions">
+                <NavLink to="/questions"><Icon type="question-circle-o" />Вопросы</NavLink>
               </Menu.Item>
               {permissions(['root', 'buchhalter']) &&
                 <Menu.Item key="users">

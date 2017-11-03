@@ -136,7 +136,7 @@ class PromotionList extends Component {
         </div>
 
         <Spin spinning={state === 'pending'}>
-          <Tabs defaultActiveKey="active" onChange={switchTab} animated={false}>
+          <Tabs defaultActiveKey="active" onChange={switchTab}>
             <Tabs.TabPane tab={`Активные (${activePages})`} key="active">
               <Table
                 bordered

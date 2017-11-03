@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Table, Button, Modal, DatePicker, Spin } from 'antd';
+import { Table, Button, Modal, DatePicker, Spin, Tabs, Icon } from 'antd';
 import { inject, observer } from 'mobx-react';
 import GroupQuestionCreator from './GroupQuestionCreator';
 import ClientsList from './ClientsList';
@@ -8,25 +8,22 @@ import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
 import { answerURL } from '../../../constants';
 import TextWithDots from '../TextWithDots';
+import ViewsPeriod from '../ViewsPeriod';
 
 const { RangePicker } = DatePicker;
 
-@inject('groupQuestionStore') @observer
-class GroupQuestionsList extends Component {
+@inject('questionStore') @observer
+class QuestionsList extends Component {
   componentWillMount() {
-    this.props.groupQuestionStore.fetchGroupQuestions();
+    this.props.questionStore.fetchQuestions();
   }
 
   setPagination = ({ current, pageSize }) =>
-    this.props.groupQuestionStore.setPagination(current, pageSize);
+    this.props.questionStore.setPagination(current, pageSize);
 
   expandedRowRender = (row, rowIndex) => {
-    const groupQuestion = this.props.groupQuestionStore.groupQuestions[rowIndex];
+    const groupQuestion = this.props.questionStore.questions[rowIndex];
     return <ClientsList groupQuestion={groupQuestion} />;
-  }
-
-  updateDate = (dates, [startDate, endDate]) => {
-    this.props.groupQuestionStore.setDate(startDate, endDate);
   }
 
   renderPageURL = (title, { url }) =>
@@ -37,7 +34,7 @@ class GroupQuestionsList extends Component {
   render() {
     const {
       groupQuestionCreator,
-      groupQuestionsData,
+      questionsData,
       startDate,
       endDate,
       setDate,
@@ -45,7 +42,7 @@ class GroupQuestionsList extends Component {
       current,
       pageSize,
       total,
-    } = this.props.groupQuestionStore;
+    } = this.props.questionStore;
 
     const paginationParams = { current, pageSize, total };
 
@@ -69,42 +66,41 @@ class GroupQuestionsList extends Component {
         >
           <GroupQuestionCreator groupQuestionCreator={groupQuestionCreator} />
         </Modal>
-        {permissions(['root']) &&
-          <div className={style.tableOperations}>
-            <Button
-              onClick={groupQuestionCreator.toggleModal}
-            >
-              Создать групповой вопрос
-            </Button>
-          </div>
-        }
         <Spin spinning={state === 'pending'}>
-          <Table
-            bordered
-            rowKey="id"
-            columns={columns}
-            dataSource={groupQuestionsData}
-            title={() => 'Список групповых вопросов'}
-            expandedRowRender={this.expandedRowRender}
-            onChange={this.setPagination}
-            pagination={paginationParams}
-            footer={() => (
-              <div>
-                Подсчет просмотров за период: <RangePicker
-                  defaultValue={[moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')]}
-                  onChange={this.updateDate}
-                  allowClear={false}
-                />
-              </div>)}
-          />
+          <Tabs defaultActiveKey="group">
+            <Tabs.TabPane tab={<span><Icon type="team" />Групповой</span>} key="group">
+              {permissions(['root']) &&
+                <div className={style.tableOperations}>
+                  <Button
+                    onClick={groupQuestionCreator.toggleModal}
+                  >
+                    Создать групповой вопрос
+                  </Button>
+                </div>
+              }
+              <Table
+                bordered
+                rowKey="id"
+                columns={columns}
+                dataSource={questionsData}
+                title={() => 'Список групповых вопросов'}
+                expandedRowRender={this.expandedRowRender}
+                onChange={this.setPagination}
+                pagination={paginationParams}
+                footer={() => <ViewsPeriod startDate={startDate} endDate={endDate} setDate={setDate} />}
+              />
+            </Tabs.TabPane>
+            <Tabs.TabPane tab={<span><Icon type="user" />Индивидуальный</span>} key="individual">
+            </Tabs.TabPane>
+          </Tabs>
         </Spin>
       </div>
     );
   }
 }
 
-GroupQuestionsList.propTypes = {
+QuestionsList.propTypes = {
 
 };
 
-export default GroupQuestionsList;
+export default QuestionsList;

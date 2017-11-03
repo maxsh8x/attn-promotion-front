@@ -73,7 +73,6 @@ class ClientsList extends Component {
         </Modal>
         <div className={style.tableOperations}>
           {permissions(['root']) && <Button onClick={clientCreator.toggleModal}>Создать клиента</Button>}
-          <Button onClick={clientCreator.toggleModal}>Создать клиента</Button>
         </div>
         <Spin spinning={state === 'pending'}>
           <Table
