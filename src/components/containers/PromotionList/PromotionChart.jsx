@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import moment from 'moment';
 import { DatePicker, Select, Button, Spin } from 'antd';
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
 import style from '../../../style.css';
 
 const { RangePicker } = DatePicker;
@@ -42,12 +42,12 @@ class PromotionChart extends Component {
         </div>
         <Spin spinning={state === 'pending'}>
           <ResponsiveContainer width="95%" height={300}>
-            <AreaChart data={chartData} >
-              <Area name="Стоимость за клик" type="monotone" dataKey="y" stroke="#8884d8" fill="#82ca9d" />
+            <BarChart data={chartData} >
               <XAxis dataKey="x" />
               <YAxis />
               <Tooltip />
-            </AreaChart>
+              <Bar name="Стоимость за клик" type="monotone" dataKey="y" fill="#82ca9d" />
+            </BarChart>
           </ResponsiveContainer>
         </Spin>
       </div >
