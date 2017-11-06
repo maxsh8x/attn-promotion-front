@@ -73,6 +73,7 @@ const Client = types
     costPerClick: types.number,
     startDate: types.string,
     endDate: types.string,
+    views: types.number,
   })
   .views(self => ({
     get question() {
@@ -248,7 +249,7 @@ const TableSettings = types
       'folded',
     ),
     paginate: true,
-    pageSize: 1,
+    pageSize: 10,
     controls: true,
     folded: true,
     header: true,
@@ -264,13 +265,14 @@ const TableSettings = types
   }))
   .actions(self => ({
     afterCreate() {
-      reaction(
+      const disposer = reaction(
         () => [
           self.current,
           self.pageSize,
         ],
         () => self.store.fetchQuestions(),
       );
+      addDisposer(self, disposer);
     },
     setFoldedMode() {
       self.folded = true;

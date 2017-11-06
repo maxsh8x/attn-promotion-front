@@ -37,6 +37,9 @@ class QuestionList extends Component {
     const views = client.question.views;
     return costPerClick * views;
   }
+  renderCampaignCost = (k, { views, costPerClick }) =>
+    costPerClick * views;
+
 
   renderRowClassName = (now, { startDate, endDate }) => {
     const start = new Date(startDate).getTime();
@@ -74,14 +77,16 @@ class QuestionList extends Component {
         title: 'Цена',
         children: [
           { key: 'costPerClick', dataIndex: 'costPerClick', title: 'Клик' },
-          { key: 'period', title: 'Период', render: this.renderPeriodCost },
+          { key: 'tablePeriod', title: 'Выбранная дата', render: this.renderPeriodCost },
+          { key: 'campaignPeriod', title: 'Начало/конец кампании', render: this.renderCampaignCost },
         ],
       },
       {
-        title: 'Дата',
+        title: 'Кампания',
         children: [
-          { key: 'startDate', title: 'От', dataIndex: 'startDate', render: this.renderDate },
-          { key: 'endDate', title: 'До', dataIndex: 'endDate', render: this.renderDate },
+          { key: 'startDate', title: 'Начало', dataIndex: 'startDate', render: this.renderDate },
+          { key: 'endDate', title: 'Конец', dataIndex: 'endDate', render: this.renderDate },
+          { key: 'views', title: 'Просмотров', dataIndex: 'views' },
         ],
       },
       {
