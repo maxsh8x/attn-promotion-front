@@ -238,6 +238,10 @@ const TableSettings = types
       types.array(types.string),
       [],
     ),
+    tableType: types.optional(
+      types.enumeration(['folded', 'unfolded']),
+      'folded',
+    ),
     paginate: true,
     pageSize: 1,
     controls: true,
@@ -270,6 +274,7 @@ const TableSettings = types
       self.nested.controls = true;
     },
     setFolding(mode) {
+      self.tableType = mode;
       switch (mode) {
         case 'unfolded': {
           self.folded = false;
@@ -300,10 +305,6 @@ const TableSettings = types
 const QuestionStore = types
   .model('QuestionStore', {
     tabSettings: types.map(TableSettings),
-    tableType: types.optional(
-      types.enumeration(['folded', 'unfolded']),
-      'folded',
-    ),
     activeTab: types.optional(
       types.enumeration(['group', 'individual']),
       'group',
@@ -344,10 +345,6 @@ const QuestionStore = types
     switchTab(tabKey) {
       self.activeTab = tabKey;
       self.fetchQuestions();
-    },
-    setTableType(value) {
-      self.tableType = value;
-      self.settings.setFolding(value);
     },
     setDate(startDate, endDate) {
       self.startDate = startDate;

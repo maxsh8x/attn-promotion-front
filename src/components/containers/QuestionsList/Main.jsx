@@ -87,15 +87,17 @@ class QuestionsList extends Component {
     );
 
     const renderExtraActions = (
-      <Radio.Group
-        value={tableType}
-        onChange={(e) => {
-          setTableType(e.target.value);
-        }}
-      >
-        <Radio.Button value="folded">Свернутый</Radio.Button>
-        <Radio.Button value="unfolded">Развернутый</Radio.Button>
-      </Radio.Group>
+      <div>
+        <Radio.Group
+          value={settings.tableType}
+          onChange={(e) => {
+            settings.setFolding(e.target.value);
+          }}
+        >
+          <Radio.Button value="folded">Свернутый</Radio.Button>
+          <Radio.Button value="unfolded">Развернутый</Radio.Button>
+        </Radio.Group>
+      </div>
     );
 
     const standartProps = {
