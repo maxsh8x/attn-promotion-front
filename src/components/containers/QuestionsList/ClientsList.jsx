@@ -122,7 +122,7 @@ class QuestionList extends Component {
           showHeader={header}
           dataSource={clientsData}
           onChange={this.setPagination}
-          pagination={paginationParams}
+          pagination={settings.paginate && paginationParams}
           footer={footer ? () => <InfoBadges /> : null}
           rowClassName={row => this.renderRowClassName(now, row)}
         />

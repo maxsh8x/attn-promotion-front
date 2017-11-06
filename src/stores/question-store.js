@@ -1,5 +1,5 @@
 import { reaction, toJS } from 'mobx';
-import { types, getParent, getRoot } from 'mobx-state-tree';
+import { types, getParent, getRoot, addDisposer } from 'mobx-state-tree';
 import { message } from 'antd';
 import moment from 'moment';
 import axios from '../utils/axios';
@@ -192,13 +192,15 @@ const Question = types
   }))
   .actions(self => ({
     afterCreate() {
-      reaction(
+      const disposer = reaction(
         () => [
           self.current,
           self.pageSize,
+          self.settings.paginate,
         ],
         () => self.fetchClients(),
       );
+      addDisposer(self, disposer);
     },
     setPagination(current, pageSize) {
       self.current = current;
@@ -206,12 +208,15 @@ const Question = types
     },
     fetchClients() {
       self.state = 'pending';
+      const params = {
+        pageID: self.id,
+      };
+      if (self.settings.paginate) {
+        params.limit = self.settings.pageSize;
+        params.offset = (self.current - 1) * self.settings.pageSize;
+      }
       axios().get('v1/client/page', {
-        params: {
-          pageID: self.id,
-          limit: self.settings.pageSize,
-          offset: (self.current - 1) * self.settings.pageSize,
-        },
+        params,
       }).then(
         self.fetchClientsSuccess,
         self.fetchClientsError,
