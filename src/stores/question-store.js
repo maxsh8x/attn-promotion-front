@@ -1,5 +1,5 @@
 import { reaction, toJS } from 'mobx';
-import { types, getParent, onSnapshot } from 'mobx-state-tree';
+import { types, getParent, getRoot } from 'mobx-state-tree';
 import { message } from 'antd';
 import moment from 'moment';
 import axios from '../utils/axios';
@@ -176,7 +176,6 @@ const Question = types
     ),
     clientsBinder: types.optional(ClientBinder, {}),
     current: 1,
-    pageSize: 10,
     total: 0,
     state: types.optional(
       types.enumeration(fetchStates),
@@ -187,8 +186,8 @@ const Question = types
     get clientsData() {
       return toJS(self.clients);
     },
-    get store() {
-      return getParent(self, 2);
+    get settings() {
+      return getRoot(self).settings.nested;
     },
   }))
   .actions(self => ({
@@ -210,8 +209,8 @@ const Question = types
       axios().get('v1/client/page', {
         params: {
           pageID: self.id,
-          limit: self.pageSize,
-          offset: (self.current - 1) * self.pageSize,
+          limit: self.settings.pageSize,
+          offset: (self.current - 1) * self.settings.pageSize,
         },
       }).then(
         self.fetchClientsSuccess,
@@ -235,22 +234,72 @@ const Question = types
 
 const TableSettings = types
   .model('TableSettings', {
-    columnsEnabled: types.optional(
+    columns: types.optional(
       types.array(types.string),
       [],
     ),
-    columnsAvailable: types.optional(
-      types.array(types.string),
-      [],
-    ),
-    tableType: types.optional(
-      types.enumeration(['folded', 'unfolded']),
-      'folded',
-    ),
-  });
+    paginate: true,
+    pageSize: 1,
+    controls: true,
+    folded: true,
+    header: true,
+    footer: true,
+    current: 1,
+    total: 0,
+    nested: types.maybe(types.late(() => TableSettings)),
+  })
+  .views(self => ({
+    get store() {
+      return getParent(self, 2);
+    },
+  }))
+  .actions(self => ({
+    afterCreate() {
+      reaction(
+        () => [
+          self.current,
+          self.pageSize,
+        ],
+        () => self.store.fetchQuestions(),
+      );
+    },
+    setFoldedMode() {
+      self.folded = true;
+      self.nested.header = true;
+      self.nested.footer = true;
+      self.nested.controls = true;
+    },
+    setFolding(mode) {
+      switch (mode) {
+        case 'unfolded': {
+          self.folded = false;
+          self.nested.header = false;
+          self.nested.footer = false;
+          self.nested.controls = false;
+          self.nested.paginate = false;
+          break;
+        }
+        case 'folded': {
+          self.folded = true;
+          self.nested.header = true;
+          self.nested.footer = true;
+          self.nested.controls = true;
+          self.nested.paginate = true;
+          break;
+        }
+        default:
+          message.error('Неподдерживаемый режим отображения');
+      }
+    },
+    setPagination({ current, pageSize }) {
+      self.current = current;
+      self.pageSize = pageSize;
+    },
+  }));
 
 const QuestionStore = types
   .model('QuestionStore', {
+    tabSettings: types.map(TableSettings),
     tableType: types.optional(
       types.enumeration(['folded', 'unfolded']),
       'folded',
@@ -273,24 +322,17 @@ const QuestionStore = types
       types.string,
       moment().format('YYYY-MM-DD'),
     ),
-    current: 1,
-    pageSize: 10,
-    total: 0,
   })
   .views(self => ({
     get questionsData() {
       return toJS(self.questions);
     },
+    get settings() {
+      return self.tabSettings.get(self.activeTab);
+    },
   }))
   .actions(self => ({
     afterCreate() {
-      reaction(
-        () => [
-          self.current,
-          self.pageSize,
-        ],
-        () => self.fetchQuestions(),
-      );
       reaction(
         () => [
           self.startDate,
@@ -305,23 +347,23 @@ const QuestionStore = types
     },
     setTableType(value) {
       self.tableType = value;
-    },
-    setPagination(current, pageSize) {
-      self.current = current;
-      self.pageSize = pageSize;
+      self.settings.setFolding(value);
     },
     setDate(startDate, endDate) {
       self.startDate = startDate;
       self.endDate = endDate;
     },
     fetchQuestions(onlyViews = false) {
+      if (!(onlyViews)) {
+        self.questions.clear();
+      }
       self.state = 'pending';
       axios().get('v1/page/questions', {
         params: {
           filter: '',
           type: self.activeTab,
-          limit: self.pageSize,
-          offset: (self.current - 1) * self.pageSize,
+          limit: self.settings.pageSize,
+          offset: (self.settings.current - 1) * self.settings.pageSize,
           startDate: self.startDate,
           endDate: self.endDate,
         },
@@ -341,7 +383,7 @@ const QuestionStore = types
           id: item._id,
         })));
       }
-      self.total = total;
+      self.settings.total = total;
       self.state = 'done';
     },
     fetchQuestionsError(error) {
@@ -350,6 +392,17 @@ const QuestionStore = types
     },
   }));
 
-const questionStore = QuestionStore.create({});
+const questionStore = QuestionStore.create({
+  tabSettings: {
+    group: {
+      columns: ['title', 'createdAt'],
+      nested: {},
+    },
+    individual: {
+      columns: ['title', 'createdAt', 'views'],
+      nested: {},
+    },
+  },
+});
 
 export default questionStore;

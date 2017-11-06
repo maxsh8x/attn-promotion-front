@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Table, Button, Spin, Icon } from 'antd';
+import { Table, Button, Icon } from 'antd';
 
 const metricName = {
   pageviews: 'Просмотры',
@@ -58,23 +58,22 @@ class YandexMetrics extends Component {
     // popup
     return (
       <div>
-        <Spin spinning={fetchMetricsState === 'pending'}>
-          <Table
-            bordered
-            title={() => (
-              <Button onClick={updateMetrics}>
-                <Icon type="reload" />
-                Обновить данные за {date}
-              </Button>
-            )}
-            rowKey="metric"
-            columns={columns}
-            dataSource={metricsData}
-            size="small"
-            pagination={false}
-            footer={() => `Стоимость за клик: ${totalClickCost}`}
-          />
-        </Spin>
+        <Table
+          loading={fetchMetricsState === 'pending'}
+          bordered
+          title={() => (
+            <Button onClick={updateMetrics}>
+              <Icon type="reload" />
+              Обновить данные за {date}
+            </Button>
+          )}
+          rowKey="metric"
+          columns={columns}
+          dataSource={metricsData}
+          size="small"
+          pagination={false}
+          footer={() => `Стоимость за клик: ${totalClickCost}`}
+        />
       </div>
     );
   }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import moment from 'moment';
-import { Button, Modal, Table, Badge, Spin } from 'antd';
+import { Button, Modal, Table, Badge } from 'antd';
 import BindClient from './BindClient';
 import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
@@ -56,10 +56,16 @@ class QuestionList extends Component {
       views,
       state,
       current,
-      pageSize,
       total,
-      store,
+      settings,
     } = this.props.groupQuestion;
+    const {
+      pageSize,
+      header,
+      footer,
+      controls,
+    } = settings;
+
     const columns = [
       { dataIndex: 'name', title: 'Имя' },
       { dataIndex: 'vatin', title: 'Инн' },
@@ -100,26 +106,26 @@ class QuestionList extends Component {
           <BindClient clientsBinder={clientsBinder} />
         </Modal>
 
-        {store.tableType === 'folded' &&
+        {controls &&
           <div className={style.tableOperations}>
             {permissions(['root']) &&
               <Button onClick={clientsBinder.toggleModal}>Привязать клиентов</Button>
             }
           </div>
         }
-        <Spin spinning={state === 'pending'}>
-          <Table
-            bordered
-            size="small"
-            rowKey="id"
-            columns={columns}
-            dataSource={clientsData}
-            onChange={this.setPagination}
-            pagination={paginationParams}
-            footer={() => <InfoBadges />}
-            rowClassName={row => this.renderRowClassName(now, row)}
-          />
-        </Spin>
+        <Table
+          loading={state === 'pending'}
+          bordered
+          size="small"
+          rowKey="id"
+          columns={columns}
+          showHeader={header}
+          dataSource={clientsData}
+          onChange={this.setPagination}
+          pagination={paginationParams}
+          footer={footer ? () => <InfoBadges /> : null}
+          rowClassName={row => this.renderRowClassName(now, row)}
+        />
       </div>
     );
   }

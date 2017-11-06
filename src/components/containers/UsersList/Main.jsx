@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Table, Button, Modal, Spin } from 'antd';
+import { Table, Button, Modal } from 'antd';
 import UserCreator from './UserCreator';
 import ClientsList from './ClientsList';
 import ViewsPeriod from '../ViewsPeriod';
@@ -78,19 +78,18 @@ class UsersList extends Component {
             <Button onClick={userCreator.toggleModal}>Создать пользователя</Button>
           </div>
         }
-        <Spin spinning={state === 'pending'}>
-          <Table
-            bordered
-            rowKey="id"
-            columns={columns}
-            dataSource={usersData}
-            title={() => 'Список пользователей'}
-            expandedRowRender={this.expandedRowRender}
-            onChange={this.setPagination}
-            pagination={paginationParams}
-            footer={this.footer}
-          />
-        </Spin>
+        <Table
+          loading={state === 'pending'}
+          bordered
+          rowKey="id"
+          columns={columns}
+          dataSource={usersData}
+          title={() => 'Список пользователей'}
+          expandedRowRender={this.expandedRowRender}
+          onChange={this.setPagination}
+          pagination={paginationParams}
+          footer={this.footer}
+        />
       </div>
     );
   }

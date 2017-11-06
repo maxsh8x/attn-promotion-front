@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Table, Button, Modal, Spin, Tabs, Icon, Radio } from 'antd';
+import { Table, Button, Modal, Tabs, Icon, Radio } from 'antd';
 import { inject, observer } from 'mobx-react';
 import GroupQuestionCreator from './GroupQuestionCreator';
 import ClientsList from './ClientsList';
@@ -9,6 +9,7 @@ import permissions from '../../../utils/permissions';
 import { answerURL } from '../../../constants';
 import TextWithDots from '../TextWithDots';
 import ViewsPeriod from '../ViewsPeriod';
+// import TableSettings from './TableSettings';
 
 
 @inject('questionStore') @observer
@@ -18,11 +19,36 @@ class QuestionsList extends Component {
   }
 
   setPagination = ({ current, pageSize }) =>
-    this.props.questionStore.setPagination(current, pageSize);
+    this.props.questionStore.pagination.setPagination(current, pageSize);
+
+  availableColumns = [
+    {
+      key: 'title',
+      dataIndex: 'title',
+      title: 'Название',
+      render: this.renderPageURL,
+    },
+    {
+      key: 'createdAt',
+      dataIndex: 'createdAt',
+      title: 'Дата создания',
+      render: value => moment(value).format('YYYY-MM-DD'),
+    },
+    {
+      key: 'views',
+      dataIndex: 'views',
+      title: 'Просмотров',
+    },
+  ];
 
   expandedRowRender = (row, rowIndex) => {
-    const groupQuestion = this.props.questionStore.questions[rowIndex];
-    return <ClientsList groupQuestion={groupQuestion} />;
+    const { questions, settings } = this.props.questionStore;
+    const groupQuestion = questions[rowIndex];
+    return (
+      <ClientsList
+        groupQuestion={groupQuestion}
+      />
+    );
   }
 
   footer = () => {
@@ -53,33 +79,44 @@ class QuestionsList extends Component {
       tableType,
       setTableType,
       state,
-      current,
-      pageSize,
-      total,
+      settings,
     } = this.props.questionStore;
 
-    const paginationParams = { current, pageSize, total };
+    const columns = this.availableColumns.filter(
+      column => settings.columns.indexOf(column.key) !== -1,
+    );
 
-    const columns = [
-      {
-        dataIndex: 'title',
-        title: 'Название',
-        render: this.renderPageURL,
+    const renderExtraActions = (
+      <Radio.Group
+        value={tableType}
+        onChange={(e) => {
+          setTableType(e.target.value);
+        }}
+      >
+        <Radio.Button value="folded">Свернутый</Radio.Button>
+        <Radio.Button value="unfolded">Развернутый</Radio.Button>
+      </Radio.Group>
+    );
+
+    const standartProps = {
+      expandedRowRender: this.expandedRowRender,
+      onChange: settings.setPagination,
+      pagination: {
+        current: settings.current,
+        pageSize: settings.pageSize,
+        total: settings.total,
       },
-      { dataIndex: 'createdAt', title: 'Дата создания', render: value => moment(value).format('YYYY-MM-DD') },
-      { dataIndex: 'views', title: 'Просмотров' },
-    ];
+      loading: state === 'pending',
+      dataSource: questionsData,
+      footer: this.footer,
+      bordered: true,
+      rowKey: 'id',
+      columns,
+    };
 
-    const renderExtraActions = (<Radio.Group
-      defaultValue="folded"
-      value={tableType}
-      onChange={(e) => {
-        setTableType(e.target.value);
-      }}
-    >
-      <Radio.Button value="folded">Свернутый</Radio.Button>
-      <Radio.Button value="unfolded">Развернутый</Radio.Button>
-    </Radio.Group>);
+    if (!(settings.folded)) {
+      standartProps.expandedRowKeys = questionsData.map(row => row.id);
+    }
 
     return (
       <div>
@@ -91,50 +128,33 @@ class QuestionsList extends Component {
         >
           <GroupQuestionCreator groupQuestionCreator={groupQuestionCreator} />
         </Modal>
-        <Spin spinning={state === 'pending'}>
-          <Tabs
-            defaultActiveKey="group"
-            tabBarExtraContent={renderExtraActions}
-            onChange={switchTab}
-          >
-            <Tabs.TabPane tab={<span><Icon type="team" />Групповые</span>} key="group">
-              {permissions(['root']) &&
-                <div className={style.tableOperations}>
-                  <Button
-                    onClick={groupQuestionCreator.toggleModal}
-                  >
-                    Создать групповой вопрос
-                  </Button>
-                </div>
-              }
-              <Table
-                bordered
-                rowKey="id"
-                columns={columns}
-                dataSource={questionsData}
-                title={() => 'Список групповых вопросов'}
-                expandedRowRender={this.expandedRowRender}
-                defaultExpandAllRows={tableType === 'unfolded'}
-                onChange={this.setPagination}
-                pagination={paginationParams}
-                footer={this.footer}
-              />
-            </Tabs.TabPane>
-            <Tabs.TabPane tab={<span><Icon type="user" />Индивидуальные</span>} key="individual">
-              <Table
-                bordered
-                rowKey="id"
-                columns={columns}
-                dataSource={questionsData}
-                title={() => 'Список индивидуальных вопросов'}
-                expandedRowRender={this.expandedRowRender}
-                onChange={this.setPagination}
-                pagination={paginationParams}
-                footer={this.footer}
-              />
-            </Tabs.TabPane>
-          </Tabs>
-        </Spin>
+        <Tabs
+          defaultActiveKey="group"
+          tabBarExtraContent={renderExtraActions}
+          onChange={switchTab}
+        >
+          <Tabs.TabPane tab={<span><Icon type="team" />Групповые</span>} key="group">
+            {permissions(['root']) &&
+              <div className={style.tableOperations}>
+                <Button
+                  onClick={groupQuestionCreator.toggleModal}
+                >
+                  Создать групповой вопрос
+                </Button>
+              </div>
+            }
+            <Table
+              {...standartProps}
+              title={() => 'Список групповых вопросов'}
+            />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab={<span><Icon type="user" />Индивидуальные</span>} key="individual">
+            <Table
+              {...standartProps}
+              title={() => 'Список индивидуальных вопросов'}
+            />
+          </Tabs.TabPane>
+        </Tabs>
       </div>
     );
   }

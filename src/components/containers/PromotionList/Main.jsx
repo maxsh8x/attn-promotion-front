@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import moment from 'moment';
 import { inject, observer } from 'mobx-react';
-import { Tabs, Table, DatePicker, Spin, Popover, Switch, Input } from 'antd';
+import { Tabs, Table, DatePicker, Popover, Switch, Input } from 'antd';
 import style from '../../../style.css';
 import PageLayout from './PageLayout';
 import SearchFilter from '../SearchFilter';
@@ -37,8 +37,6 @@ class PromotionList extends Component {
       </div>
     );
 
-    // const urlParts = pageURL.split('/');
-    // urlParts[urlParts.length - 2]
     return (
       <Popover content={content}>
         <a href={answerURL + pageURL}>
@@ -52,7 +50,6 @@ class PromotionList extends Component {
     const page = this.props.promotionStore.pages[rowIndex];
     return <Switch checked={page.active} onChange={checked => page.updateStatus(checked)} />;
   }
-
 
   render() {
     const {
@@ -72,6 +69,7 @@ class PromotionList extends Component {
       pageSize,
       pageFilter
     } = this.props.promotionStore;
+
     const metricsCostColumns = sources.map(network => ({
       key: network,
       dataIndex: `inputs.${network}`,
@@ -80,8 +78,16 @@ class PromotionList extends Component {
     }));
 
     const columns = [
-      { key: 'status', dataIndex: 'active', render: this.renderStatus },
-      { key: 'url', dataIndex: 'url', render: this.renderPageURL },
+      {
+        key: 'status',
+        dataIndex: 'active',
+        render: this.renderStatus,
+      },
+      {
+        key: 'url',
+        dataIndex: 'url',
+        render: this.renderPageURL,
+      },
       {
         title: 'Стоимость за клик',
         children: metricsCostColumns,
@@ -111,8 +117,17 @@ class PromotionList extends Component {
       },
     ];
 
-    const title = () => 'Список продвигаемых страниц';
-    const paginationParams = { current, pageSize };
+    const standartProps = {
+      loading: state === 'pending',
+      bordered: true,
+      rowKey: 'id',
+      dataSource: pagesData,
+      columns,
+      title: () => 'Список продвигаемых страниц',
+      expandedRowRender: this.expandedRowRender,
+      onChange: this.setPagination,
+      pagination: { current, pageSize, total: activePages },
+    };
 
     return (
       <div>
@@ -135,34 +150,14 @@ class PromotionList extends Component {
           />
         </div>
 
-        <Spin spinning={state === 'pending'}>
-          <Tabs defaultActiveKey="active" onChange={switchTab}>
-            <Tabs.TabPane tab={`Активные (${activePages})`} key="active">
-              <Table
-                bordered
-                rowKey="id"
-                dataSource={pagesData}
-                columns={columns}
-                title={title}
-                expandedRowRender={this.expandedRowRender}
-                onChange={this.setPagination}
-                pagination={{ ...paginationParams, total: activePages }}
-              />
-            </Tabs.TabPane>
-            <Tabs.TabPane tab={`Неактивные (${inactivePages})`} key="inactive">
-              <Table
-                bordered
-                rowKey="id"
-                dataSource={pagesData}
-                columns={columns}
-                title={title}
-                expandedRowRender={this.expandedRowRender}
-                onChange={this.setPagination}
-                pagination={{ ...paginationParams, total: inactivePages }}
-              />
-            </Tabs.TabPane>
-          </Tabs>
-        </Spin>
+        <Tabs defaultActiveKey="active" onChange={switchTab}>
+          <Tabs.TabPane tab={`Активные (${activePages})`} key="active">
+            <Table {...standartProps} />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab={`Неактивные (${inactivePages})`} key="inactive">
+            <Table {...standartProps} />
+          </Tabs.TabPane>
+        </Tabs>
       </div>
     );
   }

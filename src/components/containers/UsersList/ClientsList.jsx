@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Table, Button, Spin } from 'antd';
+import { Table, Button } from 'antd';
 import SearchFilter from '../SearchFilter';
 import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
@@ -67,17 +67,16 @@ class ClientsList extends Component {
             <Button onClick={clientsBinder.bind}>Привязать</Button>
           </div>
         }
-        <Spin spinning={state === 'pending'}>
-          <Table
-            bordered
-            rowKey="id"
-            size="small"
-            columns={columns}
-            dataSource={clientsData}
-            onChange={this.setPagination}
-            pagination={paginationParams}
-          />
-        </Spin>
+        <Table
+          loading={state === 'pending'}
+          bordered
+          rowKey="id"
+          size="small"
+          columns={columns}
+          dataSource={clientsData}
+          onChange={this.setPagination}
+          pagination={paginationParams}
+        />
       </div>
     );
   }
