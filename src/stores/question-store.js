@@ -399,7 +399,7 @@ const QuestionStore = types
 const questionStore = QuestionStore.create({
   tabSettings: {
     group: {
-      columns: ['title', 'createdAt'],
+      columns: ['title', 'createdAt', 'views'],
       nested: {},
     },
     individual: {

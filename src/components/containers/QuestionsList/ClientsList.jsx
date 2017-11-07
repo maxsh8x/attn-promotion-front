@@ -37,6 +37,7 @@ class QuestionList extends Component {
     const views = client.question.views;
     return costPerClick * views;
   }
+
   renderCampaignCost = (k, { views, costPerClick }) =>
     costPerClick * views;
 
@@ -74,19 +75,13 @@ class QuestionList extends Component {
       { dataIndex: 'vatin', title: 'Инн' },
       { dataIndex: 'brand', title: 'Бренд' },
       {
-        title: 'Цена',
-        children: [
-          { key: 'costPerClick', dataIndex: 'costPerClick', title: 'Клик' },
-          { key: 'tablePeriod', title: 'За выбранный период', render: this.renderPeriodCost },
-          { key: 'campaignPeriod', title: 'За время кампании', render: this.renderCampaignCost },
-        ],
-      },
-      {
         title: 'Кампания',
         children: [
           { key: 'startDate', title: 'Начало', dataIndex: 'startDate', render: this.renderDate },
           { key: 'endDate', title: 'Конец', dataIndex: 'endDate', render: this.renderDate },
           { key: 'views', title: 'Просмотров', dataIndex: 'views' },
+          { key: 'costPerClick', dataIndex: 'costPerClick', title: 'Цена за клик' },
+          { key: 'campaignPeriod', title: 'Стоимость', render: this.renderCampaignCost },
         ],
       },
       {
@@ -97,6 +92,10 @@ class QuestionList extends Component {
         ],
       },
     ];
+
+    if (permissions(['root', 'buchhalter'])) {
+      columns.push({ key: 'periodCost', title: 'Стоимость за период', render: this.renderPeriodCost });
+    }
 
     const paginationParams = { current, pageSize, total };
     const now = new Date().getTime();

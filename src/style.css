@@ -8,13 +8,14 @@
   .infoBadges > * {
     margin-right: 8px;
   }
+
+  .tableOperations {
+    margin-bottom: 16px;
+  }
   
   .tableOperations > * {
     margin-right: 8px;
-    margin-bottom: 16px;
   }
-
-  
 
   .searchPage {
     width: 30%;
