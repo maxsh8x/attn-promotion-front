@@ -16,6 +16,7 @@ const InputCost = ({ page }) => {
           dataIndex: `${network}.clicks`,
           render: value => (
             <InputNumber
+              step={0.001}
               value={value}
               onBlur={e => commitInput(network, 'clicks', e.target.value)}
               onChange={nextValue => setInput(network, 'clicks', nextValue)}
@@ -27,6 +28,7 @@ const InputCost = ({ page }) => {
           dataIndex: `${network}.cost`,
           render: value => (
             <InputNumber
+              step={0.001}
               value={value}
               onBlur={e => commitInput(network, 'cost', e.target.value)}
               onChange={nextValue => setInput(network, 'cost', nextValue)}
