@@ -138,7 +138,7 @@ class PromotionList extends Component {
             allowClear={false}
           />
           <SearchFilter
-            title="Введите имя клиента для поиска"
+            title="Введите имя или бренд клиента для поиска"
             url="/v1/client/search"
             callback={clients => setClientsFilter(clients.map(client => client.key))}
           />
