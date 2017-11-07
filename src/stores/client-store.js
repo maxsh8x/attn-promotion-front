@@ -1,5 +1,5 @@
 import { reaction, toJS } from 'mobx';
-import { types, getRoot, getParent } from 'mobx-state-tree';
+import { types, getRoot, getParent, addDisposer } from 'mobx-state-tree';
 import { message } from 'antd';
 import moment from 'moment';
 import axios from '../utils/axios';

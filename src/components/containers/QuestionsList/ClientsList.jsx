@@ -77,8 +77,8 @@ class QuestionList extends Component {
         title: 'Цена',
         children: [
           { key: 'costPerClick', dataIndex: 'costPerClick', title: 'Клик' },
-          { key: 'tablePeriod', title: 'Выбранная дата', render: this.renderPeriodCost },
-          { key: 'campaignPeriod', title: 'Начало/конец кампании', render: this.renderCampaignCost },
+          { key: 'tablePeriod', title: 'За выбранный период', render: this.renderPeriodCost },
+          { key: 'campaignPeriod', title: 'За время кампании', render: this.renderCampaignCost },
         ],
       },
       {
