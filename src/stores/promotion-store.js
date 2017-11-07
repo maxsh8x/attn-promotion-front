@@ -178,7 +178,10 @@ const Page = types
   }))
   .actions(self => ({
     setInput(network, type, value) {
-      self.inputs.get(network)[type] = value;
+      const parsedValue = parseFloat(value, 10);
+      if (!(isNaN)) {
+        self.inputs.get(network)[type] = parsedValue;
+      }
     },
     commitInput(network, type, value) {
       self.inputs.get(network)[type] = parseFloat(value, 10);

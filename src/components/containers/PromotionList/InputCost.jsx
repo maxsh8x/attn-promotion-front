@@ -17,7 +17,7 @@ const InputCost = ({ page }) => {
           render: value => (
             <InputNumber
               step={0.001}
-              value={value}
+              defaultValue={value}
               onBlur={e => commitInput(network, 'clicks', e.target.value)}
               onChange={nextValue => setInput(network, 'clicks', nextValue)}
             />),
@@ -29,7 +29,7 @@ const InputCost = ({ page }) => {
           render: value => (
             <InputNumber
               step={0.001}
-              value={value}
+              defaultValue={value}
               onBlur={e => commitInput(network, 'cost', e.target.value)}
               onChange={nextValue => setInput(network, 'cost', nextValue)}
             />),
