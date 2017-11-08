@@ -5,7 +5,6 @@ import { Button, Modal, Table, Badge } from 'antd';
 import BindClient from './BindClient';
 import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
-import InfoBadges from '../InfoBadges';
 
 
 @observer
@@ -109,14 +108,6 @@ class QuestionList extends Component {
         >
           <BindClient clientsBinder={clientsBinder} />
         </Modal>
-
-        {controls &&
-          <div className={style.tableOperations}>
-            {permissions(['root']) &&
-              <Button onClick={clientsBinder.toggleModal}>Привязать клиентов</Button>
-            }
-          </div>
-        }
         <Table
           loading={state === 'pending'}
           bordered
@@ -127,7 +118,6 @@ class QuestionList extends Component {
           dataSource={clientsData}
           onChange={this.setPagination}
           pagination={settings.paginate && paginationParams}
-          footer={footer ? () => <InfoBadges /> : null}
           rowClassName={row => this.renderRowClassName(now, row)}
         />
       </div>

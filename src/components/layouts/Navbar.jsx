@@ -15,7 +15,7 @@ const Navbar = () => {
   const { username } = jwtDecode(token);
 
   return (
-    <Header>
+    <Header style={{ padding: 0 }}>
       <div className={style.navButtons} >
         {/* <span>{username}</span> */}
         {/* <Avatar src="/img/placeholder-avatar.png" /> */}

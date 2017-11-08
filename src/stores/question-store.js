@@ -246,12 +246,12 @@ const TableSettings = types
     ),
     tableType: types.optional(
       types.enumeration(['folded', 'unfolded']),
-      'folded',
+      'unfolded',
     ),
-    paginate: true,
+    paginate: false,
     pageSize: 10,
     controls: true,
-    folded: true,
+    folded: false,
     header: true,
     footer: true,
     current: 1,
@@ -274,27 +274,17 @@ const TableSettings = types
       );
       addDisposer(self, disposer);
     },
-    setFoldedMode() {
-      self.folded = true;
-      self.nested.header = true;
-      self.nested.footer = true;
-      self.nested.controls = true;
-    },
     setFolding(mode) {
       self.tableType = mode;
       switch (mode) {
         case 'unfolded': {
           self.folded = false;
-          self.nested.header = false;
-          self.nested.footer = false;
           self.nested.controls = false;
           self.nested.paginate = false;
           break;
         }
         case 'folded': {
           self.folded = true;
-          self.nested.header = true;
-          self.nested.footer = true;
           self.nested.controls = true;
           self.nested.paginate = true;
           break;
@@ -399,7 +389,7 @@ const QuestionStore = types
 const questionStore = QuestionStore.create({
   tabSettings: {
     group: {
-      columns: ['title', 'createdAt', 'views'],
+      columns: ['title', 'createdAt', 'views', 'actions'],
       nested: {},
     },
     individual: {

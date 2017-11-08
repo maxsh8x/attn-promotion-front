@@ -9,38 +9,45 @@ import permissions from '../../utils/permissions';
 const { SubMenu } = Menu;
 const { Content, Sider } = Layout;
 
+const logout = () => {
+  localStorage.removeItem('token');
+  window.location.href = '/';
+};
+
 const PrivateAreaLayout = ({ children, history }) => (
   <LocaleProvider locale={ruRU}>
     <Layout>
-      <Navbar />
       <Layout>
-        <Sider width={200} style={{ background: '#fff' }}>
+        <Sider
+          collapsible
+          breakpoint="lg"
+          collapsedWidth="0"
+        >
           <Menu
             mode="inline"
-            style={{ height: '100%', borderRight: 0 }}
+            theme="dark"
             defaultSelectedKeys={[history.location.pathname.split('/')[1]]}
-            defaultOpenKeys={['control', 'metrics']}
           >
             <Menu.Item key="main">
               <NavLink to="/"><Icon type="laptop" />Дашборд</NavLink>
             </Menu.Item>
-            <SubMenu key="control" title={<span><Icon type="api" />Управление</span>}>
+            <SubMenu key="control" title={<span><Icon type="api" /><span>Управление</span></span>}>
               <Menu.Item key="clients">
-                <NavLink to="/clients"><Icon type="team" />Клиенты</NavLink>
+                <NavLink to="/clients">Клиенты</NavLink>
               </Menu.Item>
               <Menu.Item key="questions">
-                <NavLink to="/questions"><Icon type="question-circle-o" />Вопросы</NavLink>
+                <NavLink to="/questions">Вопросы</NavLink>
               </Menu.Item>
               {permissions(['root', 'buchhalter']) &&
                 <Menu.Item key="users">
                   <NavLink to="/users">
-                    <Icon type="team" />Пользователи
+                    Пользователи
                   </NavLink>
                 </Menu.Item>
               }
             </SubMenu>
             {permissions(['root']) &&
-              <SubMenu key="metrics" title={<span><Icon type="area-chart" />Метрики</span>}>
+              <SubMenu key="metrics" title={<span><Icon type="area-chart" /><span>Метрики</span></span>}>
                 <Menu.Item key="promotion">
                   <NavLink to="/promotion">Продвижение страниц</NavLink>
                 </Menu.Item>
@@ -48,8 +55,9 @@ const PrivateAreaLayout = ({ children, history }) => (
             }
           </Menu>
         </Sider>
-        <Layout style={{ padding: '0 24px 24px' }}>
-          <Breadcrumb style={{ margin: '12px 0' }} />
+        <Layout style={{ padding: '24px 24px 24px' }}>
+          {/* <Navbar /> */}
+          {/* <Breadcrumb style={{ margin: '12px 0' }} /> */}
           <Content style={{ background: '#fff', padding: 24, margin: 0, minHeight: 280 }}>
             {children}
           </Content>
