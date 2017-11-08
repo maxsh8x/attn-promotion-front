@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import moment from 'moment';
-import { Table, Spin, Switch, Modal, Button, Badge } from 'antd';
+import { Table, Switch, Modal, Badge } from 'antd';
 import style from '../../../style.css';
 import AddPage from './AddPage';
-import InfoBadges from '../InfoBadges';
 import permissions from '../../../utils/permissions';
 import shallowCompare from '../../../utils/helper';
 import { answerURL } from '../../../constants';
@@ -31,21 +30,13 @@ class PagesList extends Component {
         render: this.renderPageURL,
       },
       {
-        dataIndex: 'views',
-        title: 'Просмотров',
-      },
-      {
-        title: 'Цена',
+        title: 'Кампания',
         children: [
-          { key: 'costPerClick', dataIndex: 'costPerClick', title: 'Клик' },
-          { key: 'period', title: 'Период', render: this.renderPeriodCost },
-        ],
-      },
-      {
-        title: 'Дата',
-        children: [
-          { key: 'startDate', title: 'От', dataIndex: 'startDate', render: this.renderDate },
-          { key: 'endDate', title: 'До', dataIndex: 'endDate', render: this.renderDate },
+          { key: 'startDate', title: 'Начало', dataIndex: 'startDate', render: this.renderDate },
+          { key: 'endDate', title: 'Конец', dataIndex: 'endDate', render: this.renderDate },
+          { key: 'views', title: 'Просмотров', dataIndex: 'views' },
+          { key: 'costPerClick', dataIndex: 'costPerClick', title: 'Цена за клик' },
+          { key: 'campaignPeriod', title: 'Стоимость', render: this.renderCampaignCost },
         ],
       },
       {
@@ -56,6 +47,10 @@ class PagesList extends Component {
         ],
       },
     ];
+
+    if (permissions(['root', 'buchhalter'])) {
+      this.basicColumns.push({ key: 'periodCost', title: 'Стоимость за период', render: this.renderPeriodCost });
+    }
   }
 
   componentWillMount() {
@@ -153,27 +148,19 @@ class PagesList extends Component {
         >
           <AddPage creator={pageCreator} />
         </Modal>
-        {permissions(['root']) &&
-          <div className={style.tableOperations}>
-            <Button onClick={pageCreator.toggleModal}>
-              Создать индивидуальную страницу
-            </Button>
-          </div>}
-        <Spin spinning={spinning}>
-          <Table
-            bordered
-            rowKey="id"
-            columns={columns}
-            dataSource={pagesData}
-            size="small"
-            title={() => 'Список страниц клиента'}
-            footer={() => <InfoBadges />}
-            expandedRowRender={this.expandedRowRender}
-            onChange={this.setPagination}
-            pagination={paginationParams}
-            rowClassName={row => this.renderRowClassName(now, row)}
-          />
-        </Spin>
+        <Table
+          loading={spinning}
+          bordered
+          rowKey="id"
+          columns={columns}
+          dataSource={pagesData}
+          size="small"
+          title={() => 'Список страниц клиента'}
+          expandedRowRender={this.expandedRowRender}
+          onChange={this.setPagination}
+          pagination={paginationParams}
+          rowClassName={row => this.renderRowClassName(now, row)}
+        />
       </div>
     );
   }

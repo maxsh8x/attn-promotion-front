@@ -4,6 +4,7 @@ import { message } from 'antd';
 import moment from 'moment';
 import axios from '../utils/axios';
 import { fetchStates } from '../constants';
+import TableSettings from './table-settings';
 
 const GroupQuestionCreator = types
   .model('GroupQuestionCreator', {
@@ -238,67 +239,6 @@ const Question = types
     },
   }));
 
-const TableSettings = types
-  .model('TableSettings', {
-    columns: types.optional(
-      types.array(types.string),
-      [],
-    ),
-    tableType: types.optional(
-      types.enumeration(['folded', 'unfolded']),
-      'unfolded',
-    ),
-    paginate: false,
-    pageSize: 10,
-    controls: true,
-    folded: false,
-    header: true,
-    footer: true,
-    current: 1,
-    total: 0,
-    nested: types.maybe(types.late(() => TableSettings)),
-  })
-  .views(self => ({
-    get store() {
-      return getParent(self, 2);
-    },
-  }))
-  .actions(self => ({
-    afterCreate() {
-      const disposer = reaction(
-        () => [
-          self.current,
-          self.pageSize,
-        ],
-        () => self.store.fetchQuestions(),
-      );
-      addDisposer(self, disposer);
-    },
-    setFolding(mode) {
-      self.tableType = mode;
-      switch (mode) {
-        case 'unfolded': {
-          self.folded = false;
-          self.nested.controls = false;
-          self.nested.paginate = false;
-          break;
-        }
-        case 'folded': {
-          self.folded = true;
-          self.nested.controls = true;
-          self.nested.paginate = true;
-          break;
-        }
-        default:
-          message.error('Неподдерживаемый режим отображения');
-      }
-    },
-    setPagination({ current, pageSize }) {
-      self.current = current;
-      self.pageSize = pageSize;
-    },
-  }));
-
 const QuestionStore = types
   .model('QuestionStore', {
     tabSettings: types.map(TableSettings),
@@ -336,18 +276,18 @@ const QuestionStore = types
           self.startDate,
           self.endDate,
         ],
-        () => self.fetchQuestions(true),
+        () => self.fetchData(true),
       );
     },
     switchTab(tabKey) {
       self.activeTab = tabKey;
-      self.fetchQuestions();
+      self.fetchData();
     },
     setDate(startDate, endDate) {
       self.startDate = startDate;
       self.endDate = endDate;
     },
-    fetchQuestions(onlyViews = false) {
+    fetchData(onlyViews = false) {
       if (!(onlyViews)) {
         self.questions.clear();
       }
@@ -362,11 +302,11 @@ const QuestionStore = types
           endDate: self.endDate,
         },
       }).then(
-        ({ data }) => self.fetchQuestionsSuccess(data, onlyViews),
-        self.fetchQuestionsError,
+        ({ data }) => self.fetchDataSuccess(data, onlyViews),
+        self.fetchDataError,
       );
     },
-    fetchQuestionsSuccess({ pageData, views, total }, onlyViews) {
+    fetchDataSuccess({ pageData, views, total }, onlyViews) {
       if (onlyViews) {
         self.questions.forEach((question) => {
           question.views = views[question.id] || 0;
@@ -380,21 +320,23 @@ const QuestionStore = types
       self.settings.total = total;
       self.state = 'done';
     },
-    fetchQuestionsError(error) {
+    fetchDataError(error) {
       message.error('Ошибка при получении вопросов');
       self.state = 'error';
     },
   }));
 
+const columns = ['title', 'createdAt', 'views'];
+
 const questionStore = QuestionStore.create({
   tabSettings: {
     group: {
-      columns: ['title', 'createdAt', 'views', 'actions'],
+      columns: [...columns, 'actions'],
       nested: {},
     },
     individual: {
-      columns: ['title', 'createdAt', 'views'],
       nested: {},
+      columns,
     },
   },
 });

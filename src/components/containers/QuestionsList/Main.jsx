@@ -20,7 +20,6 @@ const Header = ({ title, onCreateClick }) => (
         (
         <a
           role="button"
-          /* onClick={groupQuestionCreator.toggleModal} */
           onClick={onCreateClick}
           tabIndex={0}
         >
@@ -38,7 +37,7 @@ const Header = ({ title, onCreateClick }) => (
 @inject('questionStore') @observer
 class QuestionsList extends Component {
   componentWillMount() {
-    this.props.questionStore.fetchQuestions();
+    this.props.questionStore.fetchData();
   }
 
   setPagination = ({ current, pageSize }) =>

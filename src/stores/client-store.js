@@ -4,6 +4,7 @@ import { message } from 'antd';
 import moment from 'moment';
 import axios from '../utils/axios';
 import { fetchStates } from '../constants';
+import TableSettings from './table-settings';
 
 const PageMetaCreator = types
   .model('PageMetaCreator', {
@@ -81,7 +82,7 @@ const PageMetaCreator = types
     createSuccess() {
       self.toggleModal();
       self.client.fetchPages();
-      self.store.fetchClients(true);
+      self.store.fetchData(true);
       self.state = 'done';
     },
     createError() {
@@ -259,6 +260,7 @@ const ClientCreator = types
 
 const ClientStore = types
   .model('ClientStore', {
+    tabSettings: types.map(TableSettings),
     clients: types.optional(types.array(Client), []),
     clientCreator: types.optional(ClientCreator, {}),
     state: types.optional(
@@ -287,24 +289,26 @@ const ClientStore = types
   }))
   .actions(self => ({
     afterCreate() {
-      reaction(
+      const disposer1 = reaction(
         () => [
           self.current,
           self.pageSize,
         ],
         () => {
-          self.fetchClients();
+          self.fetchData();
         },
       );
-      reaction(
+      const disposer2 = reaction(
         () => [
           self.startDate,
           self.endDate,
         ],
         () => [
-          self.fetchClients(true),
+          self.fetchData(true),
         ],
       );
+      addDisposer(self, disposer1);
+      addDisposer(self, disposer2);
     },
     setPagination(current, pageSize) {
       self.current = current;
@@ -314,7 +318,7 @@ const ClientStore = types
       self.startDate = startDate;
       self.endDate = endDate;
     },
-    fetchClients(onlyMeta = false) {
+    fetchData(onlyMeta = false) {
       self.state = 'pending';
       axios().get('v1/client', {
         params: {
@@ -325,11 +329,11 @@ const ClientStore = types
           endDate: self.endDate,
         },
       }).then(
-        ({ data }) => self.fetchClientsSuccess(data, onlyMeta),
-        self.fetchClientsError,
+        ({ data }) => self.fetchDataSuccess(data, onlyMeta),
+        self.fetchDataError,
       );
     },
-    fetchClientsSuccess({ clientsData, views, costPerClick, total }, onlyMeta) {
+    fetchDataSuccess({ clientsData, views, costPerClick, total }, onlyMeta) {
       self.total = total;
       if (onlyMeta) {
         self.clients.forEach((client) => {
@@ -344,12 +348,25 @@ const ClientStore = types
       }
       self.state = 'done';
     },
-    fetchClientsError(error) {
+    fetchDataError(error) {
       message.error('Ошибка при получении клиентов');
       self.state = 'error';
     },
   }));
 
-const clientStore = ClientStore.create({});
+const columns = ['counterID', 'name', 'brand', 'vatin', 'views', 'costPerClick', 'actions'];
+
+const clientStore = ClientStore.create({
+  tabSettings: {
+    group: {
+      nested: {},
+      columns,
+    },
+    individual: {
+      nested: {},
+      columns,
+    },
+  },
+});
 
 export default clientStore;

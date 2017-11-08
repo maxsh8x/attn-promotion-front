@@ -1,17 +1,40 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Table, Button, Modal, DatePicker, Spin } from 'antd';
+import { Table, Modal, Radio, Tabs, Icon } from 'antd';
 import PagesList from './PagesList';
 import ClientCreator from './ClientCreator';
 import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
 import ViewsPeriod from '../ViewsPeriod';
+import InfoBadges from '../InfoBadges';
 
+
+const Header = ({ title, onCreateClick }) => (
+  <div className={style.headerOperations}>
+    <span>{title}</span>
+    {permissions(['root']) &&
+      <span>
+        (
+        <a
+          role="button"
+          onClick={onCreateClick}
+          tabIndex={0}
+        >
+          Создать
+        </a>
+        )
+      </span>
+    }
+    <div style={{ float: 'right' }}>
+      <InfoBadges />
+    </div>
+  </div>
+);
 
 @inject('clientsStore') @observer
 class ClientsList extends Component {
   componentWillMount() {
-    this.props.clientsStore.fetchClients();
+    this.props.clientsStore.fetchData();
   }
 
   setPagination = ({ current, pageSize }) =>
@@ -23,18 +46,19 @@ class ClientsList extends Component {
     return <PagesList dates={[startDate, endDate]} client={client} type={type} />;
   }
 
-  footer = () => {
-    const {
-      startDate,
-      endDate,
-      setDate,
-    } = this.props.clientsStore;
+  renderActions = (value, rowData, rowIndex) => {
+    const { clients } = this.props.clientsStore;
+    const client = clients[rowIndex];
     return (
-      <ViewsPeriod
-        startDate={startDate}
-        endDate={endDate}
-        setDate={setDate}
-      />
+      <span>
+        <a
+          role="button"
+          tabIndex={0}
+          onClick={client.pageCreator.toggleModal}
+        >
+          Привязать клиентов
+        </a>
+      </span>
     );
   }
 
@@ -47,17 +71,82 @@ class ClientsList extends Component {
       total,
       current,
       pageSize,
+      startDate,
+      endDate,
+      setDate,
     } = this.props.clientsStore;
+
+    const renderExtraActions = (
+      <div className={style.headerOperations}>
+        <ViewsPeriod
+          startDate={startDate}
+          endDate={endDate}
+          setDate={setDate}
+        />
+        {/* value={settings.tableType}
+          onChange={(e) => {
+            settings.setFolding(e.target.value);
+          }} */}
+        <Radio.Group
+        >
+          <Radio.Button value="unfolded">Развернутый</Radio.Button>
+          <Radio.Button value="folded">Свернутый</Radio.Button>
+        </Radio.Group>
+      </div>
+    );
+
     const columns = [
-      { dataIndex: 'counterID', title: 'ID счетчика', width: 100 },
-      { dataIndex: 'name', title: 'Имя клиента' },
-      { dataIndex: 'brand', title: 'Бренд' },
-      { dataIndex: 'vatin', title: 'ИНН' },
-      { dataIndex: 'views', title: 'Просмотров' },
-      { dataIndex: 'costPerClick', title: 'Цена за период', render: (costPerClick, { views }) => views * costPerClick },
+      {
+        key: 'counterID',
+        dataIndex: 'counterID',
+        title: 'ID счетчика',
+        width: 100,
+      },
+      {
+        key: 'name',
+        dataIndex: 'name',
+        title: 'Имя клиента',
+      },
+      {
+        key: 'brand',
+        dataIndex: 'brand',
+        title: 'Бренд',
+      },
+      {
+        key: 'vatin',
+        dataIndex: 'vatin',
+        title: 'ИНН',
+      },
+      {
+        key: 'views',
+        dataIndex: 'views',
+        title: 'Просмотров за период',
+      },
+      {
+        key: 'costPerClick',
+        dataIndex: 'costPerClick',
+        title: 'Стоимость за период',
+        render: (costPerClick, { views }) => views * costPerClick,
+      },
+      {
+        key: 'actions',
+        title: 'Действия',
+        render: this.renderActions,
+      },
     ];
 
-    const paginationParams = { current, pageSize, total };
+    const standartProps = {
+      loading: state === 'pending',
+      bordered: true,
+      rowKey: 'id',
+      dataSource: clientsData,
+      title: () => 'Список клиентов',
+      footer: this.footer,
+      onChange: this.setPagination,
+      expandedRowRender: this.expandedRowRender,
+      pagination: { current, pageSize, total },
+      columns,
+    };
 
     return (
       <div>
@@ -69,22 +158,45 @@ class ClientsList extends Component {
         >
           <ClientCreator clientCreator={clientCreator} />
         </Modal>
-        <div className={style.tableOperations}>
-          {permissions(['root']) && <Button onClick={clientCreator.toggleModal}>Создать клиента</Button>}
-        </div>
-        <Spin spinning={state === 'pending'}>
-          <Table
-            bordered
-            rowKey="id"
-            columns={columns}
-            dataSource={clientsData}
-            title={() => 'Список клиентов'}
-            footer={this.footer}
-            onChange={this.setPagination}
-            expandedRowRender={this.expandedRowRender}
-            pagination={paginationParams}
-          />
-        </Spin>
+        <Tabs
+          defaultActiveKey="all"
+          tabBarExtraContent={renderExtraActions}
+        /* onChange={switchTab} */
+        >
+          <Tabs.TabPane tab={<span><Icon type="star-o" />Все</span>} key="all">
+            <Table
+              {...standartProps}
+              title={() => (
+                <Header
+                  title="Список клиентов"
+                  onCreateClick={clientCreator.toggleModal}
+                />
+              )}
+            />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab={<span><Icon type="team" />Групповые</span>} key="group">
+            <Table
+              {...standartProps}
+              title={() => (
+                <Header
+                  title="Список клиентов с групповыми вопросами"
+                  onCreateClick={clientCreator.toggleModal}
+                />
+              )}
+            />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab={<span><Icon type="user" />Индивидуальные</span>} key="individual">
+            <Table
+              {...standartProps}
+              title={() => (
+                <Header
+                  title="Список клиентов с индивидуальными вопросами"
+                  onCreateClick={clientCreator.toggleModal}
+                />
+              )}
+            />
+          </Tabs.TabPane>
+        </Tabs>
       </div>
     );
   }
