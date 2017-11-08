@@ -1,9 +1,8 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Layout, LocaleProvider, Menu, Icon, Breadcrumb } from 'antd';
+import { Layout, LocaleProvider, Menu, Icon, BackTop } from 'antd';
 import ruRU from 'antd/lib/locale-provider/ru_RU';
-import Navbar from './Navbar';
 import permissions from '../../utils/permissions';
 
 const { SubMenu } = Menu;
@@ -56,8 +55,7 @@ const PrivateAreaLayout = ({ children, history }) => (
           </Menu>
         </Sider>
         <Layout style={{ padding: '24px 24px 24px' }}>
-          {/* <Navbar /> */}
-          {/* <Breadcrumb style={{ margin: '12px 0' }} /> */}
+          <BackTop />
           <Content style={{ background: '#fff', padding: 24, margin: 0, minHeight: 280 }}>
             {children}
           </Content>

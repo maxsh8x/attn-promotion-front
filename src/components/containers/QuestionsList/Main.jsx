@@ -10,8 +10,6 @@ import { answerURL } from '../../../constants';
 import TextWithDots from '../TextWithDots';
 import ViewsPeriod from '../ViewsPeriod';
 import InfoBadges from '../InfoBadges';
-// import TableSettings from './TableSettings';
-
 
 
 const Header = ({ title, onCreateClick }) => (
@@ -52,21 +50,6 @@ class QuestionsList extends Component {
     return (
       <ClientsList
         groupQuestion={groupQuestion}
-      />
-    );
-  }
-
-  footer = () => {
-    const {
-      startDate,
-      endDate,
-      setDate,
-    } = this.props.questionStore;
-    return (
-      <ViewsPeriod
-        startDate={startDate}
-        endDate={endDate}
-        setDate={setDate}
       />
     );
   }
@@ -126,6 +109,9 @@ class QuestionsList extends Component {
       setTableType,
       state,
       settings,
+      startDate,
+      endDate,
+      setDate,
     } = this.props.questionStore;
 
     const columns = availableColumns.filter(
@@ -133,7 +119,12 @@ class QuestionsList extends Component {
     );
 
     const renderExtraActions = (
-      <div>
+      <div className={style.headerOperations}>
+        <ViewsPeriod
+          startDate={startDate}
+          endDate={endDate}
+          setDate={setDate}
+        />
         <Radio.Group
           value={settings.tableType}
           onChange={(e) => {
@@ -156,7 +147,6 @@ class QuestionsList extends Component {
       },
       loading: state === 'pending',
       dataSource: questionsData,
-      footer: this.footer,
       bordered: true,
       rowKey: 'id',
       columns,
@@ -195,12 +185,7 @@ class QuestionsList extends Component {
           <Tabs.TabPane tab={<span><Icon type="user" />Индивидуальные</span>} key="individual">
             <Table
               {...standartProps}
-              title={() => (
-                <Header
-                  title="Список индивидуальных вопросов"
-                  onCreateClick={groupQuestionCreator.toggleModal}
-                />
-              )}
+              title={() => 'Список индивидуальных вопросов'}
             />
           </Tabs.TabPane>
         </Tabs>
