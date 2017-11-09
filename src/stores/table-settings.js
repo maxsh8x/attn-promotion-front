@@ -1,5 +1,4 @@
-import { reaction } from 'mobx';
-import { types, getParent, addDisposer } from 'mobx-state-tree';
+import { types, getParent } from 'mobx-state-tree';
 import { message } from 'antd';
 
 const TableSettings = types
@@ -18,8 +17,6 @@ const TableSettings = types
     folded: false,
     header: true,
     footer: true,
-    current: 1,
-    total: 0,
     nested: types.maybe(types.late(() => TableSettings)),
   })
   .views(self => ({
@@ -28,16 +25,6 @@ const TableSettings = types
     },
   }))
   .actions(self => ({
-    afterCreate() {
-      const disposer = reaction(
-        () => [
-          self.current,
-          self.pageSize,
-        ],
-        () => self.parent.fetchData(),
-      );
-      addDisposer(self, disposer);
-    },
     setFolding(mode) {
       self.tableType = mode;
       switch (mode) {
@@ -56,10 +43,6 @@ const TableSettings = types
         default:
           message.error('Неподдерживаемый режим отображения');
       }
-    },
-    setPagination({ current, pageSize }) {
-      self.current = current;
-      self.pageSize = pageSize;
     },
   }));
 

@@ -106,7 +106,8 @@ const Page = types
     endDate: types.string,
     parent: types.maybe(types.number),
     active: types.boolean,
-    views: 0, // null
+    views: types.number,
+    viewsPeriod: types.number,
     pageCreator: types.optional(PageMetaCreator, { type: 'related' }),
   })
   .views(self => ({
@@ -134,7 +135,6 @@ const Client = types
     fetchPagesState: types.optional(types.enumeration(fetchStates), 'pending'),
     pageCreator: types.optional(PageMetaCreator, { type: 'individual' }),
     current: 1,
-    pageSize: 10,
     total: 0,
   })
   .views(self => ({
@@ -147,21 +147,25 @@ const Client = types
     findPageById(id) {
       return self.pages.find(page => page.id === id);
     },
+    get settings() {
+      return getRoot(self).settings.nested;
+    },
   }))
   .actions(self => ({
     setPagination(current, pageSize) {
       self.current = current;
-      self.pageSize = pageSize;
+      self.settings.pageSize = pageSize;
     },
     fetchPages() {
       self.fetchPagesState = 'pending';
       axios().get('v1/page/client', {
         params: {
           clientID: self.id,
-          offset: (self.current - 1) * self.pageSize,
-          limit: self.pageSize,
+          offset: (self.current - 1) * self.settings.pageSize,
+          limit: self.settings.pageSize,
           startDate: self.clientStore.startDate,
           endDate: self.clientStore.endDate,
+          type: self.clientStore.activeTab,
         },
       }).then(
         self.fetchPagesSuccess,
@@ -172,7 +176,6 @@ const Client = types
       self.pages.replace(data.pagesData.map(page => ({
         ...page,
         id: page._id,
-        ...page.meta[0],
       })));
       self.total = data.total;
       self.fetchPagesState = 'done';
@@ -260,6 +263,10 @@ const ClientCreator = types
 
 const ClientStore = types
   .model('ClientStore', {
+    activeTab: types.optional(
+      types.enumeration(['all', 'group', 'individual']),
+      'all',
+    ),
     tabSettings: types.map(TableSettings),
     clients: types.optional(types.array(Client), []),
     clientCreator: types.optional(ClientCreator, {}),
@@ -276,7 +283,6 @@ const ClientStore = types
       moment().format('YYYY-MM-DD'),
     ),
     current: 1,
-    pageSize: 10,
     total: 0,
   })
   .views(self => ({
@@ -285,6 +291,9 @@ const ClientStore = types
     },
     findClientById(id) {
       return self.clients.find(client => client.id === id);
+    },
+    get settings() {
+      return self.tabSettings.get(self.activeTab);
     },
   }))
   .actions(self => ({
@@ -310,9 +319,13 @@ const ClientStore = types
       addDisposer(self, disposer1);
       addDisposer(self, disposer2);
     },
+    switchTab(tabKey) {
+      self.activeTab = tabKey;
+      self.fetchData();
+    },
     setPagination(current, pageSize) {
       self.current = current;
-      self.pageSize = pageSize;
+      self.settings.pageSize = pageSize;
     },
     setDate(startDate, endDate) {
       self.startDate = startDate;
@@ -320,11 +333,14 @@ const ClientStore = types
     },
     fetchData(onlyMeta = false) {
       self.state = 'pending';
+      if (!(onlyMeta)) {
+        self.clients.clear();
+      }
       axios().get('v1/client', {
         params: {
           filter: '',
-          offset: (self.current - 1) * self.pageSize,
-          limit: self.pageSize,
+          offset: (self.current - 1) * self.settings.pageSize,
+          limit: self.settings.pageSize,
           startDate: self.startDate,
           endDate: self.endDate,
         },
@@ -358,6 +374,10 @@ const columns = ['counterID', 'name', 'brand', 'vatin', 'views', 'costPerClick',
 
 const clientStore = ClientStore.create({
   tabSettings: {
+    all: {
+      nested: {},
+      columns,
+    },
     group: {
       nested: {},
       columns,

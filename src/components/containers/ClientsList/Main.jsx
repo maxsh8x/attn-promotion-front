@@ -70,10 +70,12 @@ class ClientsList extends Component {
       state,
       total,
       current,
-      pageSize,
+      settings,
       startDate,
       endDate,
       setDate,
+      activeTab,
+      switchTab,
     } = this.props.clientsStore;
 
     const renderExtraActions = (
@@ -83,11 +85,11 @@ class ClientsList extends Component {
           endDate={endDate}
           setDate={setDate}
         />
-        {/* value={settings.tableType}
+        <Radio.Group
+          value={settings.tableType}
           onChange={(e) => {
             settings.setFolding(e.target.value);
-          }} */}
-        <Radio.Group
+          }}
         >
           <Radio.Button value="unfolded">Развернутый</Radio.Button>
           <Radio.Button value="folded">Свернутый</Radio.Button>
@@ -144,7 +146,11 @@ class ClientsList extends Component {
       footer: this.footer,
       onChange: this.setPagination,
       expandedRowRender: this.expandedRowRender,
-      pagination: { current, pageSize, total },
+      pagination: {
+        pageSize: settings.pageSize,
+        current,
+        total,
+      },
       columns,
     };
 
@@ -159,9 +165,9 @@ class ClientsList extends Component {
           <ClientCreator clientCreator={clientCreator} />
         </Modal>
         <Tabs
-          defaultActiveKey="all"
+          value={activeTab}
           tabBarExtraContent={renderExtraActions}
-        /* onChange={switchTab} */
+          onChange={switchTab}
         >
           <Tabs.TabPane tab={<span><Icon type="star-o" />Все</span>} key="all">
             <Table

@@ -40,9 +40,6 @@ class QuestionsList extends Component {
     this.props.questionStore.fetchData();
   }
 
-  setPagination = ({ current, pageSize }) =>
-    this.props.questionStore.pagination.setPagination(current, pageSize);
-
   expandedRowRender = (row, rowIndex) => {
     const { questions, settings } = this.props.questionStore;
     const groupQuestion = questions[rowIndex];
@@ -111,6 +108,9 @@ class QuestionsList extends Component {
       startDate,
       endDate,
       setDate,
+      current,
+      total,
+      setPagination,
     } = this.props.questionStore;
 
     const columns = availableColumns.filter(
@@ -138,11 +138,11 @@ class QuestionsList extends Component {
 
     const standartProps = {
       expandedRowRender: this.expandedRowRender,
-      onChange: settings.setPagination,
+      onChange: setPagination,
       pagination: {
-        current: settings.current,
         pageSize: settings.pageSize,
-        total: settings.total,
+        current,
+        total,
       },
       loading: state === 'pending',
       dataSource: questionsData,

@@ -197,7 +197,7 @@ const Question = types
       const disposer = reaction(
         () => [
           self.current,
-          self.pageSize,
+          self.settings.pageSize,
           self.settings.paginate,
         ],
         () => self.fetchClients(),
@@ -206,7 +206,7 @@ const Question = types
     },
     setPagination(current, pageSize) {
       self.current = current;
-      self.pageSize = pageSize;
+      self.settings.pageSize = pageSize;
     },
     fetchClients() {
       self.state = 'pending';
@@ -260,6 +260,8 @@ const QuestionStore = types
       types.string,
       moment().format('YYYY-MM-DD'),
     ),
+    current: 1,
+    total: 0,
   })
   .views(self => ({
     get questionsData() {
@@ -271,13 +273,22 @@ const QuestionStore = types
   }))
   .actions(self => ({
     afterCreate() {
-      reaction(
+      const disposer1 = reaction(
         () => [
           self.startDate,
           self.endDate,
         ],
         () => self.fetchData(true),
       );
+      const disposer2 = reaction(
+        () => [
+          self.current,
+          self.settings.pageSize,
+        ],
+        () => self.fetchData(),
+      );
+      addDisposer(self, disposer1);
+      addDisposer(self, disposer2);
     },
     switchTab(tabKey) {
       self.activeTab = tabKey;
@@ -287,17 +298,21 @@ const QuestionStore = types
       self.startDate = startDate;
       self.endDate = endDate;
     },
+    setPagination({ current, pageSize }) {
+      self.current = current;
+      self.settings.pageSize = pageSize;
+    },
     fetchData(onlyViews = false) {
+      self.state = 'pending';
       if (!(onlyViews)) {
         self.questions.clear();
       }
-      self.state = 'pending';
       axios().get('v1/page/questions', {
         params: {
           filter: '',
           type: self.activeTab,
           limit: self.settings.pageSize,
-          offset: (self.settings.current - 1) * self.settings.pageSize,
+          offset: (self.current - 1) * self.settings.pageSize,
           startDate: self.startDate,
           endDate: self.endDate,
         },
@@ -317,7 +332,7 @@ const QuestionStore = types
           id: item._id,
         })));
       }
-      self.settings.total = total;
+      self.total = total;
       self.state = 'done';
     },
     fetchDataError(error) {

@@ -115,7 +115,8 @@ class PagesList extends Component {
     return style.rowDone;
   }
 
-  renderPeriodCost = (k, { views, costPerClick }) => costPerClick * views;
+  renderPeriodCost = (k, { viewsPeriod, costPerClick }) => viewsPeriod * costPerClick;
+  renderCampaignCost = (k, { views, costPerClick }) => views * costPerClick;
 
   render() {
     const {
