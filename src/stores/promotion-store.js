@@ -1,9 +1,10 @@
 import { toJS, reaction } from 'mobx';
-import { types, getRoot, getParent } from 'mobx-state-tree';
+import { types, getRoot, getParent, addDisposer } from 'mobx-state-tree';
 import { message } from 'antd';
 import moment from 'moment';
 import axios from '../utils/axios';
 import { fetchStates } from '../constants';
+import TableSettings from './table-settings';
 
 const Input = types
   .model('Input', {
@@ -275,12 +276,15 @@ const Page = types
 
 const PromotionStore = types
   .model('PromotionStore', {
+    tabSettings: types.map(TableSettings),
+    activeTab: types.optional(
+      types.enumeration(['active', 'inactive']),
+      'active',
+    ),
     date: types.optional(
       types.string,
       moment().subtract(1, 'days').format('YYYY-MM-DD'),
     ),
-    activePages: 0,
-    inactivePages: 0,
     sources: types.optional(
       types.array(types.string),
       [],
@@ -293,9 +297,6 @@ const PromotionStore = types
       types.enumeration(fetchStates),
       'done',
     ),
-    isActiveTab: true,
-    current: 1,
-    pageSize: 10,
     clientsFilter: '',
     pageFilter: '',
   })
@@ -303,28 +304,40 @@ const PromotionStore = types
     get pagesData() {
       return toJS(self.pages);
     },
+    get settings() {
+      return self.tabSettings.get(self.activeTab);
+    },
+    get activeTabSettings() {
+      return self.tabSettings.get('active');
+    },
+    get inactiveTabSettings() {
+      return self.tabSettings.get('inactive');
+    },
   }))
   .actions(self => ({
     afterCreate() {
-      reaction(
+      const disposer1 = reaction(
         () => [
-          self.current,
-          self.pageSize,
+          self.settings.current,
+          self.settings.pageSize,
           self.clientsFilter,
         ],
         () => self.fetchPages(),
       );
-      reaction(
+      const disposer2 = reaction(
         () => [
           self.date,
         ],
         () => self.fetchPages(true),
       );
-      reaction(
+      const disposer3 = reaction(
         () => self.pageFilter,
         () => self.fetchPages(),
         { delay: 1000 },
       );
+      addDisposer(self, disposer1);
+      addDisposer(self, disposer2);
+      addDisposer(self, disposer3);
     },
     setClientsFilter(clients) {
       self.clientsFilter = clients.join(',');
@@ -333,14 +346,14 @@ const PromotionStore = types
       self.pageFilter = value;
     },
     setPagination(current, pageSize) {
-      self.current = current;
-      self.pageSize = pageSize;
+      self.settings.current = current;
+      self.settings.pageSize = pageSize;
     },
     setDate(date, dateString) {
       self.date = dateString;
     },
     switchTab(tabKey) {
-      self.isActiveTab = tabKey === 'active';
+      self.activeTab = tabKey;
       self.fetchPages();
     },
     fetchPages(onlyInputs = false) {
@@ -348,9 +361,9 @@ const PromotionStore = types
       axios().get('v1/page', {
         params: {
           yDate: self.date,
-          active: self.isActiveTab,
-          offset: (self.current - 1) * self.pageSize,
-          limit: self.pageSize,
+          active: self.activeTab === 'active',
+          offset: (self.settings.current - 1) * self.settings.pageSize,
+          limit: self.settings.pageSize,
           clients: self.clientsFilter,
           filter: self.pageFilter,
         },
@@ -395,8 +408,8 @@ const PromotionStore = types
         })));
       }
       self.sources.replace(sources);
-      self.activePages = activePages;
-      self.inactivePages = inactivePages;
+      self.activeTabSettings.setTotal(activePages);
+      self.inactiveTabSettings.setTotal(inactivePages);
       self.state = 'done';
     },
     fetchPagesError() {
@@ -405,6 +418,11 @@ const PromotionStore = types
     },
   }));
 
-const promotionStore = PromotionStore.create({});
+const promotionStore = PromotionStore.create({
+  tabSettings: {
+    active: {},
+    inactive: {},
+  },
+});
 
 export default promotionStore;

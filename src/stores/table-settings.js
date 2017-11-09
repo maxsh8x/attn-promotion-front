@@ -16,6 +16,8 @@ const TableSettings = types
     header: true,
     footer: true,
     nested: types.maybe(types.late(() => TableSettings)),
+    current: 1,
+    total: 0,
   })
   .views(self => ({
     get parent() {
@@ -27,6 +29,9 @@ const TableSettings = types
       if (self.nested) {
         self.setFolding(self.tableType);
       }
+    },
+    setTotal(total) {
+      self.total = total;
     },
     setPageSize(pageSize) {
       self.pageSize = pageSize;
