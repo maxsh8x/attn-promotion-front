@@ -206,7 +206,7 @@ const Question = types
     },
     setPagination(current, pageSize) {
       self.current = current;
-      self.settings.pageSize = pageSize;
+      self.settings.setPageSize(pageSize);
     },
     fetchClients() {
       self.state = 'pending';
@@ -300,7 +300,7 @@ const QuestionStore = types
     },
     setPagination({ current, pageSize }) {
       self.current = current;
-      self.settings.pageSize = pageSize;
+      self.settings.setPageSize(pageSize);
     },
     fetchData(onlyViews = false) {
       self.state = 'pending';
@@ -346,10 +346,12 @@ const columns = ['title', 'createdAt', 'views'];
 const questionStore = QuestionStore.create({
   tabSettings: {
     group: {
+      tableType: 'unfolded',
       columns: [...columns, 'actions'],
       nested: {},
     },
     individual: {
+      tableType: 'unfolded',
       nested: {},
       columns,
     },

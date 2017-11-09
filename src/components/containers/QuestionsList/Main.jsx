@@ -151,7 +151,7 @@ class QuestionsList extends Component {
       columns,
     };
 
-    if (!(settings.folded)) {
+    if (settings.tableType === 'unfolded') {
       standartProps.expandedRowKeys = questionsData.map(row => row.id);
     }
 

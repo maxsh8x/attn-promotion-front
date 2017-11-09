@@ -65,8 +65,6 @@ class QuestionList extends Component {
     const {
       pageSize,
       header,
-      footer,
-      controls,
     } = settings;
 
     const columns = [
@@ -117,7 +115,7 @@ class QuestionList extends Component {
           showHeader={header}
           dataSource={clientsData}
           onChange={this.setPagination}
-          pagination={settings.paginate && paginationParams}
+          pagination={settings.paginate ? paginationParams : false}
           rowClassName={row => this.renderRowClassName(now, row)}
         />
       </div>

@@ -9,12 +9,10 @@ const TableSettings = types
     ),
     tableType: types.optional(
       types.enumeration(['folded', 'unfolded']),
-      'unfolded',
+      'folded',
     ),
     paginate: false,
-    pageSize: 50,
-    controls: true,
-    folded: false,
+    pageSize: 1,
     header: true,
     footer: true,
     nested: types.maybe(types.late(() => TableSettings)),
@@ -25,18 +23,22 @@ const TableSettings = types
     },
   }))
   .actions(self => ({
+    afterCreate() {
+      if (self.nested) {
+        self.setFolding(self.tableType);
+      }
+    },
+    setPageSize(pageSize) {
+      self.pageSize = pageSize;
+    },
     setFolding(mode) {
       self.tableType = mode;
       switch (mode) {
         case 'unfolded': {
-          self.folded = false;
-          self.nested.controls = false;
           self.nested.paginate = false;
           break;
         }
         case 'folded': {
-          self.folded = true;
-          self.nested.controls = true;
           self.nested.paginate = true;
           break;
         }

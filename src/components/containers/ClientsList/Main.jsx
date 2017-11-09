@@ -91,8 +91,8 @@ class ClientsList extends Component {
             settings.setFolding(e.target.value);
           }}
         >
-          <Radio.Button value="unfolded">Развернутый</Radio.Button>
           <Radio.Button value="folded">Свернутый</Radio.Button>
+          <Radio.Button value="unfolded">Развернутый</Radio.Button>
         </Radio.Group>
       </div>
     );
@@ -120,14 +120,20 @@ class ClientsList extends Component {
         title: 'ИНН',
       },
       {
-        key: 'viewsPeriod',
-        dataIndex: 'views',
-        title: 'Просмотров за период',
-      },
-      {
-        key: 'costPeriod',
-        dataIndex: 'cost',
-        title: 'Стоимость за период',
+        key: 'period',
+        title: 'За выбранный период',
+        children: [
+          {
+            key: 'viewsPeriod',
+            dataIndex: 'views',
+            title: 'Просмотров',
+          },
+          {
+            key: 'costPeriod',
+            dataIndex: 'cost',
+            title: 'Стоимость',
+          },
+        ],
       },
       {
         key: 'actions',
@@ -152,6 +158,10 @@ class ClientsList extends Component {
       },
       columns,
     };
+
+    if (settings.tableType === 'unfolded') {
+      standartProps.expandedRowKeys = clientsData.map(row => row.id);
+    }
 
     return (
       <div>

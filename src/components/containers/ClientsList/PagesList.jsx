@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import moment from 'moment';
-import { Table, Switch, Modal, Badge } from 'antd';
+import { Table, Switch, Modal, Badge, Icon } from 'antd';
 import style from '../../../style.css';
 import AddPage from './AddPage';
 import permissions from '../../../utils/permissions';
@@ -10,15 +10,20 @@ import { answerURL } from '../../../constants';
 import TextWithDots from '../TextWithDots';
 
 const typeNames = {
-  individual: 'Индивидуальный',
-  group: 'Групповой',
+  individual: <Icon type="user" style={{ fontSize: 16, color: '#ffbf00' }} />,
+  group: <Icon type="team" style={{ fontSize: 16, color: '#7265e6' }} />,
 };
 
 @observer
 class PagesList extends Component {
   constructor(props) {
     super(props);
-    this.basicColumns = [
+    this.columns = [
+      {
+        dataIndex: 'type',
+        title: 'Тип',
+        render: type => typeNames[type],
+      },
       {
         dataIndex: 'active',
         title: 'Статус',
@@ -49,7 +54,7 @@ class PagesList extends Component {
     ];
 
     if (permissions(['root', 'buchhalter'])) {
-      this.basicColumns.push(
+      this.columns.push(
         {
           title: 'Выбранный период',
           children: [
@@ -74,10 +79,10 @@ class PagesList extends Component {
   setPagination = ({ current, pageSize }) =>
     this.props.client.setPagination(current, pageSize);
 
-  expandedRowRender = ({ id, type }) => {
+  expandedRowRender = ({ id, type }, rowIndex) => {
     if (type === 'group') {
-      const { client } = this.props;
-      const page = client.findPageById(id);
+      const { pages } = this.props.client;
+      const page = pages[rowIndex];
       return (
         <div>
           <Table
@@ -132,18 +137,13 @@ class PagesList extends Component {
       pageCreator,
       pagesData,
       current,
-      pageSize,
       total,
+      settings,
     } = this.props.client;
-    const spinning = !(fetchPagesState === 'done');
-
-    const columns = this.basicColumns.concat([
-      {
-        dataIndex: 'type',
-        title: 'Тип',
-        render: type => typeNames[type],
-      },
-    ]);
+    const {
+      pageSize,
+      header,
+    } = settings;
 
     const paginationParams = { current, pageSize, total };
     const now = new Date().getTime();
@@ -158,16 +158,17 @@ class PagesList extends Component {
           <AddPage creator={pageCreator} />
         </Modal>
         <Table
-          loading={spinning}
+          loading={fetchPagesState === 'pending'}
           bordered
           rowKey="id"
-          columns={columns}
+          columns={this.columns}
           dataSource={pagesData}
           size="small"
+          showHeader={header}
           title={() => 'Список страниц клиента'}
           expandedRowRender={this.expandedRowRender}
           onChange={this.setPagination}
-          pagination={paginationParams}
+          pagination={settings.paginate ? paginationParams : false}
           rowClassName={row => this.renderRowClassName(now, row)}
         />
       </div>

@@ -144,29 +144,40 @@ const Client = types
     get clientStore() {
       return getRoot(self);
     },
-    findPageById(id) {
-      return self.pages.find(page => page.id === id);
-    },
     get settings() {
       return getRoot(self).settings.nested;
     },
   }))
   .actions(self => ({
+    afterCreate() {
+      const disposer = reaction(
+        () => [
+          self.current,
+          self.settings.pageSize,
+          self.settings.paginate,
+        ],
+        () => self.fetchPages(),
+      );
+      addDisposer(self, disposer);
+    },
     setPagination(current, pageSize) {
       self.current = current;
-      self.settings.pageSize = pageSize;
+      self.settings.setPageSize(pageSize);
     },
     fetchPages() {
       self.fetchPagesState = 'pending';
+      const params = {
+        clientID: self.id,
+        startDate: self.clientStore.startDate,
+        endDate: self.clientStore.endDate,
+        type: self.clientStore.activeTab,
+      };
+      if (self.settings.paginate) {
+        params.limit = self.settings.pageSize;
+        params.offset = (self.current - 1) * self.settings.pageSize;
+      }
       axios().get('v1/page/client', {
-        params: {
-          clientID: self.id,
-          offset: (self.current - 1) * self.settings.pageSize,
-          limit: self.settings.pageSize,
-          startDate: self.clientStore.startDate,
-          endDate: self.clientStore.endDate,
-          type: self.clientStore.activeTab,
-        },
+        params,
       }).then(
         self.fetchPagesSuccess,
         self.fetchPagesError,
@@ -325,7 +336,7 @@ const ClientStore = types
     },
     setPagination(current, pageSize) {
       self.current = current;
-      self.settings.pageSize = pageSize;
+      self.settings.setPageSize(pageSize);
     },
     setDate(startDate, endDate) {
       self.startDate = startDate;
@@ -376,14 +387,17 @@ const columns = ['counterID', 'name', 'brand', 'vatin', 'views', 'costPerClick',
 const clientStore = ClientStore.create({
   tabSettings: {
     all: {
+      tableType: 'folded',
       nested: {},
       columns,
     },
     group: {
+      tableType: 'folded',
       nested: {},
       columns,
     },
     individual: {
+      tableType: 'folded',
       nested: {},
       columns,
     },
