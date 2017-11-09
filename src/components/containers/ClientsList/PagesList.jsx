@@ -49,7 +49,15 @@ class PagesList extends Component {
     ];
 
     if (permissions(['root', 'buchhalter'])) {
-      this.basicColumns.push({ key: 'periodCost', title: 'Стоимость за период', render: this.renderPeriodCost });
+      this.basicColumns.push(
+        {
+          title: 'Выбранный период',
+          children: [
+            { key: 'periodViews', title: 'Просмотры', dataIndex: 'viewsPeriod' },
+            { key: 'periodCost', title: 'Стоимость', render: this.renderPeriodCost },
+          ],
+        },
+      );
     }
   }
 

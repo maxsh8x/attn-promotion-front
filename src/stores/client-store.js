@@ -129,8 +129,8 @@ const Client = types
     name: types.string,
     brand: types.string,
     vatin: types.string,
-    views: 0,
-    costPerClick: 0,
+    views: types.number,
+    cost: types.number,
     pages: types.optional(types.array(Page), []),
     fetchPagesState: types.optional(types.enumeration(fetchStates), 'pending'),
     pageCreator: types.optional(PageMetaCreator, { type: 'individual' }),
@@ -343,18 +343,19 @@ const ClientStore = types
           limit: self.settings.pageSize,
           startDate: self.startDate,
           endDate: self.endDate,
+          type: self.activeTab,
         },
       }).then(
         ({ data }) => self.fetchDataSuccess(data, onlyMeta),
         self.fetchDataError,
       );
     },
-    fetchDataSuccess({ clientsData, views, costPerClick, total }, onlyMeta) {
+    fetchDataSuccess({ clientsData, views, cost, total }, onlyMeta) {
       self.total = total;
       if (onlyMeta) {
         self.clients.forEach((client) => {
-          client.views = views[client.id] || 0;
-          client.costPerClick = costPerClick[client.id] || 0;
+          client.views = views[client.id];
+          client.cost = cost[client.id];
         });
       } else {
         self.clients.replace(clientsData.map(item => ({

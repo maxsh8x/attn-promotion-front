@@ -120,15 +120,14 @@ class ClientsList extends Component {
         title: 'ИНН',
       },
       {
-        key: 'views',
+        key: 'viewsPeriod',
         dataIndex: 'views',
         title: 'Просмотров за период',
       },
       {
-        key: 'costPerClick',
-        dataIndex: 'costPerClick',
+        key: 'costPeriod',
+        dataIndex: 'cost',
         title: 'Стоимость за период',
-        render: (costPerClick, { views }) => views * costPerClick,
       },
       {
         key: 'actions',
