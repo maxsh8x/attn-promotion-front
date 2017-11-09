@@ -21,6 +21,7 @@ const PrivateAreaLayout = ({ children, history }) => (
           collapsible
           breakpoint="lg"
           collapsedWidth="0"
+          style={{minHeight: '100vh'}}
         >
           <Menu
             mode="inline"
@@ -52,6 +53,15 @@ const PrivateAreaLayout = ({ children, history }) => (
                 </Menu.Item>
               </SubMenu>
             }
+            <Menu.Item key="logout">
+              <a
+                role="button"
+                tabIndex={0}
+                onClick={logout}
+              >
+                Выход
+              </a>
+            </Menu.Item>
           </Menu>
         </Sider>
         <Layout style={{ padding: '24px 24px 24px' }}>

@@ -12,7 +12,7 @@ const TableSettings = types
       'folded',
     ),
     paginate: false,
-    pageSize: 1,
+    pageSize: 50,
     header: true,
     footer: true,
     nested: types.maybe(types.late(() => TableSettings)),

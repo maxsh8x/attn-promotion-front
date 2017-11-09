@@ -18,8 +18,9 @@ class QuestionList extends Component {
 
   renderDate = value => moment(value).format('YYYY-MM-DD')
 
-  renderViews = (value) => {
-    const { views } = this.props.groupQuestion;
+  renderViews = (value, row, rowIndex) => {
+    const client = this.props.groupQuestion.clients[rowIndex];
+    const views = client.question.views;
     const badgeStyle = value <= views
       ? { backgroundColor: '#87d068' }
       : {};
