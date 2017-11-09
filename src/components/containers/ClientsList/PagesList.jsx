@@ -165,7 +165,6 @@ class PagesList extends Component {
           dataSource={pagesData}
           size="small"
           showHeader={header}
-          title={() => 'Список страниц клиента'}
           expandedRowRender={this.expandedRowRender}
           onChange={this.setPagination}
           pagination={settings.paginate ? paginationParams : false}
