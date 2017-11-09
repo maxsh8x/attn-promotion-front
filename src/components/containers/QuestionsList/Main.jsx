@@ -85,17 +85,25 @@ class QuestionsList extends Component {
         title: 'Дата создания',
         render: value => moment(value).format('YYYY-MM-DD'),
       },
-      {
+    ];
+
+    if (permissions(['root', 'buchhalter'])) {
+      availableColumns.push({
         key: 'views',
         dataIndex: 'views',
         title: 'Просмотров',
-      },
-      {
-        key: 'actions',
-        title: 'Действия',
-        render: this.renderActions,
-      },
-    ];
+      });
+    }
+
+    if (permissions(['root', 'manager'])) {
+      availableColumns.push(
+        {
+          key: 'actions',
+          title: 'Действия',
+          render: this.renderActions,
+        },
+      );
+    }
 
     const {
       groupQuestionCreator,
@@ -122,11 +130,11 @@ class QuestionsList extends Component {
 
     const renderExtraActions = (
       <div className={style.headerOperations}>
-        <ViewsPeriod
+        {permissions(['root', 'buchhalter']) && <ViewsPeriod
           startDate={startDate}
           endDate={endDate}
           setDate={setDate}
-        />
+        />}
         <Radio.Group
           value={settings.tableType}
           onChange={(e) => {

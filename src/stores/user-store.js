@@ -218,6 +218,7 @@ const User = types
         params: {
           user: self.id,
           filter: '',
+          type: 'all',
           limit: self.pageSize,
           offset: (self.current - 1) * self.pageSize,
           startDate: self.store.startDate,

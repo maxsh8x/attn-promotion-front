@@ -49,8 +49,13 @@ class ClientsList extends Component {
       { dataIndex: 'brand', title: 'Бренд' },
       { dataIndex: 'vatin', title: 'ИНН' },
       { dataIndex: 'views', title: 'Просмотров' },
-      { title: 'Действия', render: this.renderActions },
     ];
+
+    if (permissions(['root'])) {
+      columns.push(
+        { title: 'Действия', render: this.renderActions },
+      );
+    }
 
     const paginationParams = { current, pageSize, total };
 

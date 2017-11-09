@@ -53,7 +53,7 @@ class ClientsList extends Component {
           tabIndex={0}
           onClick={client.pageCreator.toggleModal}
         >
-          Привязать клиентов
+          Создать страницу
         </a>
       </span>
     );
@@ -81,11 +81,12 @@ class ClientsList extends Component {
 
     const renderExtraActions = (
       <div className={style.headerOperations}>
-        <ViewsPeriod
+        {permissions(['root', 'buchhalter']) && <ViewsPeriod
           startDate={startDate}
           endDate={endDate}
           setDate={setDate}
         />
+        }
         <Radio.Group
           value={settings.tableType}
           onChange={(e) => {
@@ -120,28 +121,37 @@ class ClientsList extends Component {
         dataIndex: 'vatin',
         title: 'ИНН',
       },
-      {
-        key: 'period',
-        title: 'За выбранный период',
-        children: [
-          {
-            key: 'viewsPeriod',
-            dataIndex: 'views',
-            title: 'Просмотров',
-          },
-          {
-            key: 'costPeriod',
-            dataIndex: 'cost',
-            title: 'Стоимость',
-          },
-        ],
-      },
-      {
+
+    ];
+
+    if (permissions(['root', 'buchhalter'])) {
+      columns.push(...[
+        {
+          key: 'period',
+          title: 'За выбранный период',
+          children: [
+            {
+              key: 'viewsPeriod',
+              dataIndex: 'views',
+              title: 'Просмотров',
+            },
+            {
+              key: 'costPeriod',
+              dataIndex: 'cost',
+              title: 'Стоимость',
+            },
+          ],
+        },
+      ]);
+    }
+
+    if (permissions(['root'])) {
+      columns.push({
         key: 'actions',
         title: 'Действия',
         render: this.renderActions,
-      },
-    ];
+      });
+    }
 
     const standartProps = {
       loading: state === 'pending',

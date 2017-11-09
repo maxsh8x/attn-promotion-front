@@ -21,7 +21,7 @@ const PrivateAreaLayout = ({ children, history }) => (
           collapsible
           breakpoint="lg"
           collapsedWidth="0"
-          style={{minHeight: '100vh'}}
+          style={{ minHeight: '100vh' }}
         >
           <Menu
             mode="inline"
