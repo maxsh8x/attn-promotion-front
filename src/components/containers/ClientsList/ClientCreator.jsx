@@ -38,7 +38,6 @@ const ClientCreator = ({ clientCreator, form }) => (
       >
         {form.getFieldDecorator('vatin', {
           rules: [
-            { len: 12, message: 'Длина ИНН 12 цифр' },
             { pattern: /^[0-9]+$/, message: 'ИНН должен состоять из цифр' },
           ],
           onChange: e => clientCreator.setVATIN(e.target.value),
