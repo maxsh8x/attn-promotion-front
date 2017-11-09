@@ -311,8 +311,8 @@ const ClientStore = types
     afterCreate() {
       const disposer1 = reaction(
         () => [
-          self.current,
-          self.pageSize,
+          self.settings.current,
+          self.settings.pageSize,
         ],
         () => {
           self.fetchData();
@@ -334,10 +334,6 @@ const ClientStore = types
       self.activeTab = tabKey;
       self.fetchData();
     },
-    setPagination(current, pageSize) {
-      self.current = current;
-      self.settings.setPageSize(pageSize);
-    },
     setDate(startDate, endDate) {
       self.startDate = startDate;
       self.endDate = endDate;
@@ -350,7 +346,7 @@ const ClientStore = types
       axios().get('v1/client', {
         params: {
           filter: '',
-          offset: (self.current - 1) * self.settings.pageSize,
+          offset: (self.settings.current - 1) * self.settings.pageSize,
           limit: self.settings.pageSize,
           startDate: self.startDate,
           endDate: self.endDate,
@@ -362,7 +358,7 @@ const ClientStore = types
       );
     },
     fetchDataSuccess({ clientsData, views, cost, total }, onlyMeta) {
-      self.total = total;
+      self.settings.total = total;
       if (onlyMeta) {
         self.clients.forEach((client) => {
           client.views = views[client.id];

@@ -260,8 +260,6 @@ const QuestionStore = types
       types.string,
       moment().format('YYYY-MM-DD'),
     ),
-    current: 1,
-    total: 0,
   })
   .views(self => ({
     get questionsData() {
@@ -282,7 +280,7 @@ const QuestionStore = types
       );
       const disposer2 = reaction(
         () => [
-          self.current,
+          self.settings.current,
           self.settings.pageSize,
         ],
         () => self.fetchData(),
@@ -298,10 +296,6 @@ const QuestionStore = types
       self.startDate = startDate;
       self.endDate = endDate;
     },
-    setPagination({ current, pageSize }) {
-      self.current = current;
-      self.settings.setPageSize(pageSize);
-    },
     fetchData(onlyViews = false) {
       self.state = 'pending';
       if (!(onlyViews)) {
@@ -312,7 +306,7 @@ const QuestionStore = types
           filter: '',
           type: self.activeTab,
           limit: self.settings.pageSize,
-          offset: (self.current - 1) * self.settings.pageSize,
+          offset: (self.settings.current - 1) * self.settings.pageSize,
           startDate: self.startDate,
           endDate: self.endDate,
         },
@@ -332,7 +326,7 @@ const QuestionStore = types
           id: item._id,
         })));
       }
-      self.total = total;
+      self.settings.total = total;
       self.state = 'done';
     },
     fetchDataError(error) {

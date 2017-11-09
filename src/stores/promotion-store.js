@@ -345,10 +345,6 @@ const PromotionStore = types
     setPageFilter(value) {
       self.pageFilter = value;
     },
-    setPagination(current, pageSize) {
-      self.settings.current = current;
-      self.settings.pageSize = pageSize;
-    },
     setDate(date, dateString) {
       self.date = dateString;
     },

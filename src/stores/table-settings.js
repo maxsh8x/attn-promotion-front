@@ -1,4 +1,4 @@
-import { types, getParent } from 'mobx-state-tree';
+import { types } from 'mobx-state-tree';
 import { message } from 'antd';
 
 const TableSettings = types
@@ -19,16 +19,15 @@ const TableSettings = types
     current: 1,
     total: 0,
   })
-  .views(self => ({
-    get parent() {
-      return getParent(self, 2);
-    },
-  }))
   .actions(self => ({
     afterCreate() {
       if (self.nested) {
         self.setFolding(self.tableType);
       }
+    },
+    setPagination({ current, pageSize }) {
+      self.current = current;
+      self.pageSize = pageSize;
     },
     setTotal(total) {
       self.total = total;

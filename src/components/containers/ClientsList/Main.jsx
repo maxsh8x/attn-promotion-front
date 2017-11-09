@@ -37,9 +37,6 @@ class ClientsList extends Component {
     this.props.clientsStore.fetchData();
   }
 
-  setPagination = ({ current, pageSize }) =>
-    this.props.clientsStore.setPagination(current, pageSize);
-
   expandedRowRender = ({ id, type }, rowIndex) => {
     const { clients, startDate, endDate } = this.props.clientsStore;
     const client = clients[rowIndex];
@@ -68,8 +65,6 @@ class ClientsList extends Component {
       clientCreator,
       groupQuestionCreator,
       state,
-      total,
-      current,
       settings,
       startDate,
       endDate,
@@ -77,6 +72,12 @@ class ClientsList extends Component {
       activeTab,
       switchTab,
     } = this.props.clientsStore;
+    const {
+      current,
+      total,
+      pageSize,
+      setPagination,
+    } = settings;
 
     const renderExtraActions = (
       <div className={style.headerOperations}>
@@ -149,10 +150,10 @@ class ClientsList extends Component {
       dataSource: clientsData,
       title: () => 'Список клиентов',
       footer: this.footer,
-      onChange: this.setPagination,
+      onChange: setPagination,
       expandedRowRender: this.expandedRowRender,
       pagination: {
-        pageSize: settings.pageSize,
+        pageSize,
         current,
         total,
       },

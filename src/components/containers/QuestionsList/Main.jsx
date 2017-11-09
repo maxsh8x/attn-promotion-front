@@ -108,10 +108,13 @@ class QuestionsList extends Component {
       startDate,
       endDate,
       setDate,
+    } = this.props.questionStore;
+    const {
       current,
       total,
+      pageSize,
       setPagination,
-    } = this.props.questionStore;
+    } = settings;
 
     const columns = availableColumns.filter(
       column => settings.columns.indexOf(column.key) !== -1,
@@ -140,7 +143,7 @@ class QuestionsList extends Component {
       expandedRowRender: this.expandedRowRender,
       onChange: setPagination,
       pagination: {
-        pageSize: settings.pageSize,
+        pageSize,
         current,
         total,
       },

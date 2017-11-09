@@ -17,9 +17,6 @@ class PromotionList extends Component {
   getTotal = (rowIndex, type) =>
     this.props.promotionStore.pages[rowIndex].total[type];
 
-  setPagination = ({ current, pageSize }) =>
-    this.props.promotionStore.setPagination(current, pageSize);
-
   expandedRowRender = (row, rowIndex) => {
     const date = this.props.promotionStore.date;
     const page = this.props.promotionStore.pages[rowIndex];
@@ -54,7 +51,6 @@ class PromotionList extends Component {
   render() {
     const {
       sources,
-      setPagination,
       setDate,
       state,
       date,
@@ -69,7 +65,7 @@ class PromotionList extends Component {
       settings,
     } = this.props.promotionStore;
 
-    const { current, total, pageSize } = settings
+    const { current, total, pageSize, setPagination } = settings;
 
     const metricsCostColumns = sources.map(network => ({
       key: network,
@@ -126,7 +122,7 @@ class PromotionList extends Component {
       columns,
       title: () => 'Список продвигаемых страниц',
       expandedRowRender: this.expandedRowRender,
-      onChange: this.setPagination,
+      onChange: setPagination,
       pagination: { current, pageSize, total },
     };
 
