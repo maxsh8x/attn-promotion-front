@@ -252,7 +252,7 @@ const ClientCreator = types
     },
     createClientSuccess() {
       self.toggleModal();
-      self.store.fetchClients();
+      self.store.fetchData();
       self.name = '';
       self.brand = '';
       self.vatin = '';
@@ -361,8 +361,8 @@ const ClientStore = types
       self.settings.total = total;
       if (onlyMeta) {
         self.clients.forEach((client) => {
-          client.views = views[client.id];
-          client.cost = cost[client.id];
+          client.views = views[client.id] || 0;
+          client.cost = cost[client.id] || 0;
         });
       } else {
         self.clients.replace(clientsData.map(item => ({
