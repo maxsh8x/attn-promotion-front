@@ -180,7 +180,7 @@ const Page = types
   .actions(self => ({
     setInput(network, type, value) {
       const parsedValue = parseFloat(value, 10);
-      if (!(isNaN)) {
+      if (!(isNaN(parsedValue))) {
         self.inputs.get(network)[type] = parsedValue;
       }
     },
