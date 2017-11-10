@@ -242,7 +242,8 @@ const Page = types
     },
     updateMetrics() {
       axios().post('/v1/metrics', {
-        yDate: self.store.date,
+        startDate: self.store.date,
+        endDate: self.store.date,
         pageID: self.id,
       }).then(
         self.updateMetricsSucess,
