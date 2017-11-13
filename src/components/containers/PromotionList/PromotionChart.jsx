@@ -29,7 +29,7 @@ class PromotionChart extends Component {
     return (
       <div>
         <div className={style.tableOperations}>
-          <Button onClick={fetchChart}>Построить</Button>
+          <Button onClick={fetchChart}>Перестроить</Button>
           <RangePicker
             defaultValue={[moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')]}
             onChange={this.updateDate}
