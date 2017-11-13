@@ -91,6 +91,7 @@ const ClientSelectorItem = types
 const ClientBinder = types
   .model('ClientBinder', {
     modalShown: false,
+    modalQuestionID: types.maybe(types.number),
     clientSelector: types.optional(
       types.array(ClientSelectorItem),
       [],
@@ -98,7 +99,7 @@ const ClientBinder = types
     minViews: 0,
     maxViews: 0,
     costPerClick: 0,
-    status: types.optional(
+    state: types.optional(
       types.enumeration(fetchStates),
       'done',
     ),
@@ -112,18 +113,21 @@ const ClientBinder = types
     ),
   })
   .views(self => ({
-    get question() {
-      return getParent(self);
+    get store() {
+      return getRoot(self);
     },
   }))
   .actions(self => ({
-    toggleModal() {
+    toggleModal(modalQuestionID = null) {
+      if (modalQuestionID) {
+        self.modalQuestionID = modalQuestionID;
+      }
       self.modalShown = !self.modalShown;
     },
     create() {
-      self.status = 'pending';
+      self.state = 'pending';
       return axios().post('/v1/page/bind', {
-        page: self.question.id,
+        page: self.modalQuestionID,
         clients: self.clientSelector.map(item => parseInt(item.key, 10)),
         minViews: self.minViews,
         maxViews: self.maxViews,
@@ -131,21 +135,22 @@ const ClientBinder = types
         startDate: self.startDate,
         endDate: self.endDate,
       }).then(
-        self.createSuccess,
+        () => self.createSuccess(self.modalQuestionID),
         self.createError,
       );
     },
-    createSuccess() {
+    createSuccess(modalQuestionID) {
       self.toggleModal();
-      self.question.fetchClients();
-      self.clientSelector.clear();
+      self.store.findQuestion(modalQuestionID).fetchClients();
+      // self.clientSelector.clear();
       self.minViews = 0;
       self.maxViews = 0;
-      self.status = 'done';
+      message.info('Клиенты привязаны');
+      self.state = 'done';
     },
     createError() {
       message.error('Ошибка при привязке клиентов');
-      self.status = 'error';
+      self.state = 'error';
     },
     setClients(clients) {
       self.clientSelector.replace(clients);
@@ -176,7 +181,6 @@ const Question = types
       types.array(Client),
       [],
     ),
-    clientsBinder: types.optional(ClientBinder, {}),
     current: 1,
     total: 0,
     state: types.optional(
@@ -246,6 +250,7 @@ const QuestionStore = types
       types.enumeration(['group', 'individual']),
       'group',
     ),
+    clientsBinder: types.optional(ClientBinder, {}),
     questions: types.optional(types.array(Question), []),
     groupQuestionCreator: types.optional(GroupQuestionCreator, {}),
     state: types.optional(
@@ -267,6 +272,9 @@ const QuestionStore = types
     },
     get settings() {
       return self.tabSettings.get(self.activeTab);
+    },
+    findQuestion(id) {
+      return self.questions.find(question => question.id === id);
     },
   }))
   .actions(self => ({

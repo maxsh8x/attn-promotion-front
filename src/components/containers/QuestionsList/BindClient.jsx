@@ -1,7 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 import { observer } from 'mobx-react';
-import { Form } from 'antd';
+import { Form, Spin } from 'antd';
 import SearchFilter from '../SearchFilter';
 import CreatorFragments from '../CreatorFragments';
 
@@ -12,20 +12,22 @@ const formItemLayout = {
 
 // TODO: check maxViews > minViews
 const BindClient = ({ clientsBinder, form }) => (
-  <Form>
-    <Form.Item
-      label="Клиенты"
-      {...formItemLayout}
-    >
-      <SearchFilter
-        title="Введите имя клиента для поиска"
-        url="/v1/client/search"
-        callback={clientsBinder.setClients}
-        width={300}
-      />
-    </Form.Item>
-    <CreatorFragments creator={clientsBinder} form={form} />
-  </Form>
+  <Spin spinning={clientsBinder.state === 'pending'}>
+    <Form>
+      <Form.Item
+        label="Клиенты"
+        {...formItemLayout}
+      >
+        <SearchFilter
+          title="Введите имя клиента для поиска"
+          url="/v1/client/search"
+          callback={clientsBinder.setClients}
+          width={300}
+        />
+      </Form.Item>
+      <CreatorFragments creator={clientsBinder} form={form} />
+    </Form>
+  </Spin>
 );
 
 BindClient.propTypes = {

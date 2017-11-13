@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import moment from 'moment';
-import { Button, Modal, Table, Badge } from 'antd';
-import BindClient from './BindClient';
+import { Table, Badge } from 'antd';
 import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
 
@@ -56,7 +55,6 @@ class QuestionList extends Component {
   render() {
     const {
       clientsData,
-      clientsBinder,
       views,
       state,
       current,
@@ -99,14 +97,6 @@ class QuestionList extends Component {
     const now = new Date().getTime();
     return (
       <div>
-        <Modal
-          visible={clientsBinder.modalShown}
-          title="Информация о клиенте"
-          footer={null}
-          onCancel={clientsBinder.toggleModal}
-        >
-          <BindClient clientsBinder={clientsBinder} />
-        </Modal>
         <Table
           loading={state === 'pending'}
           bordered

@@ -10,6 +10,7 @@ import { answerURL } from '../../../constants';
 import TextWithDots from '../TextWithDots';
 import Period from '../Period';
 import InfoBadges from '../InfoBadges';
+import BindClient from './BindClient';
 
 
 const Header = ({ title, onCreateClick }) => (
@@ -55,21 +56,19 @@ class QuestionsList extends Component {
       <TextWithDots text={title} length={100} />
     </a>);
 
-  renderActions = (value, rowData, rowIndex) => {
-    const { questions } = this.props.questionStore;
-    const groupQuestion = questions[rowIndex];
-    return (
-      <span>
-        <a
-          role="button"
-          tabIndex={0}
-          onClick={groupQuestion.clientsBinder.toggleModal}
-        >
-          Привязать клиентов
-        </a>
-      </span>
-    );
-  }
+  renderActions = (value, { id }) => (
+    <span>
+      <a
+        role="button"
+        tabIndex={0}
+        onClick={
+          () => this.props.questionStore.clientsBinder.toggleModal(id)
+        }
+      >
+        Привязать клиентов
+      </a>
+    </span>
+  );
 
   render() {
     const availableColumns = [
@@ -116,6 +115,7 @@ class QuestionsList extends Component {
       startDate,
       endDate,
       setDate,
+      clientsBinder,
     } = this.props.questionStore;
     const {
       current,
@@ -176,6 +176,14 @@ class QuestionsList extends Component {
           onCancel={groupQuestionCreator.toggleModal}
         >
           <GroupQuestionCreator groupQuestionCreator={groupQuestionCreator} />
+        </Modal>
+        <Modal
+          visible={clientsBinder.modalShown}
+          title="Информация о клиенте"
+          footer={null}
+          onCancel={() => clientsBinder.toggleModal()}
+        >
+          <BindClient clientsBinder={clientsBinder} />
         </Modal>
         <Tabs
           defaultActiveKey="group"
