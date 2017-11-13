@@ -136,6 +136,14 @@ const Page = types
       PromotionChart,
       {},
     ),
+    startDate: types.optional(
+      types.string,
+      moment().add(-1, 'months').format('YYYY-MM-DD'),
+    ),
+    endDate: types.optional(
+      types.string,
+      moment().add(-1, 'days').format('YYYY-MM-DD'),
+    ),
   })
   .views(self => ({
     get clientsNamesData() {
@@ -183,6 +191,10 @@ const Page = types
       if (!(isNaN(parsedValue))) {
         self.inputs.get(network)[type] = parsedValue;
       }
+    },
+    setDate(startDate, endDate) {
+      self.startDate = startDate;
+      self.endDate = endDate;
     },
     commitInput(network, type, value) {
       self.inputs.get(network)[type] = parseFloat(value, 10);
@@ -235,6 +247,7 @@ const Page = types
     fetchMetricsSuccess({ data }) {
       self.fetchMetricsState = 'done';
       self.metrics.replace(data);
+      message.info('Данные метрик обновлены');
     },
     fetchMetricsError() {
       message.error('Ошибка при получении метрик');
@@ -242,8 +255,8 @@ const Page = types
     },
     updateMetrics() {
       axios().post('/v1/metrics', {
-        startDate: self.store.date,
-        endDate: self.store.date,
+        startDate: self.startDate,
+        endDate: self.endDate,
         pageID: self.id,
       }).then(
         self.updateMetricsSucess,

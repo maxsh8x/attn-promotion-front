@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Table, Button, Icon } from 'antd';
+import Period from '../Period';
+import style from '../../../style.css';
+
 
 const metricName = {
   pageviews: 'Просмотры',
@@ -22,9 +25,11 @@ class YandexMetrics extends Component {
       metricsData,
       totalClickCost,
       updateMetrics,
-      fetchMetricsState
+      fetchMetricsState,
+      startDate,
+      endDate,
+      setDate,
     } = this.props.page;
-    const { date } = this.props.page.store;
     const metricsCostColumns = store.sources.map(network => ({
       key: network,
       dataIndex: `sources.${network}`,
@@ -62,10 +67,20 @@ class YandexMetrics extends Component {
           loading={fetchMetricsState === 'pending'}
           bordered
           title={() => (
-            <Button onClick={updateMetrics}>
-              <Icon type="reload" />
-              Обновить данные за {date}
-            </Button>
+            <div className={style.headerOperations}>
+              <Period
+                startDate={startDate}
+                endDate={endDate}
+                setDate={setDate}
+                label="Подсчет просмотров за период"
+              />
+              <Button onClick={updateMetrics}>
+                <Icon type="reload" />
+                Обновить данные
+              </Button>
+              <div style={{ float: 'right' }}>
+              </div>
+            </div>
           )}
           rowKey="metric"
           columns={columns}

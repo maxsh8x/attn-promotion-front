@@ -8,7 +8,7 @@ import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
 import { answerURL } from '../../../constants';
 import TextWithDots from '../TextWithDots';
-import ViewsPeriod from '../ViewsPeriod';
+import Period from '../Period';
 import InfoBadges from '../InfoBadges';
 
 
@@ -130,10 +130,11 @@ class QuestionsList extends Component {
 
     const renderExtraActions = (
       <div className={style.headerOperations}>
-        {permissions(['root', 'buchhalter']) && <ViewsPeriod
+        {permissions(['root', 'buchhalter']) && <Period
           startDate={startDate}
           endDate={endDate}
           setDate={setDate}
+          label="Подсчет просмотров за период"
         />}
         <Radio.Group
           value={settings.tableType}

@@ -5,9 +5,9 @@ import { observer } from 'mobx-react';
 
 const { RangePicker } = DatePicker;
 
-const ViewsPeriod = ({ startDate, endDate, setDate }) => (
+const Period = ({ startDate, endDate, setDate, label }) => (
   <span>
-    Подсчет просмотров за период: <RangePicker
+    {label}: <RangePicker
       defaultValue={[moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')]}
       onChange={(dates, [startDate, endDate]) => setDate(startDate, endDate)}
       allowClear={false}
@@ -15,8 +15,8 @@ const ViewsPeriod = ({ startDate, endDate, setDate }) => (
   </span>
 );
 
-ViewsPeriod.propTypes = {
+Period.propTypes = {
 
 };
 
-export default observer(ViewsPeriod);
+export default observer(Period);

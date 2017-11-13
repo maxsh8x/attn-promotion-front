@@ -3,7 +3,7 @@ import { inject, observer } from 'mobx-react';
 import { Table, Button, Modal } from 'antd';
 import UserCreator from './UserCreator';
 import ClientsList from './ClientsList';
-import ViewsPeriod from '../ViewsPeriod';
+import Period from '../Period';
 import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
 
@@ -38,10 +38,11 @@ class UsersList extends Component {
       setDate,
     } = this.props.usersStore;
     return (
-      <ViewsPeriod
+      <Period
         startDate={startDate}
         endDate={endDate}
         setDate={setDate}
+        label="Подсчет просмотров за период"
       />
     );
   }
