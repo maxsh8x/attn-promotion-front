@@ -247,7 +247,6 @@ const Page = types
     fetchMetricsSuccess({ data }) {
       self.fetchMetricsState = 'done';
       self.metrics.replace(data);
-      message.info('Данные метрик обновлены');
     },
     fetchMetricsError() {
       message.error('Ошибка при получении метрик');
@@ -281,6 +280,7 @@ const Page = types
       self.fetchClientsNamesState = 'error';
     },
     updateMetricsSucess() {
+      message.info('Данные метрик обновлены');
       self.fetchMetrics();
     },
     updateMetricsError() {
