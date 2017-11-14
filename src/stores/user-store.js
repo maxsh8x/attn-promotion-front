@@ -70,6 +70,7 @@ const UserCreator = types
       self.role = 'manager';
       self.password = '';
       self.store.fetchUsers();
+      message.info('Пользователь успешно создан');
       self.state = 'done';
     },
     createUserFailed() {

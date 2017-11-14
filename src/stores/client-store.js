@@ -250,6 +250,7 @@ const ClientCreator = types
       self.brand = '';
       self.vatin = '';
       self.counterID = null;
+      message.info('Клиент успешно создан');
       self.state = 'done';
     },
     createClientError(error) {

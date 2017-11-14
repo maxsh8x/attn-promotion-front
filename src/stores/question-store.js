@@ -42,9 +42,10 @@ const GroupQuestionCreator = types
     },
     createGroupQuestionSuccess() {
       self.toggleModal();
-      self.store.fetchGroupQuestions();
+      self.store.fetchData();
       self.url = '';
       self.counterID = null;
+      message.info('Групповой вопрос успешно создан');
       self.state = 'done';
     },
     createGroupQuestionError(error) {
