@@ -47,11 +47,27 @@ class ClientsList extends Component {
       state,
     } = this.props.user;
     const columns = [
-      { dataIndex: 'counterID', title: 'ID счетчика', width: 100 },
-      { dataIndex: 'name', title: 'Имя клиента' },
-      { dataIndex: 'brand', title: 'Бренд' },
-      { dataIndex: 'vatin', title: 'ИНН' },
-      { dataIndex: 'views', title: 'Просмотров' },
+      {
+        dataIndex: 'counterID',
+        title: 'ID счетчика',
+        width: 100,
+      },
+      {
+        dataIndex: 'name',
+        title: 'Имя клиента',
+      },
+      {
+        dataIndex: 'brand',
+        title: 'Бренд',
+      },
+      {
+        dataIndex: 'vatin',
+        title: 'ИНН',
+      },
+      {
+        dataIndex: 'views',
+        title: 'Просмотров',
+      },
     ];
 
     if (permissions(['root'])) {

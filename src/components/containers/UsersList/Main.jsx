@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Table, Button, Modal } from 'antd';
+import { Table, Modal } from 'antd';
 import UserCreator from './UserCreator';
 import ClientsList from './ClientsList';
+import EditableCell from '../EditableCell';
 import Period from '../Period';
 import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
@@ -76,10 +77,33 @@ class UsersList extends Component {
       total,
     } = this.props.usersStore;
     const columns = [
-      { dataIndex: 'username', title: 'Имя пользователя' },
-      { dataIndex: 'name', title: 'Имя' },
-      { dataIndex: 'email', title: 'Email' },
-      { dataIndex: 'role', title: 'Роль', render: role => roleLables[role] },
+      {
+        dataIndex: 'username',
+        title: 'Имя пользователя',
+        width: 100,
+      },
+      {
+        dataIndex: 'name',
+        title: 'Имя',
+        width: 250,
+        render: (text, record) => (
+          <EditableCell
+            value={text}
+            onChange={console.log(record.key, 'name')}
+          />
+        ),
+      },
+      {
+        dataIndex: 'email',
+        title: 'Email',
+        width: 150,
+      },
+      {
+        dataIndex: 'role',
+        title: 'Роль',
+        render: role => roleLables[role],
+        width: 100,
+      },
     ];
 
     const paginationParams = { current, pageSize, total };

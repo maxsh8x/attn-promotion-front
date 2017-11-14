@@ -1,38 +1,77 @@
 .navButtons {
-    width: 120px;
-    height: 31px;
-    /* margin: 16px 28px 16px 0; */
-    float: right;
-  }
-  
-  .infoBadges > * {
-    margin-right: 8px;
-  }
+  width: 120px;
+  height: 31px;
+  /* margin: 16px 28px 16px 0; */
+  float: right;
+}
 
-  .tableOperations {
-    margin-bottom: 16px;
-  }
-  
-  .tableOperations > * {
-    margin-right: 8px;
-  }
+.infoBadges > * {
+  margin-right: 8px;
+}
 
-  .headerOperations > * {
-    margin-right: 8px;
-  }
+.tableOperations {
+  margin-bottom: 16px;
+}
 
-  .searchPage {
-    width: 30%;
-  }
-  
-  .rowWaited {
-    background-color: #fffaeb;
-  }
-  
-  .rowStarted {
-    background-color: #ebf8f2;
-  }
-  
-  .rowDone {
-    background-color: #fef0ef;
-  }
+.tableOperations > * {
+  margin-right: 8px;
+}
+
+.headerOperations > * {
+  margin-right: 8px;
+}
+
+.searchPage {
+  width: 30%;
+}
+
+.rowWaited {
+  background-color: #fffaeb;
+}
+
+.rowStarted {
+  background-color: #ebf8f2;
+}
+
+.rowDone {
+  background-color: #fef0ef;
+}
+
+.editableCell {
+  position: relative;
+}
+
+.editableCellInputWrapper,
+.editableCellTextWrapper {
+  padding-right: 24px;
+}
+
+.editableCellTextWrapper {
+  padding: 5px 24px 5px 5px;
+}
+
+.editableCellIcon,
+.editableCellIconCheck {
+  position: absolute;
+  right: 0;
+  width: 20px;
+  cursor: pointer;
+}
+
+.editableCellIcon {
+  line-height: 18px;
+  display: none;
+}
+
+.editableCellIconCheck {
+  line-height: 28px;
+}
+
+.editableCell:hover .editableCellIcon {
+  display: inline-block;
+}
+
+.editableCellIcon:hover,
+.editableCellIconCheck:hover {
+  color: #108ee9;
+}

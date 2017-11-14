@@ -72,6 +72,7 @@ class PromotionList extends Component {
       dataIndex: `inputs.${network}`,
       title: network[0].toUpperCase() + network.substr(1),
       render: this.metricRender,
+      width: 80,
     }));
 
     const columns = [
@@ -79,11 +80,13 @@ class PromotionList extends Component {
         key: 'status',
         dataIndex: 'active',
         render: this.renderStatus,
+        width: 80,
       },
       {
         key: 'url',
         dataIndex: 'url',
         render: this.renderPageURL,
+        width: 800,
       },
       {
         title: 'Стоимость за клик',
@@ -97,18 +100,21 @@ class PromotionList extends Component {
             dataIndex: 'total.clicks',
             title: 'Кликов',
             render: (v, p, rowIndex) => this.getTotal(rowIndex, 'clicks'),
+            width: 80,
           },
           {
             key: 'totalCost',
             dataIndex: 'total.cost',
             title: 'Потрачено',
             render: (v, p, rowIndex) => this.getTotal(rowIndex, 'cost'),
+            width: 80,
           },
           {
             key: 'totalCostPerClick',
             dataIndex: 'total.costPerClick',
             title: 'Стоимость',
             render: (v, p, rowIndex) => this.getTotal(rowIndex, 'costPerClick'),
+            width: 80,
           },
         ],
       },
