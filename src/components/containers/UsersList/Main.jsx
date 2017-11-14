@@ -75,21 +75,28 @@ class UsersList extends Component {
       current,
       pageSize,
       total,
+      commitInput,
     } = this.props.usersStore;
     const columns = [
       {
         dataIndex: 'username',
         title: 'Имя пользователя',
         width: 250,
+        render: (text, { id }) => (
+          <EditableCell
+            value={text}
+            onChange={value => commitInput(id, 'username', value)}
+          />
+        ),
       },
       {
         dataIndex: 'name',
         title: 'Имя',
         width: 250,
-        render: (text, record) => (
+        render: (text, { id }) => (
           <EditableCell
             value={text}
-            onChange={console.log(record.key, 'name')}
+            onChange={value => commitInput(id, 'name', value)}
           />
         ),
       },
@@ -97,6 +104,12 @@ class UsersList extends Component {
         dataIndex: 'email',
         title: 'Email',
         width: 250,
+        render: (text, { id }) => (
+          <EditableCell
+            value={text}
+            onChange={value => commitInput(id, 'email', value)}
+          />
+        ),
       },
       {
         dataIndex: 'role',

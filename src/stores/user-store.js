@@ -295,6 +295,14 @@ const UserStore = types
       self.startDate = startDate;
       self.endDate = endDate;
     },
+    commitInput(id, field, value) {
+      axios().patch(`/v1/user/${id}`, {
+        [field]: value,
+      }).then(
+        () => message.info('Данные сохранены'),
+        () => message.info('Ошибка при сохранении'),
+      );
+    },
     fetchUsers() {
       self.state = 'pending';
       axios().get('v1/user', {
