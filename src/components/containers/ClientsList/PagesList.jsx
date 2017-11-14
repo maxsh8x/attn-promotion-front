@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import moment from 'moment';
-import { Table, Switch, Modal, Badge, Icon } from 'antd';
+import { Table, Switch, Badge, Icon } from 'antd';
 import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
 import shallowCompare from '../../../utils/helper';

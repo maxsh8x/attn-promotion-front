@@ -13,6 +13,25 @@ const roleLables = {
   manager: 'Менеджер',
 };
 
+const Header = ({ title, onCreateClick }) => (
+  <div className={style.headerOperations}>
+    <span>{title}</span>
+    {permissions(['root']) &&
+      <span>
+        (
+        <a
+          role="button"
+          onClick={onCreateClick}
+          tabIndex={0}
+        >
+          Создать
+        </a>
+        )
+      </span>
+    }
+  </div>
+);
+
 @inject('usersStore') @observer
 class UsersList extends Component {
   componentWillMount() {
@@ -74,22 +93,22 @@ class UsersList extends Component {
         >
           <UserCreator creator={userCreator} />
         </Modal>
-        {permissions(['root']) &&
-          <div className={style.tableOperations}>
-            <Button onClick={userCreator.toggleModal}>Создать пользователя</Button>
-          </div>
-        }
         <Table
           loading={state === 'pending'}
           bordered
           rowKey="id"
           columns={columns}
           dataSource={usersData}
-          title={() => 'Список пользователей'}
           expandedRowRender={this.expandedRowRender}
           onChange={this.setPagination}
           pagination={paginationParams}
           footer={this.footer}
+          title={() => (
+            <Header
+              title="Список пользователей"
+              onCreateClick={userCreator.toggleModal}
+            />
+          )}
         />
       </div>
     );

@@ -24,13 +24,15 @@ class ClientsList extends Component {
   renderActions = (value, row, rowIndex) => {
     const client = this.props.user.clients[rowIndex];
     return (
-      <Button
-        type="primary"
-        size="small"
-        onClick={client.unbind}
-      >
-        Отвязать
-      </Button>
+      <span>
+        <a
+          role="button"
+          tabIndex={0}
+          onClick={client.unbind}
+        >
+          Отвязать
+        </a>
+      </span>
     );
   }
 
