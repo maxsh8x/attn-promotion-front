@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Table, Button } from 'antd';
+import { Table, Button, Popconfirm } from 'antd';
 import SearchFilter from '../SearchFilter';
 import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
@@ -21,17 +21,18 @@ class ClientsList extends Component {
   setPagination = ({ current, pageSize }) =>
     this.props.user.setPagination(current, pageSize);
 
-  renderActions = (value, row, rowIndex) => {
+  renderActions = (value, { name }, rowIndex) => {
     const client = this.props.user.clients[rowIndex];
     return (
       <span>
-        <a
-          role="button"
-          tabIndex={0}
-          onClick={client.unbind}
+        <Popconfirm
+          title={`Вы действительно хотите отвязать "${name}?"`}
+          onConfirm={client.unbind}
         >
-          Отвязать
-        </a>
+          <a role="button" tabIndex={0}>
+            Отвязать
+          </a>
+        </Popconfirm>
       </span>
     );
   }
