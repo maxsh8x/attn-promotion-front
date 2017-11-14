@@ -80,7 +80,7 @@ class UsersList extends Component {
       {
         dataIndex: 'username',
         title: 'Имя пользователя',
-        width: 100,
+        width: 250,
       },
       {
         dataIndex: 'name',
@@ -96,13 +96,13 @@ class UsersList extends Component {
       {
         dataIndex: 'email',
         title: 'Email',
-        width: 150,
+        width: 250,
       },
       {
         dataIndex: 'role',
         title: 'Роль',
         render: role => roleLables[role],
-        width: 100,
+        width: 150,
       },
     ];
 

@@ -67,30 +67,86 @@ class QuestionList extends Component {
     } = settings;
 
     const columns = [
-      { dataIndex: 'name', title: 'Имя' },
-      { dataIndex: 'vatin', title: 'Инн' },
-      { dataIndex: 'brand', title: 'Бренд' },
+      {
+        dataIndex: 'name',
+        title: 'Имя',
+        width: 250,
+      },
+      {
+        dataIndex: 'vatin',
+        title: 'Инн',
+        width: 250,
+      },
+      {
+        dataIndex: 'brand',
+        title: 'Бренд',
+        width: 250,
+      },
       {
         title: 'Кампания',
         children: [
-          { key: 'startDate', title: 'Начало', dataIndex: 'startDate', render: this.renderDate },
-          { key: 'endDate', title: 'Конец', dataIndex: 'endDate', render: this.renderDate },
-          { key: 'views', title: 'Просмотров', dataIndex: 'views' },
-          { key: 'costPerClick', dataIndex: 'costPerClick', title: 'Цена за клик' },
-          { key: 'campaignPeriod', title: 'Стоимость', render: this.renderCampaignCost },
+          {
+            key: 'startDate',
+            title: 'Начало',
+            dataIndex: 'startDate',
+            render: this.renderDate,
+            width: 110,
+          },
+          {
+            key: 'endDate',
+            title: 'Конец',
+            dataIndex: 'endDate',
+            render: this.renderDate,
+            width: 110,
+          },
+          {
+            key: 'views',
+            title: 'Просмотров',
+            dataIndex: 'views',
+            width: 110,
+          },
+          {
+            key: 'costPerClick',
+            dataIndex: 'costPerClick',
+            title: 'Цена за клик',
+            width: 110,
+          },
+          {
+            key: 'campaignPeriod',
+            title: 'Стоимость',
+            render: this.renderCampaignCost,
+            width: 110,
+          },
         ],
       },
       {
         title: 'Показы',
         children: [
-          { key: 'minViews', title: 'Min', dataIndex: 'minViews', render: this.renderViews },
-          { key: 'maxViews', title: 'Max', dataIndex: 'maxViews', render: this.renderViews },
+          {
+            key: 'minViews',
+            title: 'Min',
+            dataIndex: 'minViews',
+            render: this.renderViews,
+            width: 60,
+          },
+          {
+            key: 'maxViews',
+            title: 'Max',
+            dataIndex: 'maxViews',
+            render: this.renderViews,
+            width: 60,
+          },
         ],
       },
     ];
 
     if (permissions(['root', 'buchhalter'])) {
-      columns.push({ key: 'periodCost', title: 'Стоимость за период', render: this.renderPeriodCost });
+      columns.push({
+        key: 'periodCost',
+        title: 'Стоимость за период',
+        render: this.renderPeriodCost,
+        width: 200,
+      });
     }
 
     const paginationParams = { current, pageSize, total };

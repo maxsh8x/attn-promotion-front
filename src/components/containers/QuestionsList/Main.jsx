@@ -77,12 +77,14 @@ class QuestionsList extends Component {
         dataIndex: 'title',
         title: 'Название',
         render: this.renderPageURL,
+        width: 800,
       },
       {
         key: 'createdAt',
         dataIndex: 'createdAt',
         title: 'Дата создания',
         render: value => moment(value).format('YYYY-MM-DD'),
+        width: 250,
       },
     ];
 
@@ -91,6 +93,7 @@ class QuestionsList extends Component {
         key: 'views',
         dataIndex: 'views',
         title: 'Просмотров',
+        width: 250,
       });
     }
 
@@ -100,6 +103,7 @@ class QuestionsList extends Component {
           key: 'actions',
           title: 'Действия',
           render: this.renderActions,
+          width: 250,
         },
       );
     }

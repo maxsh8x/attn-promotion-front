@@ -113,16 +113,19 @@ class ClientsList extends Component {
         key: 'name',
         dataIndex: 'name',
         title: 'Имя клиента',
+        width: 250,
       },
       {
         key: 'brand',
         dataIndex: 'brand',
         title: 'Бренд',
+        width: 250,
       },
       {
         key: 'vatin',
         dataIndex: 'vatin',
         title: 'ИНН',
+        width: 250,
       },
 
     ];
@@ -137,11 +140,13 @@ class ClientsList extends Component {
               key: 'viewsPeriod',
               dataIndex: 'views',
               title: 'Просмотров',
+              width: 250,
             },
             {
               key: 'costPeriod',
               dataIndex: 'cost',
               title: 'Стоимость',
+              width: 250,
             },
           ],
         },
@@ -153,6 +158,7 @@ class ClientsList extends Component {
         key: 'actions',
         title: 'Действия',
         render: this.renderActions,
+        width: 250,
       });
     }
 

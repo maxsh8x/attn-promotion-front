@@ -22,32 +22,74 @@ class PagesList extends Component {
         dataIndex: 'type',
         title: 'Тип',
         render: type => typeNames[type],
+        width: 40,
       },
       {
         dataIndex: 'active',
         title: 'Статус',
         render: active => <Switch checked={active} />,
+        width: 70,
       },
       {
         dataIndex: 'title',
         title: 'Название',
         render: this.renderPageURL,
+        width: 600,
       },
       {
         title: 'Кампания',
         children: [
-          { key: 'startDate', title: 'Начало', dataIndex: 'startDate', render: this.renderDate },
-          { key: 'endDate', title: 'Конец', dataIndex: 'endDate', render: this.renderDate },
-          { key: 'views', title: 'Просмотров', dataIndex: 'views' },
-          { key: 'costPerClick', dataIndex: 'costPerClick', title: 'Цена за клик' },
-          { key: 'campaignPeriod', title: 'Стоимость', render: this.renderCampaignCost },
+          {
+            key: 'startDate',
+            title: 'Начало',
+            dataIndex: 'startDate',
+            render: this.renderDate,
+            width: 110,
+          },
+          {
+            key: 'endDate',
+            title: 'Конец',
+            dataIndex: 'endDate',
+            render: this.renderDate,
+            width: 110,
+          },
+          {
+            key: 'views',
+            title: 'Просмотров',
+            dataIndex: 'views',
+            width: 110,
+          },
+          {
+            key: 'costPerClick',
+            dataIndex: 'costPerClick',
+            title: 'Цена за клик',
+            width: 110,
+          },
+          {
+            key: 'campaignPeriod',
+            title: 'Стоимость',
+            width: 110,
+            render: this.renderCampaignCost,
+          },
         ],
       },
       {
         title: 'Показы',
         children: [
-          { key: 'minViews', title: 'Min', dataIndex: 'minViews', render: this.renderViews },
-          { key: 'maxViews', title: 'Max', dataIndex: 'maxViews', render: this.renderViews },
+          {
+            key: 'minViews',
+            title: 'Min',
+            dataIndex: 'minViews',
+            render: this.renderViews,
+            width: 60,
+          },
+          {
+            key: 'maxViews',
+            title: 'Max',
+            dataIndex: 'maxViews',
+            render: this.renderViews,
+            width: 60,
+          },
         ],
       },
     ];
@@ -57,8 +99,18 @@ class PagesList extends Component {
         {
           title: 'Выбранный период',
           children: [
-            { key: 'periodViews', title: 'Просмотры', dataIndex: 'viewsPeriod' },
-            { key: 'periodCost', title: 'Стоимость', render: this.renderPeriodCost },
+            {
+              key: 'periodViews',
+              title: 'Просмотры',
+              dataIndex: 'viewsPeriod',
+              width: 100,
+            },
+            {
+              key: 'periodCost',
+              title: 'Стоимость',
+              render: this.renderPeriodCost,
+              width: 100,
+            },
           ],
         },
       );
