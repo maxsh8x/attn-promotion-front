@@ -7,6 +7,7 @@ import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
 import Period from '../Period';
 import InfoBadges from '../InfoBadges';
+import AddPage from './AddPage';
 
 
 const Header = ({ title, onCreateClick }) => (
@@ -43,15 +44,15 @@ class ClientsList extends Component {
     return <PagesList dates={[startDate, endDate]} client={client} type={type} />;
   }
 
-  renderActions = (value, rowData, rowIndex) => {
-    const { clients } = this.props.clientsStore;
-    const client = clients[rowIndex];
+  renderActions = (value, { id }) => {
     return (
       <span>
         <a
           role="button"
           tabIndex={0}
-          onClick={client.pageCreator.toggleModal}
+          onClick={
+            () => this.props.clientsStore.pageCreator.toggleModal(id)
+          }
         >
           Создать страницу
         </a>
@@ -71,6 +72,7 @@ class ClientsList extends Component {
       setDate,
       activeTab,
       switchTab,
+      pageCreator,
     } = this.props.clientsStore;
     const {
       current,
@@ -184,6 +186,14 @@ class ClientsList extends Component {
           onCancel={clientCreator.toggleModal}
         >
           <ClientCreator clientCreator={clientCreator} />
+        </Modal>
+        <Modal
+          visible={pageCreator.modalShown}
+          title="Информация о странице"
+          footer={null}
+          onCancel={() => pageCreator.toggleModal()}
+        >
+          <AddPage creator={pageCreator} />
         </Modal>
         <Tabs
           value={activeTab}

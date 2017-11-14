@@ -3,7 +3,6 @@ import { observer } from 'mobx-react';
 import moment from 'moment';
 import { Table, Switch, Modal, Badge, Icon } from 'antd';
 import style from '../../../style.css';
-import AddPage from './AddPage';
 import permissions from '../../../utils/permissions';
 import shallowCompare from '../../../utils/helper';
 import { answerURL } from '../../../constants';
@@ -134,7 +133,6 @@ class PagesList extends Component {
   render() {
     const {
       fetchPagesState,
-      pageCreator,
       pagesData,
       current,
       total,
@@ -149,14 +147,7 @@ class PagesList extends Component {
     const now = new Date().getTime();
     return (
       <div>
-        <Modal
-          visible={pageCreator.modalShown}
-          title="Информация о странице"
-          footer={null}
-          onCancel={pageCreator.toggleModal}
-        >
-          <AddPage creator={pageCreator} />
-        </Modal>
+
         <Table
           loading={fetchPagesState === 'pending'}
           bordered

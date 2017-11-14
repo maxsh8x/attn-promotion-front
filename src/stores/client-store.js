@@ -9,6 +9,7 @@ import TableSettings from './table-settings';
 const PageMetaCreator = types
   .model('PageMetaCreator', {
     modalShown: false,
+    modalClientID: types.maybe(types.number),
     state: types.optional(
       types.enumeration(fetchStates),
       'done',
@@ -26,14 +27,9 @@ const PageMetaCreator = types
       types.string,
       moment().add(1, 'months').format('YYYY-MM-DD'),
     ),
-    type: types.enumeration(['individual', 'related']),
+    type: types.enumeration(['individual']),
   })
   .views(self => ({
-    get client() {
-      return (self.type === 'related')
-        ? getParent(self, 3)
-        : getParent(self);
-    },
     get store() {
       return getRoot(self);
     },
@@ -58,12 +54,12 @@ const PageMetaCreator = types
     setType(value) {
       self.type = value;
     },
-    create(related, parent) {
+    create() {
       self.state = 'pending';
       const query = {
         url: self.url,
         title: self.title,
-        client: self.client.id,
+        client: self.modalClientID,
         type: self.type,
         minViews: self.minViews,
         maxViews: self.maxViews,
@@ -71,24 +67,26 @@ const PageMetaCreator = types
         startDate: self.startDate,
         endDate: self.endDate,
       };
-      if (related) {
-        query.parent = getParent(self).id;
-      }
       axios().post('v1/page', query).then(
-        () => self.createSuccess(related, parent),
+        () => self.createSuccess(self.modalClientID),
         self.createError,
       );
     },
-    createSuccess() {
+    createSuccess(modalClientID) {
       self.toggleModal();
-      self.client.fetchPages();
+      self.store.findClient(modalClientID).fetchPages();
       self.store.fetchData(true);
+      message.info('Страница успешно создана');
       self.state = 'done';
     },
     createError() {
+      message.error('Ошибка при создании страницы');
       self.state = 'error';
     },
-    toggleModal() {
+    toggleModal(modalClientID = null) {
+      if (modalClientID) {
+        self.modalClientID = modalClientID;
+      }
       self.modalShown = !self.modalShown;
     },
   }));
@@ -108,7 +106,6 @@ const Page = types
     active: types.boolean,
     views: types.number,
     viewsPeriod: types.number,
-    pageCreator: types.optional(PageMetaCreator, { type: 'related' }),
   })
   .views(self => ({
     get pages() {
@@ -116,9 +113,6 @@ const Page = types
     },
     get client() {
       return getParent(self, 2);
-    },
-    get pagesData() {
-      return toJS(self.pages).filter(page => page.type === 'related');
     },
   }));
 
@@ -133,13 +127,12 @@ const Client = types
     cost: types.number,
     pages: types.optional(types.array(Page), []),
     fetchPagesState: types.optional(types.enumeration(fetchStates), 'pending'),
-    pageCreator: types.optional(PageMetaCreator, { type: 'individual' }),
     current: 1,
     total: 0,
   })
   .views(self => ({
     get pagesData() {
-      return toJS(self.pages).filter(page => page.type !== 'related');
+      return toJS(self.pages);
     },
     get clientStore() {
       return getRoot(self);
@@ -281,6 +274,7 @@ const ClientStore = types
     tabSettings: types.map(TableSettings),
     clients: types.optional(types.array(Client), []),
     clientCreator: types.optional(ClientCreator, {}),
+    pageCreator: types.optional(PageMetaCreator, { type: 'individual' }),
     state: types.optional(
       types.enumeration(fetchStates),
       'pending',
@@ -300,7 +294,7 @@ const ClientStore = types
     get clientsData() {
       return toJS(self.clients);
     },
-    findClientById(id) {
+    findClient(id) {
       return self.clients.find(client => client.id === id);
     },
     get settings() {
