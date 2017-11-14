@@ -1,6 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import { Form, Input, Spin } from 'antd';
+import { modelOf } from '../../../utils/validation';
+import { PageMetaCreator } from '../../../stores/client-store';
 
 import CreatorFragments from '../CreatorFragments';
 
@@ -31,7 +34,10 @@ const AddPage = ({ creator, form }) => (
 );
 
 AddPage.propTypes = {
-
+  creator: modelOf(PageMetaCreator),
+  form: PropTypes.shape({
+    getFieldDecorator: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 export default Form.create({
