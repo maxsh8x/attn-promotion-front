@@ -7,6 +7,7 @@ import permissions from '../../../utils/permissions';
 import shallowCompare from '../../../utils/helper';
 import { answerURL } from '../../../constants';
 import TextWithDots from '../TextWithDots';
+import Archive from './Archive';
 
 const typeNames = {
   individual: <Icon type="user" style={{ fontSize: 16, color: '#ffbf00' }} />,
@@ -130,24 +131,12 @@ class PagesList extends Component {
   setPagination = ({ current, pageSize }) =>
     this.props.client.setPagination(current, pageSize);
 
-  expandedRowRender = ({ id, type }, rowIndex) => {
-    if (type === 'group') {
-      const { pages } = this.props.client;
-      const page = pages[rowIndex];
-      return (
-        <div>
-          <Table
-            rowKey="id"
-            columns={this.basicColumns}
-            dataSource={page.pagesData}
-            size="small"
-            pagination={false}
-            title={() => 'Список страниц группового вопроса'}
-          />
-        </div>
-      );
-    }
-    return null;
+  expandedRowRender = (row, rowIndex) => {
+    const { pages } = this.props.client;
+    const page = pages[rowIndex];
+    return (
+      <Archive page={page} />
+    );
   }
   renderPageURL = (title, { url }) =>
     (<a href={answerURL + url}>
@@ -184,7 +173,7 @@ class PagesList extends Component {
 
   render() {
     const {
-      fetchPagesState,
+      state,
       pagesData,
       current,
       total,
@@ -201,7 +190,7 @@ class PagesList extends Component {
       <div>
 
         <Table
-          loading={fetchPagesState === 'pending'}
+          loading={state === 'pending'}
           bordered
           rowKey="id"
           columns={this.columns}

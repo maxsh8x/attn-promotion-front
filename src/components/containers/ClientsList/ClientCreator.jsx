@@ -1,6 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import { Button, Form, Input, InputNumber, Spin } from 'antd';
+import { modelOf } from '../../../utils/validation';
+// import { ClientCreator } from '../../../stores/client-store';
 
 const formItemLayout = {
   labelCol: { span: 6 },
@@ -72,7 +75,11 @@ const ClientCreator = ({ clientCreator, form }) => (
   </Spin>
 );
 
+// clientCreator: modelOf(PageMetaCreator),
 ClientCreator.propTypes = {
+  form: PropTypes.shape({
+    getFieldDecorator: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 export default Form.create({

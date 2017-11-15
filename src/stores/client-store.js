@@ -6,7 +6,7 @@ import axios from '../utils/axios';
 import { fetchStates } from '../constants';
 import TableSettings from './table-settings';
 
-const PageMetaCreator = types
+export const PageMetaCreator = types
   .model('PageMetaCreator', {
     modalShown: false,
     modalClientID: types.maybe(types.number),
@@ -91,7 +91,16 @@ const PageMetaCreator = types
     },
   }));
 
-const Page = types
+export const ArchiveEntity = types
+  .model('ArchiveEntity', {
+    id: types.identifier(types.string),
+    minViews: types.number,
+    maxViews: types.number,
+    startDate: types.string,
+    endDate: types.string,
+  });
+
+export const Page = types
   .model('Page', {
     id: types.identifier(types.number),
     url: types.string,
@@ -106,13 +115,36 @@ const Page = types
     active: types.boolean,
     views: types.number,
     viewsPeriod: types.number,
+    archive: types.optional(types.array(ArchiveEntity), []),
+    state: types.optional(types.enumeration(fetchStates), 'pending'),
   })
   .views(self => ({
+    get archiveData() {
+      return toJS(self.archive);
+    },
     get pages() {
       return getParent(self);
     },
     get client() {
       return getParent(self, 2);
+    },
+  }))
+  .actions(self => ({
+    fetchArchive() {
+      self.state = 'pending';
+      axios().get(`/v1/page/${self.id}/archive/${self.client.id}`,
+      ).then(
+        self.fetchArchiveSuccess,
+        self.fetchArchiveError,
+      );
+    },
+    fetchArchiveSuccess({ data }) {
+      self.archive.replace(data);
+      self.state = 'done';
+    },
+    fetchArchiveError() {
+      message.error('Ошибка при получении архивных данных');
+      self.state = 'error';
     },
   }));
 
@@ -126,7 +158,7 @@ const Client = types
     views: types.number,
     cost: types.number,
     pages: types.optional(types.array(Page), []),
-    fetchPagesState: types.optional(types.enumeration(fetchStates), 'pending'),
+    state: types.optional(types.enumeration(fetchStates), 'pending'),
     current: 1,
     total: 0,
   })
@@ -158,7 +190,7 @@ const Client = types
       self.settings.setPageSize(pageSize);
     },
     fetchPages() {
-      self.fetchPagesState = 'pending';
+      self.state = 'pending';
       const params = {
         clientID: self.id,
         startDate: self.clientStore.startDate,
@@ -182,15 +214,15 @@ const Client = types
         id: page._id,
       })));
       self.total = data.total;
-      self.fetchPagesState = 'done';
+      self.state = 'done';
     },
     fetchPagesError() {
       message.error('Ошибка при получении страниц');
-      self.fetchPagesState = 'error';
+      self.state = 'error';
     },
   }));
 
-const ClientCreator = types
+export const ClientCreator = types
   .model('ClientCreator', {
     name: '',
     brand: '',
@@ -266,7 +298,7 @@ const ClientCreator = types
     },
   }));
 
-const ClientStore = types
+export const ClientStore = types
   .model('ClientStore', {
     activeTab: types.optional(
       types.enumeration(['all', 'group', 'individual']),
