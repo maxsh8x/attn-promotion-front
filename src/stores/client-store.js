@@ -357,6 +357,14 @@ export const ClientStore = types
       addDisposer(self, disposer1);
       addDisposer(self, disposer2);
     },
+    commitInput(id, field, value) {
+      axios().patch(`/v1/client/${id}`, {
+        [field]: value,
+      }).then(
+        () => message.info('Данные сохранены'),
+        () => message.info('Ошибка при сохранении'),
+      );
+    },
     switchTab(tabKey) {
       self.activeTab = tabKey;
       self.fetchData();

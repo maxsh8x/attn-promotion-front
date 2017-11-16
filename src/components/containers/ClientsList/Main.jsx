@@ -8,6 +8,7 @@ import permissions from '../../../utils/permissions';
 import Period from '../Period';
 import InfoBadges from '../InfoBadges';
 import AddPage from './AddPage';
+import EditableCell from '../EditableCell';
 
 
 const Header = ({ title, onCreateClick }) => (
@@ -73,6 +74,7 @@ class ClientsList extends Component {
       activeTab,
       switchTab,
       pageCreator,
+      commitInput
     } = this.props.clientsStore;
     const {
       current,
@@ -114,18 +116,36 @@ class ClientsList extends Component {
         dataIndex: 'name',
         title: 'Имя клиента',
         width: 250,
+        render: (text, { id }) => (
+          <EditableCell
+            value={text}
+            onChange={value => commitInput(id, 'name', value)}
+          />
+        ),
       },
       {
         key: 'brand',
         dataIndex: 'brand',
         title: 'Бренд',
         width: 250,
+        render: (text, { id }) => (
+          <EditableCell
+            value={text}
+            onChange={value => commitInput(id, 'brand', value)}
+          />
+        ),
       },
       {
         key: 'vatin',
         dataIndex: 'vatin',
         title: 'ИНН',
         width: 250,
+        render: (text, { id }) => (
+          <EditableCell
+            value={text}
+            onChange={value => commitInput(id, 'vatin', value)}
+          />
+        ),
       },
 
     ];
