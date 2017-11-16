@@ -115,7 +115,7 @@ class ClientsList extends Component {
         key: 'name',
         dataIndex: 'name',
         title: 'Имя клиента',
-        width: 250,
+        width: 400,
         render: (text, { id }) => (
           <EditableCell
             value={text}
@@ -127,7 +127,7 @@ class ClientsList extends Component {
         key: 'brand',
         dataIndex: 'brand',
         title: 'Бренд',
-        width: 250,
+        width: 400,
         render: (text, { id }) => (
           <EditableCell
             value={text}
@@ -160,13 +160,13 @@ class ClientsList extends Component {
               key: 'viewsPeriod',
               dataIndex: 'views',
               title: 'Просмотров',
-              width: 250,
+              width: 100,
             },
             {
               key: 'costPeriod',
               dataIndex: 'cost',
               title: 'Стоимость',
-              width: 250,
+              width: 100,
             },
           ],
         },
@@ -178,7 +178,7 @@ class ClientsList extends Component {
         key: 'actions',
         title: 'Действия',
         render: this.renderActions,
-        width: 250,
+        width: 200,
       });
     }
 
