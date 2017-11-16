@@ -100,6 +100,7 @@ export const ArchiveEntity = types
     id: types.identifier(types.string),
     minViews: types.number,
     maxViews: types.number,
+    costPerClick: types.number,
     startDate: types.string,
     endDate: types.string,
   });
