@@ -79,8 +79,12 @@ export const PageMetaCreator = types
       message.info('Страница успешно создана');
       self.state = 'done';
     },
-    createError() {
-      message.error('Ошибка при создании страницы');
+    createError({ response }) {
+      if (response.data.message === 'ALREADY_EXISTS') {
+        message.error('Ошибка: индивидуальный вопрос существует и уже привязан к пользователю');
+      } else {
+        message.error('Ошибка при создании страницы');
+      }
       self.state = 'error';
     },
     toggleModal(modalClientID = null) {
