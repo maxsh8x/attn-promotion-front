@@ -26,8 +26,8 @@ const UsersListAsync = Loadable({
 const PrivateArea = () => (
   <div>
     <Route path="/clients" component={ClientsListAsync} />
-    <Route path="/questions" component={PromotionListAsync} />
-    <Route path="/promotion" component={QuestionsListAsync} />
+    <Route path="/questions" component={QuestionsListAsync} />
+    <Route path="/promotion" component={PromotionListAsync} />
     <Route path="/users" component={UsersListAsync} />
   </div>
 );
