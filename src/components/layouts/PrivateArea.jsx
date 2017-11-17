@@ -38,6 +38,9 @@ const PrivateAreaLayout = ({ children, history }) => (
               <Menu.Item key="questions">
                 <NavLink to="/questions">Вопросы</NavLink>
               </Menu.Item>
+              <Menu.Item key="reports">
+                <NavLink to="/reports">Отчеты</NavLink>
+              </Menu.Item>
               {permissions(['root', 'buchhalter']) &&
                 <Menu.Item key="users">
                   <NavLink to="/users">

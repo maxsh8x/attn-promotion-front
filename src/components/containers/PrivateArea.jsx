@@ -14,10 +14,17 @@ const PromotionListAsync = Loadable({
   loader: () => import('./PromotionList/Main'),
   loading,
 });
+
+const ReportsListAsync = Loadable({
+  loader: () => import('./ReportsList/Main'),
+  loading,
+});
+
 const QuestionsListAsync = Loadable({
   loader: () => import('./QuestionsList/Main'),
   loading,
 });
+
 const UsersListAsync = Loadable({
   loader: () => import('./UsersList/Main'),
   loading,
@@ -28,6 +35,7 @@ const PrivateArea = () => (
     <Route path="/clients" component={ClientsListAsync} />
     <Route path="/questions" component={QuestionsListAsync} />
     <Route path="/promotion" component={PromotionListAsync} />
+    <Route path="/promotion" component={ReportsListAsync} />
     <Route path="/users" component={UsersListAsync} />
   </div>
 );
