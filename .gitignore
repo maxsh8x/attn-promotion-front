@@ -1,6 +1,7 @@
 config.dev.json
 config.production.json
 dist/bundle.js
+dist/*.bundle.js
 dist/uploads/
 node_modules/
 yarn-error.log

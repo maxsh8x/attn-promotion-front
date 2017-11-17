@@ -1,41 +1,23 @@
 import React from 'react';
-import Loadable from 'react-loadable';
+import universal from 'react-universal-component';
 import { Route } from 'react-router-dom';
-import { Spin } from 'antd';
 
-const loading = () => <Spin tip="Загрузка..." />;
+const ClientsListAsync = universal(() => import('./ClientsList/Main'));
 
-const ClientsListAsync = Loadable({
-  loader: () => import('./ClientsList/Main'),
-  loading,
-});
+const PromotionListAsync = universal(() => import('./PromotionList/Main.jsx'));
 
-const PromotionListAsync = Loadable({
-  loader: () => import('./PromotionList/Main'),
-  loading,
-});
+const ReportsListAsync = universal(() => import('./ReportsList/Main'));
 
-const ReportsListAsync = Loadable({
-  loader: () => import('./ReportsList/Main'),
-  loading,
-});
+const QuestionsListAsync = universal(() => import('./QuestionsList/Main'));
 
-const QuestionsListAsync = Loadable({
-  loader: () => import('./QuestionsList/Main'),
-  loading,
-});
-
-const UsersListAsync = Loadable({
-  loader: () => import('./UsersList/Main'),
-  loading,
-});
+const UsersListAsync = universal(() => import('./UsersList/Main'));
 
 const PrivateArea = () => (
   <div>
     <Route path="/clients" component={ClientsListAsync} />
     <Route path="/questions" component={QuestionsListAsync} />
     <Route path="/promotion" component={PromotionListAsync} />
-    <Route path="/promotion" component={ReportsListAsync} />
+    <Route path="/reports" component={ReportsListAsync} />
     <Route path="/users" component={UsersListAsync} />
   </div>
 );
