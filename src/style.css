@@ -37,6 +37,18 @@
   background-color: #fef0ef;
 }
 
+.campaignWaited {
+  background-color: #ffe9a7;
+}
+
+.campaignStarted {
+  background-color: #cfefdf;
+}
+
+.campaignDone {
+  background-color: #fabeb9;
+}
+
 .editableCell {
   position: relative;
 }
