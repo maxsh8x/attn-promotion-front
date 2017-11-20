@@ -5,6 +5,8 @@ import moment from 'moment';
 import axios from '../utils/axios';
 import { fetchStates } from '../constants';
 import TableSettings from './table-settings';
+import Filter from './filter-store';
+
 
 const Input = types
   .model('Input', {
@@ -295,6 +297,10 @@ const PromotionStore = types
       types.enumeration(['active', 'inactive']),
       'active',
     ),
+    filter: types.optional(Filter, {
+      length: 1,
+      url: '/v1/client/search',
+    }),
     date: types.optional(
       types.string,
       moment().subtract(1, 'days').format('YYYY-MM-DD'),
@@ -349,9 +355,14 @@ const PromotionStore = types
         () => self.fetchPages(),
         { delay: 1000 },
       );
+      const disposer4 = reaction(
+        () => self.filter.itemsData,
+        () => self.setClientsFilter(self.filter.itemsData.map(client => client.key)),
+      );
       addDisposer(self, disposer1);
       addDisposer(self, disposer2);
       addDisposer(self, disposer3);
+      addDisposer(self, disposer4);
     },
     setClientsFilter(clients) {
       self.clientsFilter = clients.join(',');

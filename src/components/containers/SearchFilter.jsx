@@ -2,18 +2,18 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { Select, Spin } from 'antd';
 
-const SearchFilter = ({ store }) => (<Select
+const SearchFilter = ({ store, title, width }) => (<Select
   mode="multiple"
   labelInValue
   value={store.itemsData}
-  placeholder={this.props.title}
+  placeholder={title}
   notFoundContent={store.state === 'done' ? <Spin size="small" /> : null}
   filterOption={false}
   onSearch={store.fetchData}
   onChange={store.setFilter}
-  style={{ width: this.props.width }}
+  style={{ width }}
 >
-  {this.props.store.data.map(page =>
+  {store.data.map(page =>
     <Select.Option key={page.value}>{page.text}</Select.Option>,
   )}
 </Select>

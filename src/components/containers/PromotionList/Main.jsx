@@ -58,7 +58,7 @@ class PromotionList extends Component {
       activeTabSettings,
       inactiveTabSettings,
       pagesData,
-      setClientsFilter,
+      filter,
       setPageFilter,
       setExpandedPages,
       pageFilter,
@@ -142,8 +142,7 @@ class PromotionList extends Component {
           />
           <SearchFilter
             title="Введите имя или бренд клиента для поиска"
-            url="/v1/client/search"
-            callback={clients => setClientsFilter(clients.map(client => client.key))}
+            store={filter}
           />
           <Input
             placeholder="Введите название страницы"

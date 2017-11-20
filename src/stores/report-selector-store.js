@@ -1,5 +1,5 @@
 import { reaction, toJS } from 'mobx';
-import { types, addDisposer, getParent, getRoot } from 'mobx-state-tree';
+import { types, addDisposer, getParent } from 'mobx-state-tree';
 import axios from '../utils/axios';
 import { fetchStates } from '../constants';
 import Filter from './filter-store';
