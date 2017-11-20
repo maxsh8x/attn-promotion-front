@@ -1,8 +1,9 @@
-import { reaction, toJS } from 'mobx';
-import { types, addDisposer, getParent } from 'mobx-state-tree';
+import { toJS } from 'mobx';
+import { types } from 'mobx-state-tree';
 import moment from 'moment';
 import axios from '../utils/axios';
 import { fetchStates } from '../constants';
+import TableSettings from './table-settings';
 
 
 const ReportItem = types
@@ -15,6 +16,7 @@ const ReportItem = types
 
 const ReportStore = types
   .model('ReportStore', {
+    tabSettings: types.map(TableSettings),
     data: types.optional(types.array(ReportItem), []),
     state: types.optional(
       types.enumeration(fetchStates),
@@ -24,6 +26,9 @@ const ReportStore = types
   .views(self => ({
     get reportData() {
       return toJS(self.data);
+    },
+    get settings() {
+      return self.tabSettings.get('general');
     },
   }))
   .actions(self => ({
@@ -52,6 +57,10 @@ const ReportStore = types
     },
   }));
 
-const reportStore = ReportStore.create({});
+const reportStore = ReportStore.create({
+  tabSettings: {
+    general: {},
+  },
+});
 
 export default reportStore;
