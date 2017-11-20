@@ -17,6 +17,7 @@ const CampaignSelectorItem = types
 
 const CampaignsSelector = types
   .model('CampaignsSelector', {
+    index: types.maybe(types.number),
     startDate: types.maybe(types.string),
     endDate: types.maybe(types.string),
     campaigns: types.optional(types.array(CampaignSelectorItem), []),
@@ -29,8 +30,16 @@ const CampaignsSelector = types
     get pageSelector() {
       return getParent(self);
     },
-    get campaignsData() {
-      return toJS(self.campaigns);
+    get selectedCampaign() {
+      return self.index !== null
+        ? self.campaigns[self.index]
+        : null;
+    },
+    get newestIsActive() {
+      return self.index !== null && self.index !== 0;
+    },
+    get oldestIsActive() {
+      return self.index !== null && self.index + 1 !== self.campaigns.length;
     },
   }))
   .actions(self => ({
@@ -43,17 +52,30 @@ const CampaignsSelector = types
       );
       addDisposer(self, disposer1);
     },
+    oldest() {
+      self.index += 1;
+    },
+    newest() {
+      self.index -= 1;
+    },
+    reset() {
+      self.index = null;
+      self.campaigns.clear();
+    },
     fetchCampaigns() {
       self.state = 'pending';
       const clientID = self.pageSelector.clientSelector.clientID;
       const pageID = self.pageSelector.pageID;
-      axios().get(`v1/page/${clientID}/report/${pageID}`,
-      ).then(
-        self.fetchPagesSuccess,
-        self.fetchPagesError,
-      );
+      if (clientID && pageID) {
+        axios().get(`v1/page/${pageID}/report/${clientID}`,
+        ).then(
+          self.fetchCampaignsSuccess,
+          self.fetchCampaignsError,
+        );
+      }
     },
     fetchCampaignsSuccess({ data }) {
+      self.index = data.length > 0 ? 0 : null;
       self.campaigns.replace(data);
       self.state = 'done';
     },
@@ -85,10 +107,19 @@ const PageSelector = types
       const disposer1 = reaction(
         () => self.clientSelector.clientID,
         () => {
-          self.fetchPages();
+          if (self.clientSelector.clientID) {
+            self.fetchPages();
+          }
         },
       );
       addDisposer(self, disposer1);
+    },
+    setPage(pageID) {
+      self.pageID = parseInt(pageID, 10);
+    },
+    reset() {
+      self.pageID = null;
+      self.pages.clear();
     },
     fetchPages() {
       self.state = 'pending';
@@ -118,6 +149,8 @@ const ClientSelector = types
       self.clientID = items.length > 0
         ? parseInt(items[0].key, 10)
         : null;
+      self.pageSelector.reset();
+      self.pageSelector.campaignSelector.reset();
     },
   }));
 

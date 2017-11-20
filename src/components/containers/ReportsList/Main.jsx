@@ -65,6 +65,7 @@ class ReportList extends Component {
       pageSelector,
       setClient,
     } = this.props.reportSelectorStore;
+    const { campaignSelector } = pageSelector;
 
     return (
       <div>
@@ -75,7 +76,7 @@ class ReportList extends Component {
             callback={setClient}
           />
           <PageSelector pageSelector={pageSelector} />
-          <CampaignSelector />
+          <CampaignSelector campaignSelector={campaignSelector} />
         </div>
         <Table
           bordered

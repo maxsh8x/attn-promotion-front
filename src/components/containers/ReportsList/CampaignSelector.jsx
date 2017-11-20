@@ -1,18 +1,33 @@
 import React from 'react';
+import { observer } from 'mobx-react';
+import moment from 'moment';
 import { Button, Icon } from 'antd';
-import style from '../../../style.css';
+// import style from '../../../style.css';
 
+const formatDate = dateISO => moment(dateISO).format('YYYY-MM-DD');
+const getLabel = selectedCampaign =>
+  `${formatDate(selectedCampaign.startDate)} - ${formatDate(selectedCampaign.endDate)}`;
 
-const CampaignSelector = () => (
+const CampaignSelector = ({ campaignSelector }) => (
   <span>
     <Button.Group>
-      <Button disabled>
+      <Button
+        disabled={!campaignSelector.oldestIsActive}
+        onClick={campaignSelector.oldest}
+      >
         <Icon type="left" />
       </Button>
-      <Button className={style.campaignDone}>
-        2017-05-11 - 2017-06-20
-      </Button>
       <Button>
+        {
+          campaignSelector.selectedCampaign
+            ? getLabel(campaignSelector.selectedCampaign)
+            : 'Нет данных'
+        }
+      </Button>
+      <Button
+        disabled={!campaignSelector.newestIsActive}
+        onClick={campaignSelector.newest}
+      >
         <Icon type="right" />
       </Button>
     </Button.Group>
@@ -23,4 +38,4 @@ CampaignSelector.propTypes = {
 
 };
 
-export default CampaignSelector;
+export default observer(CampaignSelector);
