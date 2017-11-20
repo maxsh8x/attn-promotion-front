@@ -1,5 +1,5 @@
 import { toJS } from 'mobx';
-import { types, getEnv } from 'mobx-state-tree';
+import { types } from 'mobx-state-tree';
 import { message } from 'antd';
 import axios from '../utils/axios';
 import { fetchStates } from '../constants';
@@ -38,10 +38,6 @@ const Filter = types
       const items = rawItems.slice(0, self.length);
       self.items.replace(items);
       self.data.clear();
-      const callback = getEnv(self).callback;
-      if (callback) {
-        callback(self.itemsData);
-      }
       self.state = 'done';
     },
     fetchData(filter) {

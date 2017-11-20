@@ -1,7 +1,9 @@
 import { reaction, toJS } from 'mobx';
-import { types, addDisposer, getParent } from 'mobx-state-tree';
+import { types, addDisposer, getParent, getRoot } from 'mobx-state-tree';
 import axios from '../utils/axios';
 import { fetchStates } from '../constants';
+import Filter from './filter-store';
+
 
 const PageSelectorItem = types
   .model('PageSelectorItem', {
@@ -141,8 +143,21 @@ const ClientSelector = types
   .model('ClientSelector', {
     clientID: types.maybe(types.number),
     pageSelector: types.optional(PageSelector, {}),
+    filter: types.optional(Filter, {
+      length: 1,
+      url: '/v1/client/search',
+    }),
   })
   .actions(self => ({
+    afterCreate() {
+      const disposer1 = reaction(
+        () => self.filter.itemsData,
+        () => {
+          self.setClient(self.filter.itemsData);
+        },
+      );
+      addDisposer(self, disposer1);
+    },
     setClient(items) {
       self.clientID = items.length > 0
         ? parseInt(items[0].key, 10)
@@ -170,4 +185,6 @@ const ReportSelectorStore = types
     },
   }));
 
-export default ReportSelectorStore;
+const reportSelectorStore = ReportSelectorStore.create({});
+
+export default reportSelectorStore;

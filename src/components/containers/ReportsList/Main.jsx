@@ -5,9 +5,9 @@ import style from '../../../style.css';
 import ClientSearchFilter from '../SearchFilter';
 import PageSelector from './PageSelector';
 import CampaignSelector from './CampaignSelector';
-import ReportSelectorStore from '../../../stores/report-selector-store';
 
-// @inject('reportSelectorStore') 
+@inject('reportStore')
+@inject('reportSelectorStore')
 @observer
 class ReportList extends Component {
   constructor(props) {
@@ -16,31 +16,27 @@ class ReportList extends Component {
       {
         key: 'date',
         title: 'Дата',
-        dataIndex: '',
+        dataIndex: 'id',
         width: 100,
       },
       {
         key: 'yMetricViews',
         title: 'Просмотров в метрике',
-        dataIndex: '',
+        dataIndex: 'views',
+        width: 100,
+      },
+
+      {
+        key: 'avgClicksSold',
+        title: 'Кликов куплено',
+        dataIndex: 'clicks',
         width: 100,
       },
       {
-        title: 'Кликов',
-        children: [
-          {
-            key: 'avgClicksSold',
-            title: 'Куплено',
-            dataIndex: '',
-            width: 100,
-          },
-          {
-            key: 'avgMoneySpent',
-            title: 'Потрачено',
-            dataIndex: '',
-            width: 100,
-          },
-        ],
+        key: 'avgMoneySpent',
+        title: 'Потрачено',
+        dataIndex: 'cost',
+        width: 100,
       },
       {
         title: 'Средняя цена',
@@ -50,38 +46,48 @@ class ReportList extends Component {
             title: 'Клик',
             dataIndex: '',
             width: 100,
+            render: this.renderAvgClickCost,
           },
           {
             key: 'avgViewCost',
             title: 'Просмотр',
             dataIndex: '',
             width: 100,
+            render: this.renderAvgViewCost,
           },
         ],
       },
     ];
-
-    this.reportSelectorStore = ReportSelectorStore.create({});
   }
 
   getReport = () => {
-    console.log(this.reportSelectorStore.result);
+    this.props.reportStore.fetchReport(this.props.reportSelectorStore.result);
   }
+
+  renderAvgClickCost = (value, { cost, clicks }) =>
+    ((cost && clicks)
+      ? (cost / clicks).toFixed(2)
+      : 0)
+
+  renderAvgViewCost = (value, { cost, views }) => ((cost && views)
+    ? (cost / views).toFixed(2)
+    : 0)
 
   render() {
     const {
       pageSelector,
       setClient,
-    } = this.reportSelectorStore.clientSelector;
+      filter,
+    } = this.props.reportSelectorStore.clientSelector;
     const { campaignSelector } = pageSelector;
+    const { reportData } = this.props.reportStore;
 
     return (
       <div>
         <div className={style.tableOperations}>
           <ClientSearchFilter
             title="Введите имя или бренд клиента для поиска"
-            url="/v1/client/search"
-            callback={setClient}
+            store={filter}
           />
           <PageSelector pageSelector={pageSelector} />
           <CampaignSelector campaignSelector={campaignSelector} />
@@ -94,6 +100,8 @@ class ReportList extends Component {
         </div>
         <Table
           bordered
+          rowKey="id"
+          dataSource={reportData}
           title={() => 'Краткий отчет'}
           columns={this.columns}
         />
