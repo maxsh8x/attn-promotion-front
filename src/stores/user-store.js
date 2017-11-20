@@ -4,6 +4,8 @@ import { message } from 'antd';
 import moment from 'moment';
 import axios from '../utils/axios';
 import { fetchStates } from '../constants';
+import Filter from './filter-store';
+
 
 const UserCreator = types
   .model('UserCreator', {
@@ -95,6 +97,10 @@ const ClientsBinder = types
       types.array(ClientSelectorItem),
       [],
     ),
+    filter: types.optional(Filter, {
+      length: 10,
+      url: '/v1/client/search',
+    }),
   })
   .views(self => ({
     get user() {
@@ -102,6 +108,15 @@ const ClientsBinder = types
     },
   }))
   .actions(self => ({
+    afterCreate() {
+      const disposer1 = reaction(
+        () => self.filter.itemsData,
+        () => {
+          self.setClients(self.filter.itemsData);
+        },
+      );
+      addDisposer(self, disposer1);
+    },
     setClients(clients) {
       self.clientSelector.replace(clients);
     },

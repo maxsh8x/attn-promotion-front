@@ -5,6 +5,8 @@ import moment from 'moment';
 import axios from '../utils/axios';
 import { fetchStates } from '../constants';
 import TableSettings from './table-settings';
+import Filter from './filter-store';
+
 
 const GroupQuestionCreator = types
   .model('GroupQuestionCreator', {
@@ -104,6 +106,10 @@ const ClientBinder = types
       types.enumeration(fetchStates),
       'done',
     ),
+    filter: types.optional(Filter, {
+      length: 10,
+      url: '/v1/client/search',
+    }),
     startDate: types.optional(
       types.string,
       moment().add(1, 'days').format('YYYY-MM-DD'),
@@ -119,6 +125,15 @@ const ClientBinder = types
     },
   }))
   .actions(self => ({
+    afterCreate() {
+      const disposer1 = reaction(
+        () => self.filter.itemsData,
+        () => {
+          self.setClients(self.filter.itemsData);
+        },
+      );
+      addDisposer(self, disposer1);
+    },
     toggleModal(modalQuestionID = null) {
       if (modalQuestionID) {
         self.modalQuestionID = modalQuestionID;

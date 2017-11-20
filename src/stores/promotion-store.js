@@ -298,7 +298,7 @@ const PromotionStore = types
       'active',
     ),
     filter: types.optional(Filter, {
-      length: 1,
+      length: 10,
       url: '/v1/client/search',
     }),
     date: types.optional(

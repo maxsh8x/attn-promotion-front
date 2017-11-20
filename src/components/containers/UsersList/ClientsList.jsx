@@ -84,9 +84,8 @@ class ClientsList extends Component {
           <div className={style.tableOperations}>
             <SearchFilter
               title="Выберите клиентов"
-              url="/v1/client/search"
+              store={clientsBinder.filter}
               width={300}
-              callback={clientsBinder.setClients}
             />
             <Button onClick={clientsBinder.bind}>Привязать</Button>
           </div>

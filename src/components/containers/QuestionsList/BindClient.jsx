@@ -20,8 +20,7 @@ const BindClient = ({ clientsBinder, form }) => (
       >
         <SearchFilter
           title="Введите имя клиента для поиска"
-          url="/v1/client/search"
-          callback={clientsBinder.setClients}
+          store={clientsBinder.filter}
           width={300}
         />
       </Form.Item>
