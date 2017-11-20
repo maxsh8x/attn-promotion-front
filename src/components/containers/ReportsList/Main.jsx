@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
-import { Table } from 'antd';
+import { Table, Button } from 'antd';
 import { inject, observer } from 'mobx-react';
 import style from '../../../style.css';
 import ClientSearchFilter from '../SearchFilter';
 import PageSelector from './PageSelector';
 import CampaignSelector from './CampaignSelector';
+import ReportSelectorStore from '../../../stores/report-selector-store';
 
-@inject('reportSelectorStore') @observer
+// @inject('reportSelectorStore') 
+@observer
 class ReportList extends Component {
   constructor(props) {
     super(props);
@@ -58,13 +60,19 @@ class ReportList extends Component {
         ],
       },
     ];
+
+    this.reportSelectorStore = ReportSelectorStore.create({});
+  }
+
+  getReport = () => {
+    console.log(this.reportSelectorStore.result);
   }
 
   render() {
     const {
       pageSelector,
       setClient,
-    } = this.props.reportSelectorStore;
+    } = this.reportSelectorStore.clientSelector;
     const { campaignSelector } = pageSelector;
 
     return (
@@ -77,6 +85,12 @@ class ReportList extends Component {
           />
           <PageSelector pageSelector={pageSelector} />
           <CampaignSelector campaignSelector={campaignSelector} />
+          <Button
+            disabled={campaignSelector.index === null}
+            onClick={this.getReport}
+          >
+            Сформировать
+          </Button>
         </div>
         <Table
           bordered

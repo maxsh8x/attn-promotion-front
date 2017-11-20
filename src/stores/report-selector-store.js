@@ -18,8 +18,6 @@ const CampaignSelectorItem = types
 const CampaignsSelector = types
   .model('CampaignsSelector', {
     index: types.maybe(types.number),
-    startDate: types.maybe(types.string),
-    endDate: types.maybe(types.string),
     campaigns: types.optional(types.array(CampaignSelectorItem), []),
     state: types.optional(
       types.enumeration(fetchStates),
@@ -154,6 +152,22 @@ const ClientSelector = types
     },
   }));
 
-const reportSelectorStore = ClientSelector.create({});
+const ReportSelectorStore = types
+  .model('ReportSelectorStore', {
+    clientSelector: types.optional(ClientSelector, {}),
+  })
+  .views(self => ({
+    get result() {
+      const { selectedCampaign } = self.clientSelector.pageSelector.campaignSelector;
+      const startDate = selectedCampaign ? selectedCampaign.startDate : null;
+      const endDate = selectedCampaign ? selectedCampaign.endDate : null;
+      return {
+        clientID: self.clientSelector.clientID,
+        pageID: self.clientSelector.pageSelector.pageID,
+        startDate,
+        endDate,
+      };
+    },
+  }));
 
-export default reportSelectorStore;
+export default ReportSelectorStore;
