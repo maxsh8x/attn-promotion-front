@@ -81,7 +81,7 @@ class ReportList extends Component {
     } = this.props.reportSelectorStore.clientSelector;
     const { campaignSelector } = pageSelector;
     const { reportData, settings } = this.props.reportStore;
-    const { current, total, pageSize, setPagination } = settings;
+    // const { current, total, pageSize, setPagination } = settings;
 
     return (
       <div>
@@ -102,8 +102,7 @@ class ReportList extends Component {
         <Table
           bordered
           rowKey="id"
-          pagination={{ current, pageSize, total }}
-          onChange={setPagination}
+          pagination={false}
           dataSource={reportData}
           title={() => 'Краткий отчет'}
           columns={this.columns}
