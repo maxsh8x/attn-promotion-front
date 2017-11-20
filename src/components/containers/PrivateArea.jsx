@@ -4,7 +4,7 @@ import { Route } from 'react-router-dom';
 
 const ClientsListAsync = universal(() => import('./ClientsList/Main'));
 
-const PromotionListAsync = universal(() => import('./PromotionList/Main.jsx'));
+const PromotionListAsync = universal(() => import('./PromotionList/Main'));
 
 const ReportsListAsync = universal(() => import('./ReportsList/Main'));
 

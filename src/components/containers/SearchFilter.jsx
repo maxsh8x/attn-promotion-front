@@ -8,8 +8,10 @@ import Filter from '../../stores/filter-store';
 class SearchFilter extends Component {
   constructor(props) {
     super(props);
-    this.pageFilter = Filter.create({}, {
+    this.pageFilter = Filter.create({
+      length: this.props.length,
       url: this.props.url,
+    }, {
       callback: this.props.callback,
     });
   }
@@ -37,6 +39,7 @@ class SearchFilter extends Component {
 
 SearchFilter.defaultProps = {
   width: 400,
+  length: 1,
 };
 
 export default SearchFilter;

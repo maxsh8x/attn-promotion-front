@@ -6,7 +6,7 @@ import ClientSearchFilter from '../SearchFilter';
 import PageSelector from './PageSelector';
 import CampaignSelector from './CampaignSelector';
 
-@inject('reportsStore') @observer
+@inject('reportSelectorStore') @observer
 class ReportList extends Component {
   constructor(props) {
     super(props);
@@ -62,8 +62,9 @@ class ReportList extends Component {
 
   render() {
     const {
-      reportSelector,
-    } = this.props.reportsStore;
+      pageSelector,
+      setClient,
+    } = this.props.reportSelectorStore;
 
     return (
       <div>
@@ -71,9 +72,9 @@ class ReportList extends Component {
           <ClientSearchFilter
             title="Введите имя или бренд клиента для поиска"
             url="/v1/client/search"
-            callback={reportSelector.setClient}
+            callback={setClient}
           />
-          <PageSelector />
+          <PageSelector pageSelector={pageSelector} />
           <CampaignSelector />
         </div>
         <Table

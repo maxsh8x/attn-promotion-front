@@ -1,5 +1,5 @@
 import { toJS, reaction } from 'mobx';
-import { types, getParent, getRoot } from 'mobx-state-tree';
+import { types, getParent, getRoot, addDisposer } from 'mobx-state-tree';
 import { message } from 'antd';
 import moment from 'moment';
 import axios from '../utils/axios';
@@ -199,7 +199,7 @@ const User = types
   }))
   .actions(self => ({
     afterCreate() {
-      reaction(
+      const disposer1 = reaction(
         () => [
           self.current,
           self.pageSize,
@@ -208,6 +208,7 @@ const User = types
           self.fetchClients();
         },
       );
+      addDisposer(self, disposer1);
     },
     setPagination(current, pageSize) {
       self.current = current;

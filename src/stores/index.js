@@ -2,7 +2,7 @@ import authStore from './auth-store';
 import clientsStore from './client-store';
 import questionStore from './question-store';
 import promotionStore from './promotion-store';
-import reportsStore from './report-store';
+import reportSelectorStore from './report-store';
 import usersStore from './user-store';
 
 const stores = {
@@ -10,7 +10,7 @@ const stores = {
   clientsStore,
   questionStore,
   promotionStore,
-  reportsStore,
+  reportSelectorStore,
   usersStore,
 };
 

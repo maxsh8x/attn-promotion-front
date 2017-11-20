@@ -19,6 +19,8 @@ const FilterValue = types
 const Filter = types
   .model('Filter', {
     lastFetchID: 0,
+    url: types.string,
+    length: types.number,
     items: types.optional(types.array(FilterValue), []),
     data: types.optional(types.array(Page), []),
     state: types.optional(
@@ -32,7 +34,8 @@ const Filter = types
     },
   }))
   .actions(self => ({
-    setFilter(items) {
+    setFilter(rawItems) {
+      const items = rawItems.slice(0, self.length);
       self.items.replace(items);
       self.data.clear();
       const callback = getEnv(self).callback;
@@ -45,8 +48,7 @@ const Filter = types
       self.state = 'pending';
       self.lastFetchID += 1;
       const fetchID = self.lastFetchID;
-      const url = getEnv(self).url;
-      axios().get(url, {
+      axios().get(self.url, {
         params: {
           filter,
           limit: 5,
