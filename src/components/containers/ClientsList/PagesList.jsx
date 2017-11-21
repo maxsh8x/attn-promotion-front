@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import moment from 'moment';
-import { Table, Switch, Badge, Icon } from 'antd';
+import { Table, Switch, Badge, Icon, Tabs } from 'antd';
 import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
 import shallowCompare from '../../../utils/helper';
@@ -186,22 +186,29 @@ class PagesList extends Component {
 
     const paginationParams = { current, pageSize, total };
     const now = new Date().getTime();
+    const standartProps = {
+      loading: state === 'pending',
+      bordered: true,
+      rowKey: 'id',
+      columns: this.columns,
+      dataSource: pagesData,
+      size: 'small',
+      showHeader: header,
+      onChange: this.setPagination,
+      pagination: settings.paginate ? paginationParams : false,
+      rowClassName: row => this.renderRowClassName(now, row)
+    };
+
     return (
       <div>
-
-        <Table
-          loading={state === 'pending'}
-          bordered
-          rowKey="id"
-          columns={this.columns}
-          dataSource={pagesData}
-          size="small"
-          showHeader={header}
-          expandedRowRender={this.expandedRowRender}
-          onChange={this.setPagination}
-          pagination={settings.paginate ? paginationParams : false}
-          rowClassName={row => this.renderRowClassName(now, row)}
-        />
+        <Tabs defaultActiveKey="1" size="small">
+          <Tabs.TabPane tab="Действующие" key="1">
+            <Table {...standartProps} />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Архивные" key="2">
+            <Table {...standartProps} expandedRowRender={this.expandedRowRender} />
+          </Tabs.TabPane>
+        </Tabs>
       </div>
     );
   }

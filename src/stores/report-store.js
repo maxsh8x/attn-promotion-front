@@ -9,9 +9,9 @@ import TableSettings from './table-settings';
 const ReportItem = types
   .model('ReportItem', {
     id: types.string,
-    views: 0,
-    clicks: 0,
-    cost: 0,
+    views: types.maybe(types.number),
+    clicks: types.maybe(types.number),
+    cost: types.maybe(types.number),
   });
 
 const ReportStore = types
