@@ -220,6 +220,7 @@ const Client = types
     },
     fetchPages() {
       self.state = 'pending';
+      self.pages.clear();
       const params = {
         clientID: self.id,
         startDate: self.clientStore.startDate,
