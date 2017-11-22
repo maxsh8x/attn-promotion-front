@@ -138,12 +138,22 @@ export const Page = types
     get client() {
       return getParent(self, 2);
     },
+    get store() {
+      return getRoot(self);
+    },
   }))
   .actions(self => ({
     fetchArchive() {
       self.state = 'pending';
-      axios().get(`/v1/page/${self.id}/archive/${self.client.id}`,
-      ).then(
+      axios().get('/v1/archive/pageHistorical/', {
+        params: {
+          startDate: self.store.startDate,
+          endDate: self.store.endDate,
+          clientID: self.client.id,
+          type: self.store.activeTab,
+          pageID: self.id,
+        },
+      }).then(
         self.fetchArchiveSuccess,
         self.fetchArchiveError,
       );
@@ -161,6 +171,10 @@ export const Page = types
 const Client = types
   .model('Client', {
     id: types.identifier(types.number),
+    activeTab: types.optional(
+      types.enumeration(['active', 'archived']),
+      'active',
+    ),
     counterID: types.number,
     name: types.string,
     brand: types.string,
@@ -190,6 +204,7 @@ const Client = types
           self.current,
           self.settings.pageSize,
           self.settings.paginate,
+          self.activeTab,
         ],
         () => self.fetchPages(),
       );
@@ -198,6 +213,10 @@ const Client = types
     setPagination(current, pageSize) {
       self.current = current;
       self.settings.setPageSize(pageSize);
+    },
+    switchTab(tabKey) {
+      self.settings.resetCurrent();
+      self.activeTab = tabKey;
     },
     fetchPages() {
       self.state = 'pending';
@@ -211,7 +230,10 @@ const Client = types
         params.limit = self.settings.pageSize;
         params.offset = (self.current - 1) * self.settings.pageSize;
       }
-      axios().get('v1/page/client', {
+      const url = self.activeTab === 'active'
+        ? 'v1/page/client'
+        : 'v1/archive/latest';
+      axios().get(url, {
         params,
       }).then(
         self.fetchPagesSuccess,

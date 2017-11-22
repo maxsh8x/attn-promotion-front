@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import moment from 'moment';
-import { Table, Switch, Badge, Icon, Tabs } from 'antd';
+import { Table, Switch, Badge, Icon, Tabs, Button } from 'antd';
 import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
 import shallowCompare from '../../../utils/helper';
@@ -18,6 +18,30 @@ const typeNames = {
 class PagesList extends Component {
   constructor(props) {
     super(props);
+
+    const additionalFields = []
+    if (permissions(['root', 'buchhalter'])) {
+      additionalFields.push(
+        {
+          title: 'Выбранный период',
+          children: [
+            {
+              key: 'periodViews',
+              title: 'Просмотры',
+              dataIndex: 'viewsPeriod',
+              width: 100,
+            },
+            {
+              key: 'periodCost',
+              title: 'Стоимость',
+              render: this.renderPeriodCost,
+              width: 100,
+            },
+          ],
+        },
+      );
+    }
+
     this.columns = [
       {
         dataIndex: 'type',
@@ -93,29 +117,13 @@ class PagesList extends Component {
           },
         ],
       },
+      ...additionalFields,
+      {
+        key: 'actions',
+        width: 40,
+        render: this.renderActions,
+      },
     ];
-
-    if (permissions(['root', 'buchhalter'])) {
-      this.columns.push(
-        {
-          title: 'Выбранный период',
-          children: [
-            {
-              key: 'periodViews',
-              title: 'Просмотры',
-              dataIndex: 'viewsPeriod',
-              width: 100,
-            },
-            {
-              key: 'periodCost',
-              title: 'Стоимость',
-              render: this.renderPeriodCost,
-              width: 100,
-            },
-          ],
-        },
-      );
-    }
   }
 
   componentWillMount() {
@@ -171,6 +179,12 @@ class PagesList extends Component {
   renderPeriodCost = (k, { viewsPeriod, costPerClick }) => viewsPeriod * costPerClick;
   renderCampaignCost = (k, { views, costPerClick }) => views * costPerClick;
 
+  renderActions = () => (
+    this.props.client.activeTab === 'active'
+      ? <Button icon="delete" />
+      : <Button icon="to-top" />
+  );
+
   render() {
     const {
       state,
@@ -178,6 +192,8 @@ class PagesList extends Component {
       current,
       total,
       settings,
+      activeTab,
+      switchTab,
     } = this.props.client;
     const {
       pageSize,
@@ -201,11 +217,15 @@ class PagesList extends Component {
 
     return (
       <div>
-        <Tabs defaultActiveKey="1" size="small">
-          <Tabs.TabPane tab="Действующие" key="1">
+        <Tabs
+          value={activeTab}
+          onChange={switchTab}
+          size="small"
+        >
+          <Tabs.TabPane tab="Действующие" key="active">
             <Table {...standartProps} />
           </Tabs.TabPane>
-          <Tabs.TabPane tab="Архивные" key="2">
+          <Tabs.TabPane tab="Архивные" key="archived">
             <Table {...standartProps} expandedRowRender={this.expandedRowRender} />
           </Tabs.TabPane>
         </Tabs>

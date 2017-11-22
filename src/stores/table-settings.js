@@ -25,6 +25,9 @@ const TableSettings = types
         self.setFolding(self.tableType);
       }
     },
+    resetCurrent() {
+      self.current = 1;
+    },
     setPagination({ current, pageSize }) {
       self.current = current;
       self.pageSize = pageSize;
