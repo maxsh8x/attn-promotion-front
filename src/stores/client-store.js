@@ -79,17 +79,8 @@ export const PageMetaCreator = types
       message.info('Страница успешно создана');
       self.state = 'done';
     },
-    createError({ response: { data: { message: errMsg } } }) {
-      let response = 'Ошибка при создании страницы';
-      switch (errMsg) {
-        case 'ALREADY_EXISTS': {
-          response = 'Ошибка: индивидуальный вопрос существует';
-          break;
-        }
-        default:
-          break;
-      }
-      message.error(response);
+    createError() {
+      message.error('Ошибка при создании страницы');
       self.state = 'error';
     },
     toggleModal(modalClientID = null) {
@@ -179,17 +170,8 @@ export const Page = types
       self.state = 'done';
       self.client.fetchPages();
     },
-    archiveToMetaError({ response: { data: { message: errMsg } } }) {
-      let response = 'Ошибка при восстановлении кампании';
-      switch (errMsg) {
-        case 'ALREADY_EXISTS': {
-          response = 'Ошибка: кампания уже привязана';
-          break;
-        }
-        default:
-          break;
-      }
-      message.error(response);
+    archiveToMetaError() {
+      message.error('Ошибка при восстановлении кампании');
       self.state = 'error';
     },
     fetchArchive() {
