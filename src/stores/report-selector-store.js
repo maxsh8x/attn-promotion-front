@@ -15,6 +15,7 @@ const CampaignSelectorItem = types
   .model('CampaignSelectorItem', {
     startDate: types.string,
     endDate: types.string,
+    archived: types.boolean,
   });
 
 const CampaignsSelector = types

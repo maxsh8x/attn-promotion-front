@@ -45,15 +45,11 @@
   background-color: #fef0ef;
 }
 
-.campaignWaited {
-  background-color: #ffe9a7;
-}
-
-.campaignStarted {
+.campaignNotArchived {
   background-color: #cfefdf;
 }
 
-.campaignDone {
+.campaignArchived {
   background-color: #fabeb9;
 }
 

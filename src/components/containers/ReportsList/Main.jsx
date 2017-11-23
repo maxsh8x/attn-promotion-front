@@ -82,9 +82,7 @@ class ReportList extends Component {
     const { campaignSelector } = pageSelector;
     const { reportData, settings, total } = this.props.reportStore;
 
-    if (reportData.length > 0) {
-      reportData.unshift({ ...total, id: 'Всего' });
-    }
+    const data = [{ ...total, id: 'Всего' }, ...reportData];
 
     return (
       <div>
@@ -107,7 +105,7 @@ class ReportList extends Component {
           bordered
           rowKey="id"
           pagination={false}
-          dataSource={reportData}
+          dataSource={data}
           title={() => 'Краткий отчет'}
           columns={this.columns}
         />
