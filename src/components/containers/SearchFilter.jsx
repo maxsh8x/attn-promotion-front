@@ -7,7 +7,7 @@ const SearchFilter = ({ store, title, width }) => (<Select
   labelInValue
   value={store.itemsData}
   placeholder={title}
-  notFoundContent={store.state === 'done' ? <Spin size="small" /> : null}
+  notFoundContent={store.state === 'pending' ? <Spin size="small" /> : null}
   filterOption={false}
   onSearch={store.fetchData}
   onChange={store.setFilter}
