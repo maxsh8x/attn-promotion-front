@@ -152,7 +152,11 @@ class PromotionList extends Component {
           />
         </div>
 
-        <Tabs defaultActiveKey="active" onChange={switchTab}>
+        <Tabs
+          animated={false}
+          defaultActiveKey="active"
+          onChange={switchTab}
+        >
           <Tabs.TabPane tab={`Активные (${activeTabSettings.total})`} key="active">
             <Table {...standartProps} />
           </Tabs.TabPane>

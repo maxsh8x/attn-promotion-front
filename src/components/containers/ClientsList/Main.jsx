@@ -223,6 +223,7 @@ class ClientsList extends Component {
           <AddPage creator={pageCreator} />
         </Modal>
         <Tabs
+          animated={false}
           value={activeTab}
           tabBarExtraContent={renderExtraActions}
           onChange={switchTab}

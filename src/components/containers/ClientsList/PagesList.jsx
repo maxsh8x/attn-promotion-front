@@ -226,6 +226,7 @@ class PagesList extends Component {
     return (
       <div>
         <Tabs
+          animated={false}
           value={activeTab}
           onChange={switchTab}
           size="small"

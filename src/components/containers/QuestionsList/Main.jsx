@@ -190,6 +190,7 @@ class QuestionsList extends Component {
           <BindClient clientsBinder={clientsBinder} />
         </Modal>
         <Tabs
+          animated={false}
           defaultActiveKey="group"
           tabBarExtraContent={renderExtraActions}
           onChange={switchTab}
