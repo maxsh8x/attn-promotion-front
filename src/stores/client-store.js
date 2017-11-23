@@ -154,29 +154,42 @@ export const Page = types
         clientID: self.client.id,
       }).then(
         self.metaToArchiveSuccess,
-        self.metaToArchiveFailed,
+        self.metaToArchiveErrror,
       );
     },
     metaToArchiveSuccess() {
+      message.info('Кампания отправлена в архив');
       self.state = 'done';
       self.client.fetchPages();
     },
-    metaToArchiveFailed() {
+    metaToArchiveError() {
+      message.error('Ошибка при добавлении кампании в архив');
       self.state = 'error';
     },
     archiveToMeta() {
       self.state = 'pending';
       axios().delete(`/v1/archive/${self.archiveID}`,
       ).then(
-        self.metaToArchiveSuccess,
-        self.metaToArchiveFailed,
+        self.archiveToMetaSucess,
+        self.archiveToMetaError,
       );
     },
     archiveToMetaSucess() {
+      message.info('Кампания успешно восстановлена');
       self.state = 'done';
       self.client.fetchPages();
     },
-    archiveToMetaFailed() {
+    archiveToMetaError({ response: { data: { message: errMsg } } }) {
+      let response = 'Ошибка при восстановлении кампании';
+      switch (errMsg) {
+        case 'ALREADY_EXISTS': {
+          response = 'Ошибка: кампания уже привязана';
+          break;
+        }
+        default:
+          break;
+      }
+      message.error(response);
       self.state = 'error';
     },
     fetchArchive() {
