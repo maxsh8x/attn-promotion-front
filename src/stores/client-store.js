@@ -83,7 +83,7 @@ export const PageMetaCreator = types
       let response = 'Ошибка при создании страницы';
       switch (errMsg) {
         case 'ALREADY_EXISTS': {
-          response = 'Ошибка: индивидуальный вопрос существует и уже привязан к пользователю';
+          response = 'Ошибка: индивидуальный вопрос существует';
           break;
         }
         default:
