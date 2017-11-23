@@ -9,6 +9,14 @@
   margin-right: 8px;
 }
 
+.reportTable tbody tr:first-of-type{
+  background-color: #cfefdf;
+}
+
+.reportTable tbody tr:first-of-type td:last-of-type{
+  background-color: #fabeb9;
+}
+
 .tableOperations {
   margin-bottom: 16px;
 }

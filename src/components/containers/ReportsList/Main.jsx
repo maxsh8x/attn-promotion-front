@@ -80,8 +80,11 @@ class ReportList extends Component {
       filter,
     } = this.props.reportSelectorStore.clientSelector;
     const { campaignSelector } = pageSelector;
-    const { reportData, settings } = this.props.reportStore;
-    // const { current, total, pageSize, setPagination } = settings;
+    const { reportData, settings, total } = this.props.reportStore;
+
+    if (reportData.length > 0) {
+      reportData.unshift({ ...total, id: 'Всего' });
+    }
 
     return (
       <div>
@@ -100,6 +103,7 @@ class ReportList extends Component {
           </Button>
         </div>
         <Table
+          className={style.reportTable}
           bordered
           rowKey="id"
           pagination={false}

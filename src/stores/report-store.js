@@ -27,6 +27,21 @@ const ReportStore = types
     get reportData() {
       return toJS(self.data);
     },
+    get total() {
+      let views = 0;
+      let clicks = 0;
+      let cost = 0;
+      for (let i = 0; i < self.reportData.length; i += 1) {
+        views += self.reportData[i].views;
+        clicks += self.reportData[i].clicks;
+        cost += self.reportData[i].cost;
+      }
+      return {
+        views,
+        clicks,
+        cost,
+      };
+    },
     get settings() {
       return self.tabSettings.get('general');
     },
