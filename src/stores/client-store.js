@@ -113,6 +113,7 @@ export const ArchiveEntity = types
 export const Page = types
   .model('Page', {
     id: types.identifier(types.number),
+    archiveID: types.maybe(types.string),
     url: types.string,
     title: types.string,
     type: types.string,
@@ -143,6 +144,38 @@ export const Page = types
     },
   }))
   .actions(self => ({
+    metaToArchive() {
+      self.state = 'pending';
+      axios().post('/v1/archive', {
+        pageID: self.id,
+        clientID: self.client.id,
+      }).then(
+        self.metaToArchiveSuccess,
+        self.metaToArchiveFailed,
+      );
+    },
+    metaToArchiveSuccess() {
+      self.state = 'done';
+      self.client.fetchPages();
+    },
+    metaToArchiveFailed() {
+      self.state = 'error';
+    },
+    archiveToMeta() {
+      self.state = 'pending';
+      axios().delete(`/v1/archive/${self.archiveID}`,
+      ).then(
+        self.metaToArchiveSuccess,
+        self.metaToArchiveFailed,
+      );
+    },
+    archiveToMetaSucess() {
+      self.state = 'done';
+      self.client.fetchPages();
+    },
+    archiveToMetaFailed() {
+      self.state = 'error';
+    },
     fetchArchive() {
       self.state = 'pending';
       axios().get('/v1/archive/pageHistorical/', {
@@ -215,7 +248,7 @@ const Client = types
       self.settings.setPageSize(pageSize);
     },
     switchTab(tabKey) {
-      self.settings.resetCurrent();
+      self.current = 1;
       self.activeTab = tabKey;
     },
     fetchPages() {

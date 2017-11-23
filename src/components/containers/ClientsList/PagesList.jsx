@@ -179,11 +179,14 @@ class PagesList extends Component {
   renderPeriodCost = (k, { viewsPeriod, costPerClick }) => viewsPeriod * costPerClick;
   renderCampaignCost = (k, { views, costPerClick }) => views * costPerClick;
 
-  renderActions = () => (
-    this.props.client.activeTab === 'active'
-      ? <Button icon="delete" />
-      : <Button icon="to-top" />
-  );
+  renderActions = (value, row, rowIndex) => {
+    const page = this.props.client.pages[rowIndex];
+    return (
+      this.props.client.activeTab === 'active'
+        ? <Button icon="delete" onClick={page.metaToArchive} />
+        : <Button icon="to-top" onClick={page.archiveToMeta} />
+    );
+  } 
 
   render() {
     const {
