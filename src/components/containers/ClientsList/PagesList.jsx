@@ -19,7 +19,7 @@ class PagesList extends Component {
   constructor(props) {
     super(props);
 
-    const additionalFields = []
+    const additionalFields = [];
     if (permissions(['root', 'buchhalter'])) {
       additionalFields.push(
         {
@@ -186,7 +186,7 @@ class PagesList extends Component {
         ? <Button icon="delete" onClick={page.metaToArchive} />
         : <Button icon="to-top" onClick={page.archiveToMeta} />
     );
-  } 
+  }
 
   render() {
     const {

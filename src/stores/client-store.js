@@ -105,6 +105,8 @@ export const ArchiveEntity = types
     id: types.identifier(types.string),
     minViews: types.number,
     maxViews: types.number,
+    views: types.number,
+    viewsPeriod: types.number,
     costPerClick: types.number,
     startDate: types.string,
     endDate: types.string,
@@ -128,6 +130,7 @@ export const Page = types
     viewsPeriod: types.number,
     archive: types.optional(types.array(ArchiveEntity), []),
     state: types.optional(types.enumeration(fetchStates), 'pending'),
+    archiveState: types.optional(types.enumeration(fetchStates), 'pending'),
   })
   .views(self => ({
     get archiveData() {
@@ -177,7 +180,7 @@ export const Page = types
       self.state = 'error';
     },
     fetchArchive() {
-      self.state = 'pending';
+      self.archiveState = 'pending';
       axios().get('/v1/archive/pageHistorical/', {
         params: {
           startDate: self.store.startDate,
@@ -193,11 +196,11 @@ export const Page = types
     },
     fetchArchiveSuccess({ data }) {
       self.archive.replace(data);
-      self.state = 'done';
+      self.archiveState = 'done';
     },
     fetchArchiveError() {
       message.error('Ошибка при получении архивных данных');
-      self.state = 'error';
+      self.archiveState = 'error';
     },
   }));
 

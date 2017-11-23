@@ -1,12 +1,35 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Table } from 'antd';
+import { Table, Button } from 'antd';
 import { observer } from 'mobx-react';
+import permissions from '../../../utils/permissions';
 
 @observer
 class ClientsList extends Component {
   constructor(props) {
     super(props);
+    const additionalFields = [];
+    if (permissions(['root', 'buchhalter'])) {
+      additionalFields.push(
+        {
+          title: 'Выбранный период',
+          children: [
+            {
+              key: 'periodViews',
+              title: 'Просмотры',
+              dataIndex: 'viewsPeriod',
+              width: 100,
+            },
+            {
+              key: 'periodCost',
+              title: 'Стоимость',
+              render: this.renderPeriodCost,
+              width: 100,
+            },
+          ],
+        },
+      );
+    }
     this.columns = [
       {
         title: 'Кампания',
@@ -23,6 +46,12 @@ class ClientsList extends Component {
             title: 'Конец',
             dataIndex: 'endDate',
             render: this.renderDate,
+            width: 110,
+          },
+          {
+            key: 'views',
+            title: 'Просмотров',
+            dataIndex: 'views',
             width: 110,
           },
           {
@@ -52,6 +81,12 @@ class ClientsList extends Component {
           },
         ],
       },
+      ...additionalFields,
+      {
+        key: 'actions',
+        width: 40,
+        render: this.renderActions,
+      },
     ];
   }
 
@@ -61,11 +96,16 @@ class ClientsList extends Component {
 
   renderDate = value => moment(value).format('YYYY-MM-DD')
 
+  renderActions = () => (
+    <Button icon="to-top" onClick={this.props.page.archiveToMeta} />
+  );
+
   render() {
-    const { archiveData } = this.props.page;
+    const { archiveData, archiveState } = this.props.page;
     return (
       <div>
         <Table
+          loading={archiveState === 'pending'}
           dataSource={archiveData}
           columns={this.columns}
           rowKey="id"
