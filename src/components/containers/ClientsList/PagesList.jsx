@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import moment from 'moment';
-import { Table, Switch, Badge, Icon, Tabs, Button } from 'antd';
+import { Table, Switch, Badge, Icon, Tabs, Button, Popconfirm } from 'antd';
 import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
 import shallowCompare from '../../../utils/helper';
@@ -183,7 +183,12 @@ class PagesList extends Component {
     const page = this.props.client.pages[rowIndex];
     return (
       this.props.client.activeTab === 'active'
-        ? <Button icon="delete" onClick={page.metaToArchive} />
+        ? <Popconfirm
+          title="Вы действительно хотите перенести кампанию в архив?"
+          onConfirm={page.metaToArchive}
+        >
+          <Button icon="delete" />
+        </Popconfirm>
         : <Button icon="to-top" onClick={page.archiveToMeta} />
     );
   }
