@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Table, Modal, Radio, Tabs, Icon } from 'antd';
+import { Table, Modal, Radio, Tabs, Icon, Popover } from 'antd';
 import PagesList from './PagesList';
 import ClientCreator from './ClientCreator';
 import style from '../../../style.css';
@@ -46,8 +46,9 @@ class ClientsList extends Component {
   }
 
   renderActions = (value, { id }) => {
+    const content = (<span>Создание кампании для индивидуальной страницы</span>);
     return (
-      <span>
+      <Popover content={content}>
         <a
           role="button"
           tabIndex={0}
@@ -55,9 +56,9 @@ class ClientsList extends Component {
             () => this.props.clientsStore.pageCreator.toggleModal(id)
           }
         >
-          Создать страницу
+          Создать кампанию
         </a>
-      </span>
+      </Popover>
     );
   }
 
@@ -215,7 +216,7 @@ class ClientsList extends Component {
         </Modal>
         <Modal
           visible={pageCreator.modalShown}
-          title="Информация о странице"
+          title="Информация о кампании индивидуальной страницы"
           footer={null}
           onCancel={() => pageCreator.toggleModal()}
         >

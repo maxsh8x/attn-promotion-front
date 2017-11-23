@@ -175,7 +175,7 @@ class QuestionsList extends Component {
       <div>
         <Modal
           visible={groupQuestionCreator.modalShown}
-          title="Информация о странице"
+          title="Информация о групповом вопросе"
           footer={null}
           onCancel={groupQuestionCreator.toggleModal}
         >
