@@ -132,27 +132,31 @@ class PromotionList extends Component {
       pagination: { current, pageSize, total },
     };
 
+    const renderExtraActions = (
+      <div className={style.headerOperations}>
+        <SearchFilter
+          className={style.searchPage}
+          title="Введите имя или бренд клиента для поиска"
+          store={filter}
+        />
+        <Input
+          placeholder="Введите название страницы"
+          className={style.searchPage}
+          onChange={e => setPageFilter(e.target.value)}
+          value={pageFilter}
+        />
+        <DatePicker
+          onChange={setDate}
+          value={moment(date, 'YYYY-MM-DD')}
+          allowClear={false}
+        />
+      </div>
+    );
+
     return (
       <div>
-        <div className={style.tableOperations}>
-          <DatePicker
-            onChange={setDate}
-            value={moment(date, 'YYYY-MM-DD')}
-            allowClear={false}
-          />
-          <SearchFilter
-            title="Введите имя или бренд клиента для поиска"
-            store={filter}
-          />
-          <Input
-            placeholder="Введите название страницы"
-            className={style.searchPage}
-            onChange={e => setPageFilter(e.target.value)}
-            value={pageFilter}
-          />
-        </div>
-
         <Tabs
+          tabBarExtraContent={renderExtraActions}
           animated={false}
           defaultActiveKey="active"
           onChange={switchTab}
