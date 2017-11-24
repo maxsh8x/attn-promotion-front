@@ -80,9 +80,11 @@ class ReportList extends Component {
       filter,
     } = this.props.reportSelectorStore.clientSelector;
     const { campaignSelector } = pageSelector;
-    const { reportData, settings, total } = this.props.reportStore;
+    const { reportData, settings, total, state } = this.props.reportStore;
 
-    const data = [{ ...total, id: 'Всего' }, ...reportData];
+    const data = reportData.length > 0
+      ? [{ ...total, id: 'Всего' }, ...reportData]
+      : [];
 
     return (
       <div>
@@ -101,6 +103,7 @@ class ReportList extends Component {
           </Button>
         </div>
         <Table
+          loading={state === 'pending'}
           className={style.reportTable}
           bordered
           rowKey="id"
