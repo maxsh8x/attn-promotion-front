@@ -7,6 +7,8 @@ import PageLayout from './PageLayout';
 import SearchFilter from '../SearchFilter';
 import TextWithDots from '../TextWithDots';
 import { answerURL } from '../../../constants';
+import Period from '../Period';
+
 
 @inject('promotionStore') @observer
 class PromotionList extends Component {
@@ -63,6 +65,7 @@ class PromotionList extends Component {
       setExpandedPages,
       pageFilter,
       settings,
+      metricsPeriodSelector,
     } = this.props.promotionStore;
 
     const { current, total, pageSize, setPagination } = settings;
@@ -126,7 +129,17 @@ class PromotionList extends Component {
       rowKey: 'id',
       dataSource: pagesData,
       columns,
-      title: () => 'Список продвигаемых страниц',
+      title: () => (
+        <span>
+          Список продвигаемых страниц
+          <Period
+            startDate={metricsPeriodSelector.startDate}
+            endDate={metricsPeriodSelector.endDate}
+            setDate={metricsPeriodSelector.setDate}
+            label=""
+          />
+        </span>
+      ),
       expandedRowRender: this.expandedRowRender,
       onChange: setPagination,
       pagination: { current, pageSize, total },

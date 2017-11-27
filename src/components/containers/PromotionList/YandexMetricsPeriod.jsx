@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Table, Button, Popover, Icon } from 'antd';
-import Period from '../Period';
-import style from '../../../style.css';
+import { Table } from 'antd';
 
 
 const metricName = {
@@ -14,9 +12,9 @@ const metricName = {
 
 
 @observer
-class YandexMetrics extends Component {
+class YandexMetricsPeriod extends Component {
   componentWillMount() {
-    this.props.metricsWidget.fetchMetrics();
+    this.props.metricsWidgetPeriod.fetchMetrics();
   }
 
   render() {
@@ -24,51 +22,18 @@ class YandexMetrics extends Component {
       store,
       metricsData,
       totalClickCost,
-      updateMetrics,
       state,
-      startDate,
-      endDate,
-      setDate,
-      popoverShown,
-      togglePopover,
-    } = this.props.metricsWidget;
+    } = this.props.metricsWidgetPeriod;
+    const { metricsPeriodSelector: { startDate, endDate } } = store;
     const metricsCostColumns = store.sources.map(network => ({
       key: network,
       dataIndex: `sources.${network}`,
       title: network[0].toUpperCase() + network.substr(1),
     }));
 
-
-    const TableTitle = (<Popover
-      visible={popoverShown}
-      content={
-        <div className={style.headerOperations}>
-          <Period
-            startDate={startDate}
-            endDate={endDate}
-            setDate={setDate}
-            label=""
-          />
-          <Button onClick={updateMetrics}>
-            <Icon type="reload" />
-            Обновить из метрики
-          </Button>
-        </div>
-      }
-      trigger="click"
-    >
-      <a
-        role="button"
-        tabIndex={0}
-        onClick={togglePopover}
-      >
-        Обновить
-      </a>
-    </Popover>);
-
     const columns = [
       {
-        title: <span>Данные яндекс метрики ({TableTitle})</span>,
+        title: <span>Данные яндекс метрики за {startDate} - {endDate}</span>,
         children: [
           { dataIndex: 'metric', title: 'Метрика', render: metric => metricName[metric] },
           {
@@ -85,31 +50,27 @@ class YandexMetrics extends Component {
               { dataIndex: 'metagroups.direct', title: 'Прямые заходы' },
             ],
           },
-          { dataIndex: 'metagroups.total', title: 'Итого' },
         ],
       },
     ];
 
     // popup
     return (
-      <div>
-        <Table
-          loading={state === 'pending'}
-          bordered
-          rowKey="metric"
-          columns={columns}
-          dataSource={metricsData}
-          size="small"
-          pagination={false}
-          footer={() => `Стоимость за клик: ${totalClickCost}`}
-        />
-      </div>
+      <Table
+        loading={state === 'pending'}
+        bordered
+        rowKey="metric"
+        columns={columns}
+        dataSource={metricsData}
+        size="small"
+        pagination={false}
+      />
     );
   }
 }
 
-YandexMetrics.propTypes = {
+YandexMetricsPeriod.propTypes = {
 
 };
 
-export default YandexMetrics;
+export default YandexMetricsPeriod;

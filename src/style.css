@@ -17,6 +17,10 @@
   background-color: #fabeb9;
 }
 
+.cards > * {
+  margin-bottom: 8px;
+}
+
 .tableOperations {
   margin-bottom: 16px;
 }
@@ -24,6 +28,7 @@
 .tableOperations > * {
   margin-right: 8px;
 }
+
 
 .headerOperations > * {
   margin-right: 8px;

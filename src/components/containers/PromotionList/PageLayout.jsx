@@ -2,12 +2,15 @@ import React from 'react';
 import { Card } from 'antd';
 import { observer } from 'mobx-react';
 import InputCost from './InputCost';
-import YandexMetrics from './YandexMetrics';
+import YandexMetricsDay from './YandexMetricsDay';
+import YandexMetricsPeriod from './YandexMetricsPeriod';
 import PromotionChart from './PromotionChart';
 import ClientsList from './ClientsList';
+import style from '../../../style.css';
+
 
 const PageLayout = ({ page, date }) => (
-  <div>
+  <div className={style.cards} >
     <Card noHovering>
       <ClientsList page={page} />
     </Card>
@@ -15,7 +18,8 @@ const PageLayout = ({ page, date }) => (
       <InputCost page={page} />
     </Card>
     <Card noHovering>
-      <YandexMetrics metricsWidget={page.metricsWidget} key={`${page.id}_${date}`} />
+      <YandexMetricsDay metricsWidgetDay={page.metricsWidgetDay} key={`${page.id}_${date}_day`} />
+      <YandexMetricsPeriod metricsWidgetPeriod={page.metricsWidgetPeriod} key={`${page.id}_period`} />
     </Card>
     <Card noHovering>
       <PromotionChart chart={page.chart} />

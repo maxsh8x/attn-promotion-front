@@ -102,8 +102,8 @@ const PromotionChart = types
     },
   }));
 
-const MetricsWidget = types
-  .model('MetricsWidget', {
+const MetricsWidgetDay = types
+  .model('MetricsWidgetDay', {
     state: types.optional(
       types.enumeration(fetchStates),
       'pending',
@@ -152,7 +152,7 @@ const MetricsWidget = types
     fetchMetrics() {
       self.state = 'pending';
       axios().get(
-        'v1/metrics',
+        'v1/metrics/day',
         {
           params: {
             yDate: self.store.date,
@@ -169,7 +169,7 @@ const MetricsWidget = types
       self.metrics.replace(data);
     },
     fetchMetricsError() {
-      message.error('Ошибка при получении метрик');
+      message.error('Ошибка при получении метрик за день');
       self.state = 'error';
     },
     updateMetrics() {
@@ -194,6 +194,65 @@ const MetricsWidget = types
     },
   }));
 
+const MetricsWidgetPeriod = types
+  .model('MetricsWidgetPeriod', {
+    state: types.optional(
+      types.enumeration(fetchStates),
+      'pending',
+    ),
+    metrics: types.optional(
+      types.array(Metric),
+      [],
+    ),
+  })
+  .views(self => ({
+    get metricsData() {
+      return toJS(self.metrics);
+    },
+    get page() {
+      return getParent(self);
+    },
+    get store() {
+      return getRoot(self);
+    },
+  }))
+  .actions(self => ({
+    afterCreate() {
+      const disposer1 = reaction(
+        () => [
+          self.store.metricsPeriodSelector.startDate,
+          self.store.metricsPeriodSelector.endDate,
+        ],
+        () => self.fetchMetrics(),
+      );
+      addDisposer(self, disposer1);
+    },
+    fetchMetrics() {
+      self.state = 'pending';
+      axios().get(
+        'v1/metrics/period',
+        {
+          params: {
+            startDate: self.store.metricsPeriodSelector.startDate,
+            endDate: self.store.metricsPeriodSelector.endDate,
+            pageID: self.page.id,
+          },
+        },
+      ).then(
+        self.fetchMetricsSuccess,
+        self.fetchMetricsError,
+      );
+    },
+    fetchMetricsSuccess({ data }) {
+      self.state = 'done';
+      self.metrics.replace(data);
+    },
+    fetchMetricsError() {
+      message.error('Ошибка при получении метрик за период');
+      self.state = 'error';
+    },
+  }));
+
 const Page = types
   .model('Page', {
     id: types.identifier(types.number),
@@ -214,7 +273,8 @@ const Page = types
       types.enumeration(fetchStates),
       'done',
     ),
-    metricsWidget: types.optional(MetricsWidget, {}),
+    metricsWidgetDay: types.optional(MetricsWidgetDay, {}),
+    metricsWidgetPeriod: types.optional(MetricsWidgetPeriod, {}),
     fetchClientsNamesState: types.optional(
       types.enumeration(fetchStates),
       'pending',
@@ -312,8 +372,28 @@ const Page = types
     },
   }));
 
+const MetricsPeriodSelector = types
+  .model('MetricsPeriodSelector', {
+    startDate: types.optional(
+      types.string,
+      moment().add(-1, 'months').format('YYYY-MM-DD'),
+    ),
+    endDate: types.optional(
+      types.string,
+      moment().add(-1, 'days').format('YYYY-MM-DD'),
+    ),
+
+  })
+  .actions(self => ({
+    setDate(startDate, endDate) {
+      self.startDate = startDate;
+      self.endDate = endDate;
+    },
+  }));
+
 const PromotionStore = types
   .model('PromotionStore', {
+    metricsPeriodSelector: types.optional(MetricsPeriodSelector, {}),
     tabSettings: types.map(TableSettings),
     activeTab: types.optional(
       types.enumeration(['active', 'inactive']),
