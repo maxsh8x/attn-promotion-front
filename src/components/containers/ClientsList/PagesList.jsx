@@ -179,7 +179,7 @@ class PagesList extends Component {
   renderPeriodCost = (k, { viewsPeriod, costPerClick }) => viewsPeriod * costPerClick;
   renderCampaignCost = (k, { views, costPerClick }) => views * costPerClick;
 
-  renderActions = (value, row, rowIndex) => {
+  renderActions = (value, { archiveID }, rowIndex) => {
     const page = this.props.client.pages[rowIndex];
     return (
       this.props.client.activeTab === 'active'
@@ -189,7 +189,7 @@ class PagesList extends Component {
         >
           <Button icon="delete" />
         </Popconfirm>
-        : <Button icon="to-top" onClick={page.archiveToMeta} />
+        : <Button icon="to-top" onClick={() => page.archiveToMeta(archiveID)} />
     );
   }
 

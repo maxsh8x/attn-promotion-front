@@ -157,9 +157,9 @@ export const Page = types
       message.error('Ошибка при добавлении кампании в архив');
       self.state = 'error';
     },
-    archiveToMeta() {
+    archiveToMeta(archiveID = null) {
       self.state = 'pending';
-      axios().delete(`/v1/archive/${self.archiveID}`,
+      axios().delete(`/v1/archive/${archiveID}`,
       ).then(
         self.archiveToMetaSucess,
         self.archiveToMetaError,

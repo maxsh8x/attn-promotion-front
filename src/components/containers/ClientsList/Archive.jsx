@@ -96,8 +96,8 @@ class ClientsList extends Component {
 
   renderDate = value => moment(value).format('YYYY-MM-DD')
 
-  renderActions = () => (
-    <Button icon="to-top" onClick={this.props.page.archiveToMeta} />
+  renderActions = (value, { id }) => (
+    <Button icon="to-top" onClick={() => this.props.page.archiveToMeta(id)} />
   );
 
   render() {
