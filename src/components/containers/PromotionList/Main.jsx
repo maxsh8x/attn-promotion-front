@@ -130,15 +130,17 @@ class PromotionList extends Component {
       dataSource: pagesData,
       columns,
       title: () => (
-        <span>
+        <div>
           Список продвигаемых страниц
-          <Period
-            startDate={metricsPeriodSelector.startDate}
-            endDate={metricsPeriodSelector.endDate}
-            setDate={metricsPeriodSelector.setDate}
-            label=""
-          />
-        </span>
+          <div style={{ float: 'right' }}>
+            <Period
+              startDate={metricsPeriodSelector.startDate}
+              endDate={metricsPeriodSelector.endDate}
+              setDate={metricsPeriodSelector.setDate}
+              label="Подсчет метрик за период"
+            />
+          </div>
+        </div>
       ),
       expandedRowRender: this.expandedRowRender,
       onChange: setPagination,
