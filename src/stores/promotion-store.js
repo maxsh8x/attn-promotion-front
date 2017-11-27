@@ -173,6 +173,7 @@ const MetricsWidget = types
       self.state = 'error';
     },
     updateMetrics() {
+      self.state = 'pending';
       axios().post('/v1/metrics', {
         startDate: self.startDate,
         endDate: self.endDate,
@@ -185,9 +186,11 @@ const MetricsWidget = types
     updateMetricsSucess() {
       message.info('Данные метрик обновлены');
       self.fetchMetrics();
+      self.state = 'done';
     },
     updateMetricsError() {
       message.error('Ошибка при обновлении метрик');
+      self.state = 'error';
     },
   }));
 
