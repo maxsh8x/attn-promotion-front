@@ -15,7 +15,7 @@ const PageLayout = ({ page, date }) => (
       <InputCost page={page} />
     </Card>
     <Card noHovering>
-      <YandexMetrics page={page} key={`${page.id}_${date}`} />
+      <YandexMetrics metricsWidget={page.metricsWidget} key={`${page.id}_${date}`} />
     </Card>
     <Card noHovering>
       <PromotionChart chart={page.chart} />

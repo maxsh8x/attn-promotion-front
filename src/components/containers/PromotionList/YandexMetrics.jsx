@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Table, Button, Icon } from 'antd';
+import { Table, Button, Popover, Icon } from 'antd';
 import Period from '../Period';
 import style from '../../../style.css';
 
@@ -16,7 +16,7 @@ const metricName = {
 @observer
 class YandexMetrics extends Component {
   componentWillMount() {
-    this.props.page.fetchMetrics();
+    this.props.metricsWidget.fetchMetrics();
   }
 
   render() {
@@ -25,20 +25,50 @@ class YandexMetrics extends Component {
       metricsData,
       totalClickCost,
       updateMetrics,
-      fetchMetricsState,
+      state,
       startDate,
       endDate,
       setDate,
-    } = this.props.page;
+      popoverShown,
+      togglePopover,
+    } = this.props.metricsWidget;
     const metricsCostColumns = store.sources.map(network => ({
       key: network,
       dataIndex: `sources.${network}`,
       title: network[0].toUpperCase() + network.substr(1),
     }));
 
+
+    const TableTitle = (<Popover
+      visible={popoverShown}
+      content={
+        <div className={style.headerOperations}>
+          <Period
+            startDate={startDate}
+            endDate={endDate}
+            setDate={setDate}
+            label=""
+          />
+          <Button onClick={updateMetrics}>
+            <Icon type="reload" />
+            Обновить из метрики
+          </Button>
+        </div>
+      }
+      trigger="click"
+    >
+      <a
+        role="button"
+        tabIndex={0}
+        onClick={togglePopover}
+      >
+        Обновить
+      </a>
+    </Popover>);
+
     const columns = [
       {
-        title: 'Данные яндекс метрики',
+        title: <span>Данные яндекс метрики ({TableTitle})</span>,
         children: [
           { dataIndex: 'metric', title: 'Метрика', render: metric => metricName[metric] },
           {
@@ -64,24 +94,8 @@ class YandexMetrics extends Component {
     return (
       <div>
         <Table
-          loading={fetchMetricsState === 'pending'}
+          loading={state === 'pending'}
           bordered
-          title={() => (
-            <div className={style.headerOperations}>
-              <Period
-                startDate={startDate}
-                endDate={endDate}
-                setDate={setDate}
-                label="Подсчет просмотров за период"
-              />
-              <Button onClick={updateMetrics}>
-                <Icon type="reload" />
-                Обновить данные
-              </Button>
-              <div style={{ float: 'right' }}>
-              </div>
-            </div>
-          )}
           rowKey="metric"
           columns={columns}
           dataSource={metricsData}

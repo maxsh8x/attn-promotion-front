@@ -102,6 +102,95 @@ const PromotionChart = types
     },
   }));
 
+const MetricsWidget = types
+  .model('MetricsWidget', {
+    state: types.optional(
+      types.enumeration(fetchStates),
+      'pending',
+    ),
+    metrics: types.optional(
+      types.array(Metric),
+      [],
+    ),
+    startDate: types.optional(
+      types.string,
+      moment().add(-1, 'months').format('YYYY-MM-DD'),
+    ),
+    endDate: types.optional(
+      types.string,
+      moment().add(-1, 'days').format('YYYY-MM-DD'),
+    ),
+    popoverShown: false,
+  })
+  .views(self => ({
+    get metricsData() {
+      return toJS(self.metrics);
+    },
+    get page() {
+      return getParent(self);
+    },
+    get store() {
+      return getRoot(self);
+    },
+    get totalClickCost() {
+      const { cost } = self.page.total;
+      const pageViews = self.metrics.find(item => item.metric === 'pageviews');
+      if (cost && pageViews && pageViews.metagroups.get('total')) {
+        return (cost / pageViews.metagroups.get('total')).toFixed(2);
+      }
+      return 0;
+    },
+  }))
+  .actions(self => ({
+    togglePopover() {
+      self.popoverShown = !self.popoverShown;
+    },
+    setDate(startDate, endDate) {
+      self.startDate = startDate;
+      self.endDate = endDate;
+    },
+    fetchMetrics() {
+      self.state = 'pending';
+      axios().get(
+        'v1/metrics',
+        {
+          params: {
+            yDate: self.store.date,
+            pageID: self.page.id,
+          },
+        },
+      ).then(
+        self.fetchMetricsSuccess,
+        self.fetchMetricsError,
+      );
+    },
+    fetchMetricsSuccess({ data }) {
+      self.state = 'done';
+      self.metrics.replace(data);
+    },
+    fetchMetricsError() {
+      message.error('Ошибка при получении метрик');
+      self.state = 'error';
+    },
+    updateMetrics() {
+      axios().post('/v1/metrics', {
+        startDate: self.startDate,
+        endDate: self.endDate,
+        pageID: self.page.id,
+      }).then(
+        self.updateMetricsSucess,
+        self.updateMetricsError,
+      );
+    },
+    updateMetricsSucess() {
+      message.info('Данные метрик обновлены');
+      self.fetchMetrics();
+    },
+    updateMetricsError() {
+      message.error('Ошибка при обновлении метрик');
+    },
+  }));
+
 const Page = types
   .model('Page', {
     id: types.identifier(types.number),
@@ -122,29 +211,14 @@ const Page = types
       types.enumeration(fetchStates),
       'done',
     ),
-    fetchMetricsState: types.optional(
-      types.enumeration(fetchStates),
-      'pending',
-    ),
+    metricsWidget: types.optional(MetricsWidget, {}),
     fetchClientsNamesState: types.optional(
       types.enumeration(fetchStates),
       'pending',
     ),
-    metrics: types.optional(
-      types.array(Metric),
-      [],
-    ),
     chart: types.optional(
       PromotionChart,
       {},
-    ),
-    startDate: types.optional(
-      types.string,
-      moment().add(-1, 'months').format('YYYY-MM-DD'),
-    ),
-    endDate: types.optional(
-      types.string,
-      moment().add(-1, 'days').format('YYYY-MM-DD'),
     ),
   })
   .views(self => ({
@@ -166,14 +240,6 @@ const Page = types
       }
       return result;
     },
-    get totalClickCost() {
-      const { cost } = self.total;
-      const pageViews = self.metrics.find(item => item.metric === 'pageviews');
-      if (cost && pageViews && pageViews.metagroups.get('total')) {
-        return (cost / pageViews.metagroups.get('total')).toFixed(2);
-      }
-      return 0;
-    },
     get store() {
       return getRoot(self);
     },
@@ -183,9 +249,6 @@ const Page = types
         id: self.id,
       }];
     },
-    get metricsData() {
-      return toJS(self.metrics);
-    },
   }))
   .actions(self => ({
     setInput(network, type, value) {
@@ -193,10 +256,6 @@ const Page = types
       if (!(isNaN(parsedValue))) {
         self.inputs.get(network)[type] = parsedValue;
       }
-    },
-    setDate(startDate, endDate) {
-      self.startDate = startDate;
-      self.endDate = endDate;
     },
     commitInput(network, type, value) {
       self.inputs.get(network)[type] = parseFloat(value, 10);
@@ -231,39 +290,6 @@ const Page = types
       self.active = checked;
     },
     updateStatusFailed() { },
-    fetchMetrics() {
-      self.fetchMetricsState = 'pending';
-      axios().get(
-        'v1/metrics',
-        {
-          params: {
-            yDate: self.store.date,
-            pageID: self.id,
-          },
-        },
-      ).then(
-        self.fetchMetricsSuccess,
-        self.fetchMetricsError,
-      );
-    },
-    fetchMetricsSuccess({ data }) {
-      self.fetchMetricsState = 'done';
-      self.metrics.replace(data);
-    },
-    fetchMetricsError() {
-      message.error('Ошибка при получении метрик');
-      self.fetchMetricsState = 'error';
-    },
-    updateMetrics() {
-      axios().post('/v1/metrics', {
-        startDate: self.startDate,
-        endDate: self.endDate,
-        pageID: self.id,
-      }).then(
-        self.updateMetricsSucess,
-        self.updateMetricsError,
-      );
-    },
     fetchClientsNames() {
       self.fetchClientsNamesState = 'pending';
       return axios().get('/v1/page/clientsList', {
@@ -280,13 +306,6 @@ const Page = types
     fetchClientsNamesError() {
       message.error('Ошибка при получении имен клиентов');
       self.fetchClientsNamesState = 'error';
-    },
-    updateMetricsSucess() {
-      message.info('Данные метрик обновлены');
-      self.fetchMetrics();
-    },
-    updateMetricsError() {
-      message.error('Ошибка при обновлении метрик');
     },
   }));
 

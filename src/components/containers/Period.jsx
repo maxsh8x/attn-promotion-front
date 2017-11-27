@@ -7,7 +7,7 @@ const { RangePicker } = DatePicker;
 
 const Period = ({ startDate, endDate, setDate, label }) => (
   <span>
-    {label}: <RangePicker
+    {label && `${label}: `}<RangePicker
       defaultValue={[moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')]}
       onChange={(dates, [startDate, endDate]) => setDate(startDate, endDate)}
       allowClear={false}
