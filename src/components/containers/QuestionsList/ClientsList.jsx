@@ -106,21 +106,26 @@ class QuestionList extends Component {
             width: 110,
           },
           {
-            key: 'costPerClick',
-            dataIndex: 'costPerClick',
-            title: 'Цена продажи',
-            width: 110,
+            title: 'Цена',
+            children: [
+              {
+                key: 'costPerClick',
+                dataIndex: 'costPerClick',
+                title: 'Продажи',
+                width: 110,
+              },
+              {
+                key: 'targetClickCost',
+                dataIndex: 'targetClickCost',
+                title: 'Плановая',
+                width: 110,
+              },
+            ],
           },
           {
             key: 'campaignPeriod',
             title: 'Стоимость',
             render: this.renderCampaignCost,
-            width: 110,
-          },
-          {
-            key: 'targetClickCost',
-            dataIndex: 'targetClickCost',
-            title: 'Плановая',
             width: 110,
           },
         ],
