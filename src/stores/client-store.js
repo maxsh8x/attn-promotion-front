@@ -248,6 +248,18 @@ const Client = types
       );
       addDisposer(self, disposer);
     },
+    commitInput(id, field, value) {
+      let processedValue = value;
+      if (['costPerClick', 'targetClickCost'].indexOf(field) !== -1) {
+        processedValue = parseInt(processedValue, 10);
+      }
+      axios().patch(`/v1/client/${self.id}/page/${id}`, {
+        [field]: processedValue,
+      }).then(
+        () => message.info('Данные сохранены'),
+        () => message.info('Ошибка при сохранении'),
+      );
+    },
     setPagination(current, pageSize) {
       self.current = current;
       self.settings.setPageSize(pageSize);

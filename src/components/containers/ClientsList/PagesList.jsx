@@ -8,6 +8,8 @@ import shallowCompare from '../../../utils/helper';
 import { answerURL } from '../../../constants';
 import TextWithDots from '../TextWithDots';
 import Archive from './Archive';
+import EditableCell from '../EditableCell';
+
 
 const typeNames = {
   individual: <Icon type="user" style={{ fontSize: 16, color: '#ffbf00' }} />,
@@ -18,6 +20,8 @@ const typeNames = {
 class PagesList extends Component {
   constructor(props) {
     super(props);
+
+    const { commitInput } = this.props.client;
 
     const additionalFields = [];
     if (permissions(['root', 'buchhalter'])) {
@@ -92,12 +96,24 @@ class PagesList extends Component {
                 dataIndex: 'costPerClick',
                 title: 'Продажи',
                 width: 110,
+                render: (text, { id }) => (
+                  <EditableCell
+                    value={text}
+                    onChange={value => commitInput(id, 'costPerClick', value)}
+                  />
+                ),
               },
               {
                 key: 'targetClickCost',
                 dataIndex: 'targetClickCost',
                 title: 'Плановая',
                 width: 110,
+                render: (text, { id }) => (
+                  <EditableCell
+                    value={text}
+                    onChange={value => commitInput(id, 'targetClickCost', value)}
+                  />
+                ),
               },
             ],
           },
@@ -231,7 +247,7 @@ class PagesList extends Component {
       showHeader: header,
       onChange: this.setPagination,
       pagination: settings.paginate ? paginationParams : false,
-      rowClassName: row => this.renderRowClassName(now, row)
+      rowClassName: row => this.renderRowClassName(now, row),
     };
 
     return (
