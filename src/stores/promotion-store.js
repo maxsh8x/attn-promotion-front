@@ -338,7 +338,7 @@ const Page = types
       self.commitInputState = 'done';
     },
     commitInputError() {
-      message.info('Ошибка при сохранении изменений');
+      message.error('Ошибка при сохранении изменений');
       self.commitInputState = 'error';
     },
     updateStatus(checked) {

@@ -316,7 +316,7 @@ const UserStore = types
         [field]: value,
       }).then(
         () => message.info('Данные сохранены'),
-        () => message.info('Ошибка при сохранении'),
+        () => message.error('Ошибка при сохранении'),
       );
     },
     fetchUsers() {
