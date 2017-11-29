@@ -57,7 +57,7 @@ const Creator = ({ creator, form }) => [
   </Form.Item>),
   (<Form.Item
     key="costPerClick"
-    label="Цена за показ"
+    label="Цена продажи"
     {...formItemLayout}
   >
     {form.getFieldDecorator('costPerClick', {
@@ -66,6 +66,15 @@ const Creator = ({ creator, form }) => [
         { message: 'Укажите цену за показ', type: 'number', min: 1 },
       ],
       onChange: value => creator.setCostPerClick(value),
+    })(<InputNumber min={0} />)}
+  </Form.Item>),
+  (<Form.Item
+    key="costPerClick"
+    label="Плановая"
+    {...formItemLayout}
+  >
+    {form.getFieldDecorator('targetClickCost', {
+      onChange: value => creator.setTargetClickCost(value),
     })(<InputNumber min={0} />)}
   </Form.Item>),
   (<Form.Item

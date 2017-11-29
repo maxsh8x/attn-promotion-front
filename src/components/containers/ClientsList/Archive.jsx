@@ -57,7 +57,13 @@ class ClientsList extends Component {
           {
             key: 'costPerClick',
             dataIndex: 'costPerClick',
-            title: 'Цена за клик',
+            title: 'Цена продажи',
+            width: 110,
+          },
+          {
+            key: 'targetClickCost',
+            dataIndex: 'targetClickCost',
+            title: 'Плановая',
             width: 110,
           },
         ],

@@ -87,7 +87,7 @@ class PagesList extends Component {
           {
             key: 'costPerClick',
             dataIndex: 'costPerClick',
-            title: 'Цена за клик',
+            title: 'Цена продажи',
             width: 110,
           },
           {
@@ -95,6 +95,12 @@ class PagesList extends Component {
             title: 'Стоимость',
             width: 110,
             render: this.renderCampaignCost,
+          },
+          {
+            key: 'targetClickCost',
+            dataIndex: 'targetClickCost',
+            title: 'Плановая',
+            width: 110,
           },
         ],
       },

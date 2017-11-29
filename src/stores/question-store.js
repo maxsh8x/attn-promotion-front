@@ -75,6 +75,7 @@ const Client = types
     minViews: types.number,
     maxViews: types.number,
     costPerClick: types.number,
+    targetClickCost: 0,
     startDate: types.string,
     endDate: types.string,
     views: types.number,
@@ -101,6 +102,7 @@ const ClientBinder = types
     ),
     minViews: 0,
     maxViews: 0,
+    targetClickCost: 0,
     costPerClick: 0,
     state: types.optional(
       types.enumeration(fetchStates),
@@ -148,6 +150,7 @@ const ClientBinder = types
         minViews: self.minViews,
         maxViews: self.maxViews,
         costPerClick: self.costPerClick,
+        targetClickCost: self.targetClickCost,
         startDate: self.startDate,
         endDate: self.endDate,
       }).then(
@@ -179,6 +182,9 @@ const ClientBinder = types
     },
     setCostPerClick(value) {
       self.costPerClick = value;
+    },
+    setTargetClickCost(value) {
+      self.targetClickCost = value;
     },
     setDate(startDate, endDate) {
       self.startDate = startDate;

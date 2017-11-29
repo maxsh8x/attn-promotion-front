@@ -18,6 +18,7 @@ export const PageMetaCreator = types
     title: '',
     minViews: 0,
     maxViews: 0,
+    targetClickCost: 0,
     costPerClick: 0,
     startDate: types.optional(
       types.string,
@@ -44,6 +45,9 @@ export const PageMetaCreator = types
     setCostPerClick(value) {
       self.costPerClick = value;
     },
+    setTargetClickCost(value) {
+      self.targetClickCost = value;
+    },
     setDate(startDate, endDate) {
       self.startDate = startDate;
       self.endDate = endDate;
@@ -64,6 +68,7 @@ export const PageMetaCreator = types
         minViews: self.minViews,
         maxViews: self.maxViews,
         costPerClick: self.costPerClick,
+        targetClickCost: self.targetClickCost,
         startDate: self.startDate,
         endDate: self.endDate,
       };
@@ -99,6 +104,7 @@ export const ArchiveEntity = types
     views: types.number,
     viewsPeriod: types.number,
     costPerClick: types.number,
+    targetClickCost: 0,
     startDate: types.string,
     endDate: types.string,
   });
@@ -113,6 +119,7 @@ export const Page = types
     minViews: types.number,
     maxViews: types.number,
     costPerClick: types.number,
+    targetClickCost: 0,
     startDate: types.string,
     endDate: types.string,
     parent: types.maybe(types.number),
