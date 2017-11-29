@@ -17,6 +17,8 @@ class YandexMetricsPeriod extends Component {
     this.props.metricsWidgetPeriod.fetchMetrics();
   }
 
+  renderNumber = value => value && Number(value.toFixed(2))
+
   render() {
     const {
       store,
@@ -29,6 +31,7 @@ class YandexMetricsPeriod extends Component {
       key: network,
       dataIndex: `sources.${network}`,
       title: network[0].toUpperCase() + network.substr(1),
+      render: this.renderNumber,
     }));
 
     const columns = [
@@ -43,13 +46,14 @@ class YandexMetricsPeriod extends Component {
           {
             title: 'Метагруппы',
             children: [
-              { dataIndex: 'metagroups.ad', title: 'Реклама всего' },
-              { dataIndex: 'metagroups.social', title: 'Социальные сети' },
-              { dataIndex: 'metagroups.referral', title: 'Ссылки на сайт' },
-              { dataIndex: 'metagroups.internal', title: 'Внутренние переходы' },
-              { dataIndex: 'metagroups.direct', title: 'Прямые заходы' },
+              { dataIndex: 'metagroups.ad', title: 'Реклама всего', render: this.renderNumber },
+              { dataIndex: 'metagroups.social', title: 'Социальные сети', render: this.renderNumber },
+              { dataIndex: 'metagroups.referral', title: 'Ссылки на сайт', render: this.renderNumber },
+              { dataIndex: 'metagroups.internal', title: 'Внутренние переходы', render: this.renderNumber },
+              { dataIndex: 'metagroups.direct', title: 'Прямые заходы', render: this.renderNumber },
             ],
           },
+          { dataIndex: 'metagroups.total', title: 'Итого', render: this.renderNumber },
         ],
       },
     ];
