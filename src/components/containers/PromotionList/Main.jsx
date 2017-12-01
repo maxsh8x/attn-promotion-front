@@ -16,8 +16,10 @@ class PromotionList extends Component {
     this.props.promotionStore.fetchPages();
   }
 
-  getTotal = (rowIndex, type) =>
-    this.props.promotionStore.pages[rowIndex].total[type];
+  getTotal = (rowIndex, type) => {
+    const page = this.props.promotionStore.pages[rowIndex];
+    return `${page.total.day[type]} / ${page.total.period[type]}`;
+  }
 
   expandedRowRender = (row, rowIndex) => {
     const date = this.props.promotionStore.date;
@@ -25,9 +27,17 @@ class PromotionList extends Component {
     return <PageLayout page={page} date={date} />;
   }
 
-  metricRender = value => ((value && value.cost && value.clicks)
-    ? (value.cost / value.clicks).toFixed(2)
-    : 0)
+  metricRender = (network, inputsDay, inputsPeriod) => {
+    const day = inputsDay[network];
+    const period = inputsPeriod[network];
+    const dayResult = (day && day.cost && day.clicks)
+      ? (day.cost / day.clicks).toFixed(2)
+      : 0;
+    const periodResult = (period && period.cost && period.clicks)
+      ? (period.cost / period.clicks).toFixed(2)
+      : 0;
+    return `${dayResult} / ${periodResult}`;
+  }
 
   renderPageURL = (pageURL, { title, createdAt }) => {
     const content = (
@@ -72,10 +82,10 @@ class PromotionList extends Component {
 
     const metricsCostColumns = sources.map(network => ({
       key: network,
-      dataIndex: `inputsDay.${network}`,
       title: network[0].toUpperCase() + network.substr(1),
-      render: this.metricRender,
-      width: 80,
+      render: (v, { inputsDay, inputsPeriod }) =>
+        this.metricRender(network, inputsDay, inputsPeriod),
+      width: 100,
     }));
 
     const columns = [
@@ -100,24 +110,21 @@ class PromotionList extends Component {
         children: [
           {
             key: 'totalClicks',
-            dataIndex: 'total.clicks',
             title: 'Кликов',
             render: (v, p, rowIndex) => this.getTotal(rowIndex, 'clicks'),
-            width: 80,
+            width: 100,
           },
           {
             key: 'totalCost',
-            dataIndex: 'total.cost',
             title: 'Потрачено',
             render: (v, p, rowIndex) => this.getTotal(rowIndex, 'cost'),
-            width: 80,
+            width: 100,
           },
           {
             key: 'totalCostPerClick',
-            dataIndex: 'total.costPerClick',
             title: 'Стоимость',
             render: (v, p, rowIndex) => this.getTotal(rowIndex, 'costPerClick'),
-            width: 80,
+            width: 100,
           },
         ],
       },

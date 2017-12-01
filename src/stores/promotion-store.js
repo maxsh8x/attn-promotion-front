@@ -3,6 +3,7 @@ import { types, getRoot, getParent, addDisposer } from 'mobx-state-tree';
 import { message } from 'antd';
 import moment from 'moment';
 import axios from '../utils/axios';
+import { getInitState, getFlatInputs, mergeInputs } from '../utils/inputs';
 import { fetchStates } from '../constants';
 import TableSettings from './table-settings';
 import Filter from './filter-store';
@@ -293,17 +294,29 @@ const Page = types
       return toJS(self.clientsNames);
     },
     get total() {
-      const result = {
+      const resultItem = {
         cost: 0,
         clicks: 0,
         costPerClick: 0,
       };
+      const result = {
+        day: { ...resultItem },
+        period: { ...resultItem },
+      };
+      // TODO: refactor
       self.inputsDay.forEach((input) => {
-        result.cost += input.cost;
-        result.clicks += input.clicks;
+        result.day.cost += input.cost;
+        result.day.clicks += input.clicks;
       });
-      if (result.cost && result.clicks) {
-        result.costPerClick = (result.cost / result.clicks).toFixed(2);
+      if (result.day.cost && result.day.clicks) {
+        result.day.costPerClick = (result.day.cost / result.day.clicks).toFixed(2);
+      }
+      self.inputsPeriod.forEach((input) => {
+        result.period.cost += input.cost;
+        result.period.clicks += input.clicks;
+      });
+      if (result.period.cost && result.period.clicks) {
+        result.period.costPerClick = (result.period.cost / result.period.clicks).toFixed(2);
       }
       return result;
     },
@@ -503,39 +516,48 @@ const PromotionStore = types
         self.fetchPagesError,
       );
     },
-    fetchPagesSuccess({ sources, inputDay, pages, activePages, inactivePages }, onlyInputs) {
-      const networksInitState = {};
-      for (let i = 0; i < sources.length; i += 1) {
-        networksInitState[sources[i]] = {
-          cost: 0,
-          clicks: 0,
-        };
-      }
+    fetchPagesSuccess({
+      sources,
+      inputDay,
+      inputPeriod,
+      pages,
+      activePages,
+      inactivePages,
+    }, onlyInputs) {
+      const networksInitState = getInitState(sources);
 
-      const flatInputDay = {};
-      for (let i = 0; i < inputDay.length; i += 1) {
-        flatInputDay[inputDay[i]._id.page] = { ...networksInitState };
-        for (let x = 0; x < inputDay[i].sources.length; x += 1) {
-          flatInputDay[inputDay[i]._id.page][inputDay[i].sources[x]] = {
-            cost: inputDay[i].cost[x],
-            clicks: inputDay[i].clicks[x],
-          };
-        }
-      }
+      const flatInputDay = getFlatInputs(inputDay, networksInitState);
+      const flatInputPeriod = getFlatInputs(inputPeriod, networksInitState);
+
       if (onlyInputs) {
         for (let i = 0; i < self.pages.length; i += 1) {
           self.pages[i].inputsDay.clear();
-          self.pages[i].inputsDay = flatInputDay[self.pages[i].id]
-            ? { ...networksInitState, ...flatInputDay[self.pages[i].id] }
-            : networksInitState;
+          self.pages[i].inputsDay = mergeInputs(
+            flatInputDay,
+            networksInitState,
+            self.pages[i].id,
+          );
+          self.pages[i].inputsPeriod.clear();
+          self.pages[i].inputsPeriod = mergeInputs(
+            flatInputPeriod,
+            networksInitState,
+            self.pages[i].id,
+          );
         }
       } else {
         self.pages.replace(pages.map(item => ({
           ...item,
           id: item._id,
-          inputsDay: flatInputDay[item._id]
-            ? { ...networksInitState, ...flatInputDay[item._id] }
-            : networksInitState,
+          inputsDay: mergeInputs(
+            flatInputDay,
+            networksInitState,
+            item._id,
+          ),
+          inputsPeriod: mergeInputs(
+            flatInputPeriod,
+            networksInitState,
+            item._id,
+          ),
         })));
       }
       self.sources.replace(sources);
