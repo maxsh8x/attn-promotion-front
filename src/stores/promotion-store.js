@@ -308,15 +308,17 @@ const Page = types
         result.day.cost += input.cost;
         result.day.clicks += input.clicks;
       });
+
       if (result.day.cost && result.day.clicks) {
-        result.day.costPerClick = (result.day.cost / result.day.clicks).toFixed(2);
+        result.day.costPerClick = (result.day.cost / result.day.clicks);
       }
       self.inputsPeriod.forEach((input) => {
         result.period.cost += input.cost;
         result.period.clicks += input.clicks;
       });
+
       if (result.period.cost && result.period.clicks) {
-        result.period.costPerClick = (result.period.cost / result.period.clicks).toFixed(2);
+        result.period.costPerClick = (result.period.cost / result.period.clicks);
       }
       return result;
     },

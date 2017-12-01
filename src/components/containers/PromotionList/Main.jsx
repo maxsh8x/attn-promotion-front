@@ -19,8 +19,12 @@ class PromotionList extends Component {
   getTotal = (rowIndex, type) => {
     const page = this.props.promotionStore.pages[rowIndex];
     return [
-      <div key="totalDay" className={style.dayCostPerClick}>{page.total.day[type]}</div>,
-      <div key="totalPeriod" className={style.periodCostPerClick}>{page.total.period[type]}</div>,
+      <div key="totalDay" className={style.dayCostPerClick}>
+        {page.total.day[type].toFixed(2)}
+      </div>,
+      <div key="totalPeriod" className={style.periodCostPerClick}>
+        {page.total.period[type].toFixed(2)}
+      </div>,
     ];
   }
 
