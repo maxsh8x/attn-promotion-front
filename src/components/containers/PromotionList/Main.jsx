@@ -72,7 +72,7 @@ class PromotionList extends Component {
 
     const metricsCostColumns = sources.map(network => ({
       key: network,
-      dataIndex: `inputs.${network}`,
+      dataIndex: `inputsDay.${network}`,
       title: network[0].toUpperCase() + network.substr(1),
       render: this.metricRender,
       width: 80,

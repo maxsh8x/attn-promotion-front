@@ -265,7 +265,11 @@ const Page = types
       types.array(types.string),
       [],
     ),
-    inputs: types.optional(
+    inputsDay: types.optional(
+      types.map(Input),
+      {},
+    ),
+    inputsPeriod: types.optional(
       types.map(Input),
       {},
     ),
@@ -294,7 +298,7 @@ const Page = types
         clicks: 0,
         costPerClick: 0,
       };
-      self.inputs.forEach((input) => {
+      self.inputsDay.forEach((input) => {
         result.cost += input.cost;
         result.clicks += input.clicks;
       });
@@ -308,7 +312,7 @@ const Page = types
     },
     get inputData() {
       return [{
-        ...self.inputs.toJSON(),
+        ...self.inputsDay.toJSON(),
         id: self.id,
       }];
     },
@@ -317,11 +321,11 @@ const Page = types
     setInput(network, type, value) {
       const parsedValue = parseFloat(value, 10);
       if (!(isNaN(parsedValue))) {
-        self.inputs.get(network)[type] = parsedValue;
+        self.inputsDay.get(network)[type] = parsedValue;
       }
     },
     commitInput(network, type, value) {
-      self.inputs.get(network)[type] = parseFloat(value, 10);
+      self.inputsDay.get(network)[type] = parseFloat(value, 10);
       axios().post('v1/input', {
         yDate: self.store.date,
         source: network,
@@ -449,6 +453,8 @@ const PromotionStore = types
       const disposer2 = reaction(
         () => [
           self.date,
+          self.metricsPeriodSelector.startDate,
+          self.metricsPeriodSelector.endDate,
         ],
         () => self.fetchPages(true),
       );
@@ -484,6 +490,8 @@ const PromotionStore = types
       axios().get('v1/page', {
         params: {
           yDate: self.date,
+          startDate: self.metricsPeriodSelector.startDate,
+          endDate: self.metricsPeriodSelector.endDate,
           active: self.activeTab === 'active',
           offset: (self.settings.current - 1) * self.settings.pageSize,
           limit: self.settings.pageSize,
@@ -495,7 +503,7 @@ const PromotionStore = types
         self.fetchPagesError,
       );
     },
-    fetchPagesSuccess({ sources, input, pages, activePages, inactivePages }, onlyInputs) {
+    fetchPagesSuccess({ sources, inputDay, pages, activePages, inactivePages }, onlyInputs) {
       const networksInitState = {};
       for (let i = 0; i < sources.length; i += 1) {
         networksInitState[sources[i]] = {
@@ -504,29 +512,29 @@ const PromotionStore = types
         };
       }
 
-      const flatInput = {};
-      for (let i = 0; i < input.length; i += 1) {
-        flatInput[input[i]._id.page] = { ...networksInitState };
-        for (let x = 0; x < input[i].sources.length; x += 1) {
-          flatInput[input[i]._id.page][input[i].sources[x]] = {
-            cost: input[i].cost[x],
-            clicks: input[i].clicks[x],
+      const flatInputDay = {};
+      for (let i = 0; i < inputDay.length; i += 1) {
+        flatInputDay[inputDay[i]._id.page] = { ...networksInitState };
+        for (let x = 0; x < inputDay[i].sources.length; x += 1) {
+          flatInputDay[inputDay[i]._id.page][inputDay[i].sources[x]] = {
+            cost: inputDay[i].cost[x],
+            clicks: inputDay[i].clicks[x],
           };
         }
       }
       if (onlyInputs) {
         for (let i = 0; i < self.pages.length; i += 1) {
-          self.pages[i].inputs.clear();
-          self.pages[i].inputs = flatInput[self.pages[i].id]
-            ? { ...networksInitState, ...flatInput[self.pages[i].id] }
+          self.pages[i].inputsDay.clear();
+          self.pages[i].inputsDay = flatInputDay[self.pages[i].id]
+            ? { ...networksInitState, ...flatInputDay[self.pages[i].id] }
             : networksInitState;
         }
       } else {
         self.pages.replace(pages.map(item => ({
           ...item,
           id: item._id,
-          inputs: flatInput[item._id]
-            ? { ...networksInitState, ...flatInput[item._id] }
+          inputsDay: flatInputDay[item._id]
+            ? { ...networksInitState, ...flatInputDay[item._id] }
             : networksInitState,
         })));
       }
