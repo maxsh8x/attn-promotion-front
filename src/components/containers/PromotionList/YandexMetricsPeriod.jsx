@@ -14,7 +14,7 @@ const metricName = {
 @observer
 class YandexMetricsPeriod extends Component {
   componentWillMount() {
-    this.props.metricsWidgetPeriod.fetchMetrics();
+    this.props.metricsWidgetPeriod.init();
   }
 
   renderNumber = value => value && Number(value.toFixed(2))

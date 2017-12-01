@@ -218,7 +218,17 @@ const MetricsWidgetPeriod = types
     },
   }))
   .actions(self => ({
-    afterCreate() {
+    // afterCreate() {
+    //   const disposer1 = reaction(
+    //     () => [
+    //       self.store.metricsPeriodSelector.startDate,
+    //       self.store.metricsPeriodSelector.endDate,
+    //     ],
+    //     () => self.fetchMetrics(),
+    //   );
+    //   addDisposer(self, disposer1);
+    // },
+    init() {
       const disposer1 = reaction(
         () => [
           self.store.metricsPeriodSelector.startDate,
@@ -227,6 +237,7 @@ const MetricsWidgetPeriod = types
         () => self.fetchMetrics(),
       );
       addDisposer(self, disposer1);
+      self.fetchMetrics();
     },
     fetchMetrics() {
       self.state = 'pending';
