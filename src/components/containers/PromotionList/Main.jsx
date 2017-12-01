@@ -19,8 +19,8 @@ class PromotionList extends Component {
   getTotal = (rowIndex, type) => {
     const page = this.props.promotionStore.pages[rowIndex];
     return [
-      <div className={style.dayCostPerClick}>{page.total.day[type]}</div>,
-      <div className={style.periodCostPerClick}>{page.total.period[type]}</div>,
+      <div key="totalDay" className={style.dayCostPerClick}>{page.total.day[type]}</div>,
+      <div key="totalPeriod" className={style.periodCostPerClick}>{page.total.period[type]}</div>,
     ];
   }
 
@@ -40,14 +40,14 @@ class PromotionList extends Component {
       ? (period.cost / period.clicks).toFixed(2)
       : 0;
     return [
-      <tr className={style.dayCostPerClick}>{dayResult}</tr>,
-      <tr className={style.periodCostPerClick}>{periodResult}</tr>,
+      <div key="costDay" className={style.dayCostPerClick}>{dayResult}</div>,
+      <div key="costPeriod" className={style.periodCostPerClick}>{periodResult}</div>,
     ];
   }
 
   renderLabels = () => [
-    <div className={style.dayCostPerClick}>День</div>,
-    <div className={style.periodCostPerClick}>Период</div>,
+    <div key="labelDay" className={style.dayCostPerClick}>День</div>,
+    <div key="labelPeriod" className={style.periodCostPerClick}>Период</div>,
   ]
 
   renderPageURL = (pageURL, { title, createdAt }) => {
