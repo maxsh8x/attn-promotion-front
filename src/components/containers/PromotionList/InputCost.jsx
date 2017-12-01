@@ -4,7 +4,7 @@ import { Table, InputNumber } from 'antd';
 
 
 const InputCost = ({ page }) => {
-  const { inputData, commitInput, setInput } = page;
+  const { inputDataDay, commitInput, setInput } = page;
   const networks = page.store.sources;
   const childItems = networks.map(network => (
     {
@@ -48,7 +48,7 @@ const InputCost = ({ page }) => {
       bordered
       rowKey="id"
       columns={columns}
-      dataSource={inputData}
+      dataSource={inputDataDay}
       size="small"
       pagination={false}
     />

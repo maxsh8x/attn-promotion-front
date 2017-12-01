@@ -323,7 +323,7 @@ const Page = types
     get store() {
       return getRoot(self);
     },
-    get inputData() {
+    get inputDataDay() {
       return [{
         ...self.inputsDay.toJSON(),
         id: self.id,
@@ -336,6 +336,30 @@ const Page = types
       if (!(isNaN(parsedValue))) {
         self.inputsDay.get(network)[type] = parsedValue;
       }
+    },
+    fetchPeriodInputs() {
+      axios().get('/v1/input', {
+        params: {
+          pageID: self.id,
+          startDate: self.store.metricsPeriodSelector.startDate,
+          endDate: self.store.metricsPeriodSelector.endDate,
+        },
+      }).then(
+        self.fetchPeriodInputsSuccess,
+        self.fetchPeriodInputsError,
+      );
+    },
+    fetchPeriodInputsSuccess({ data }) {
+      const networksInitState = getInitState(self.store.sources);
+      const flatInputPeriod = getFlatInputs(data, networksInitState);
+      self.inputsPeriod = mergeInputs(
+        flatInputPeriod,
+        networksInitState,
+        self.id,
+      );
+    },
+    fetchPeriodInputsError() {
+      message.error('Не удалось получить общее за период');
     },
     commitInput(network, type, value) {
       self.inputsDay.get(network)[type] = parseFloat(value, 10);
@@ -352,6 +376,7 @@ const Page = types
     },
     commitInputSuccess() {
       message.info('Изменения сохранены');
+      self.fetchPeriodInputs();
       self.commitInputState = 'done';
     },
     commitInputError() {
