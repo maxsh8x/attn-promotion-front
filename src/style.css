@@ -37,6 +37,14 @@
   width: 400px;
 }
 
+.dayCostPerClick {
+  color: #f78e3d;
+}
+
+.periodCostPerClick {
+  color: #948aec;
+}
+
 .rowWaited {
   background-color: #fffaeb;
 }

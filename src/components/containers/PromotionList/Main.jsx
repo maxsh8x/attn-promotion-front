@@ -18,7 +18,10 @@ class PromotionList extends Component {
 
   getTotal = (rowIndex, type) => {
     const page = this.props.promotionStore.pages[rowIndex];
-    return `${page.total.day[type]} / ${page.total.period[type]}`;
+    return [
+      <div className={style.dayCostPerClick}>{page.total.day[type]}</div>,
+      <div className={style.periodCostPerClick}>{page.total.period[type]}</div>,
+    ];
   }
 
   expandedRowRender = (row, rowIndex) => {
@@ -36,8 +39,16 @@ class PromotionList extends Component {
     const periodResult = (period && period.cost && period.clicks)
       ? (period.cost / period.clicks).toFixed(2)
       : 0;
-    return `${dayResult} / ${periodResult}`;
+    return [
+      <tr className={style.dayCostPerClick}>{dayResult}</tr>,
+      <tr className={style.periodCostPerClick}>{periodResult}</tr>,
+    ];
   }
+
+  renderLabels = () => [
+    <div className={style.dayCostPerClick}>День</div>,
+    <div className={style.periodCostPerClick}>Период</div>,
+  ]
 
   renderPageURL = (pageURL, { title, createdAt }) => {
     const content = (
@@ -100,6 +111,11 @@ class PromotionList extends Component {
         dataIndex: 'url',
         render: this.renderPageURL,
         width: 800,
+      },
+      {
+        key: 'labels',
+        render: this.renderLabels,
+        width: 80,
       },
       {
         title: 'Стоимость за клик',
