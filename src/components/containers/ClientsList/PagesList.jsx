@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import moment from 'moment';
-import { Table, Switch, Badge, Icon, Tabs, Button, Popconfirm } from 'antd';
+import { Table, Switch, Badge, Icon, Tabs, Button, Popconfirm, Tooltip } from 'antd';
 import style from '../../../style.css';
 import permissions from '../../../utils/permissions';
 import shallowCompare from '../../../utils/helper';
@@ -115,6 +115,12 @@ class PagesList extends Component {
                   />
                 ),
               },
+              {
+                key: 'inputCostPerClick',
+                title: 'Фактическая',
+                width: 110,
+                render: this.renderInputCostPerClick,
+              },
             ],
           },
           {
@@ -203,8 +209,15 @@ class PagesList extends Component {
     return style.rowDone;
   }
 
-  renderPeriodCost = (k, { viewsPeriod, costPerClick }) => viewsPeriod * costPerClick;
-  renderCampaignCost = (k, { views, costPerClick }) => views * costPerClick;
+  renderPeriodCost = (k, { viewsPeriod, costPerClick }) =>
+    (viewsPeriod * costPerClick).toFixed(2);
+  renderCampaignCost = (k, { views, costPerClick, inputCost }) => {
+    const campaignCost = (views * costPerClick).toFixed(2);
+    const diff = (campaignCost - inputCost).toFixed(2);
+    return <Tooltip title={`Прибыль: ${diff}`}>{campaignCost}</Tooltip>;
+  }
+  renderInputCostPerClick = (k, { inputCost, inputClicks }) =>
+    (inputCost / inputClicks).toFixed(2);
 
   renderActions = (value, { archiveID }, rowIndex) => {
     const page = this.props.client.pages[rowIndex];

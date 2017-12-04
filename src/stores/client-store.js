@@ -126,6 +126,8 @@ export const Page = types
     active: types.boolean,
     views: types.number,
     viewsPeriod: types.number,
+    inputCost: types.number,
+    inputClicks: types.number,
     archive: types.optional(types.array(ArchiveEntity), []),
     state: types.optional(types.enumeration(fetchStates), 'pending'),
     archiveState: types.optional(types.enumeration(fetchStates), 'pending'),
