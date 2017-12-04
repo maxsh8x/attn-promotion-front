@@ -443,8 +443,12 @@ export const ClientStore = types
       addDisposer(self, disposer2);
     },
     commitInput(id, field, value) {
+      let processedValue = value;
+      if (['counterID'].indexOf(field) !== -1) {
+        processedValue = parseInt(processedValue, 10);
+      }
       axios().patch(`/v1/client/${id}`, {
-        [field]: value,
+        [field]: processedValue,
       }).then(
         () => message.info('Данные сохранены'),
         () => message.error('Ошибка при сохранении'),

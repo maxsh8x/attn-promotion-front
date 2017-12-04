@@ -110,7 +110,13 @@ class ClientsList extends Component {
         key: 'counterID',
         dataIndex: 'counterID',
         title: 'ID счетчика',
-        width: 100,
+        width: 120,
+        render: (text, { id }) => (
+          <EditableCell
+            value={text}
+            onChange={value => commitInput(id, 'counterID', value)}
+          />
+        ),
       },
       {
         key: 'name',
