@@ -27,6 +27,7 @@ class YandexMetricsDay extends Component {
       metricsData,
       totalClickCost,
       updateMetrics,
+      removeMetrics,
       state,
       startDate,
       endDate,
@@ -55,6 +56,10 @@ class YandexMetricsDay extends Component {
           <Button onClick={updateMetrics}>
             <Icon type="reload" />
             Обновить из метрики
+          </Button>
+          <Button onClick={removeMetrics}>
+            <Icon type="delete" />
+            Удалить метрики
           </Button>
         </div>
       }

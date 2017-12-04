@@ -193,6 +193,28 @@ const MetricsWidgetDay = types
       message.error('Ошибка при обновлении метрик');
       self.state = 'error';
     },
+    removeMetrics() {
+      self.state = 'pending';
+      axios().delete('/v1/metrics', {
+        params: {
+          startDate: self.startDate,
+          endDate: self.endDate,
+          pageID: self.page.id,
+        },
+      }).then(
+        self.removeMetricsSucess,
+        self.removeMetricsError,
+      );
+    },
+    removeMetricsSucess() {
+      message.info('Данные метрик удалены');
+      self.fetchMetrics();
+      self.state = 'done';
+    },
+    removeMetricsError() {
+      message.error('Ошибка при удалении метрик');
+      self.state = 'error';
+    },
   }));
 
 const MetricsWidgetPeriod = types
